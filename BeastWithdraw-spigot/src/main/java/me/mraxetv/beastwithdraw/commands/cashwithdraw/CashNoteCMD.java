@@ -3,7 +3,6 @@ package me.mraxetv.beastwithdraw.commands.cashwithdraw;
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
 import me.mraxetv.beastwithdraw.commands.CommandModule;
 import me.mraxetv.beastwithdraw.utils.Utils;
-import me.mraxetv.beastwithdraw.utils.XpManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -23,11 +22,11 @@ public class CashNoteCMD extends CommandModule implements CommandExecutor {
     List<String> messagel;
 
     public CashNoteCMD(BeastWithdrawPlugin plugin) {
-        super(plugin,"BeastWithdraw.CashNote.Withdraw",1,2);
+        super(plugin, "BeastWithdraw.CashNote.Withdraw", 1, 2);
         pl = plugin;
 
         try {
-            pl.getAliases().setAliases("bWithdraw", pl.getWithdrawManager().getCashNoteConfig().getStringList("CashNote.Aliases"));
+            pl.getAliasesManager().setAliases("bWithdraw", pl.getWithdrawManager().getCashNoteConfig().getStringList("Settings.Aliases"));
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException | NoSuchFieldException e) {
             // TODO Auto-generated catch block
@@ -38,10 +37,10 @@ public class CashNoteCMD extends CommandModule implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
         if (!(sender instanceof Player)) {
-            Utils.sendMessage(sender,"%prefix% Console can't use this command! /BeastWithdraw help");
+            Utils.sendMessage(sender, "%prefix% Console can't use this command! /BeastWithdraw help");
             return true;
         }
-        run(sender,args);
+        run(sender, args);
         return true;
     }
 
@@ -57,8 +56,8 @@ public class CashNoteCMD extends CommandModule implements CommandExecutor {
             return;
         }
 
-        if(!hasEnoughArgs(args)) {
-            String s = pl.getMessages().getString("Withdraws.CashNote.Cash");
+        if (!hasEnoughArgs(args)) {
+            String s = pl.getMessages().getString("Withdraws.CashNote.Help");
             s = s.replaceAll("%balance%", "" + pl.getUtils().formatDouble(pl.getEcon().getBalance(p)));
             s = ChatColor.translateAlternateColorCodes('&', s);
             pl.getUtils().sendMessage(p, s);
@@ -72,18 +71,18 @@ public class CashNoteCMD extends CommandModule implements CommandExecutor {
             if (!Utils.isInt(args[1])) {
                 String s = pl.getMessages().getString("Withdraws.NoNumber");
                 s = s.replaceAll("%prefix%", Utils.getPrefix());
-                s = s.replaceAll("%value%", args[1]);
+                s = s.replaceAll("%amount%", args[1]);
                 pl.getUtils().sendMessage(sender, s);
                 return;
             }
-            amount = Integer.parseInt(args[1]);
+            amount = Math.abs(Integer.parseInt(args[1]));
         }
 
 
         if ((args.length >= 1)) {
             //Withdraw all
             if (args[0].equalsIgnoreCase("all")) {
-                if (!sender.hasPermission(permission+".All")) {
+                if (!sender.hasPermission(permission + ".All")) {
                     pl.getUtils().noPermission(p);
                     return;
                 }
@@ -92,7 +91,7 @@ public class CashNoteCMD extends CommandModule implements CommandExecutor {
             //Regular double check
             else if (!pl.getUtils().isDouble(args[0])) {
                 String s = pl.getMessages().getString("Withdraws.NoNumber");
-                s = s.replaceAll("%value%", args[0]);
+                s = s.replaceAll("%amount%", args[0]);
                 pl.getUtils().sendMessage(sender, s);
                 return;
             } else {
@@ -110,7 +109,7 @@ public class CashNoteCMD extends CommandModule implements CommandExecutor {
             //Check if cash is bigger then 0
             if ((takenCash <= 0)) {
                 message = pl.getMessages().getString("Withdraws.CashNote.Min");
-                message = message.replaceAll("%mincash%", "" + 1);
+                message = message.replaceAll("%min-amount%", "" + 1);
                 message = ChatColor.translateAlternateColorCodes('&', message);
                 pl.getUtils().sendMessage(p, message);
                 return;
@@ -118,77 +117,76 @@ public class CashNoteCMD extends CommandModule implements CommandExecutor {
             double minCash = 0;
             //Limit min and max amount of xp which can be withdrawn
             if (!sender.hasPermission("BeastWithdraw.CashNote.ByPass.WithdrawLimit")) {
-                minCash = pl.getWithdrawManager().getCashNoteConfig().getDouble("CashNote.Min");
-                if (pl.getWithdrawManager().getCashNoteConfig().getBoolean("CashNote.PermNotes.Enabled")) {
-                    for (String s : pl.getWithdrawManager().getCashNoteConfig().getConfigurationSection("CashNote.PermNotes").getKeys(false)) {
-                        if (sender.hasPermission("BeastWithdraw.CashNote.PermNotes." + s)) {
-                            minCash = pl.getWithdrawManager().getCashNoteConfig().getDouble("CashNote.PermNotes." + s + ".Min");
+                minCash = pl.getWithdrawManager().getCashNoteConfig().getDouble("Settings.Min");
+                if (pl.getWithdrawManager().getCashNoteConfig().getBoolean("Settings.PermissionNotes.Enabled")) {
+                    for (String s : pl.getWithdrawManager().getCashNoteConfig().getConfigurationSection("Settings.PermissionNotes").getKeys(false)) {
+                        if (sender.hasPermission("BeastWithdraw.CashNote.PermissionNotes." + s)) {
+                            minCash = pl.getWithdrawManager().getCashNoteConfig().getDouble("Settings.PermissionNotes." + s + ".Min");
                         }
                     }
 
                 }
                 if ((takenCash < minCash)) {
                     message = pl.getMessages().getString("Withdraws.CashNote.Min");
-                    message = message.replaceAll("%mincash%", pl.getUtils().formatDouble(pl.getConfig().getDouble("CashNote.Min")));
+                    message = message.replaceAll("%min-amount%", pl.getUtils().formatDouble(pl.getConfig().getDouble("Settings.Min")));
                     pl.getUtils().sendMessage(p, message);
                     return;
                 }
 
 
-                double maxCash = pl.getWithdrawManager().getCashNoteConfig().getDouble("CashNote.Max");
-                if (pl.getWithdrawManager().getCashNoteConfig().getBoolean("CashNote.PermNotes.Enabled")) {
-                    for (String s : pl.getWithdrawManager().getCashNoteConfig().getConfigurationSection("CashNote.PermNotes").getKeys(false)) {
-                        if (sender.hasPermission("BeastWithdraw.CashNote.PermNotes." + s)) {
-                            maxCash = pl.getWithdrawManager().getCashNoteConfig().getDouble("CashNote.PermNotes." + s + ".Max");
+                double maxCash = pl.getWithdrawManager().getCashNoteConfig().getDouble("Settings.Max");
+                if (pl.getWithdrawManager().getCashNoteConfig().getBoolean("Settings.PermissionNotes.Enabled")) {
+                    for (String s : pl.getWithdrawManager().getCashNoteConfig().getConfigurationSection("Settings.PermissionNotes").getKeys(false)) {
+                        if (sender.hasPermission("BeastWithdraw.CashNote.PermissionNotes." + s)) {
+                            maxCash = pl.getWithdrawManager().getCashNoteConfig().getDouble("Settings.PermissionNotes." + s + ".Max");
                         }
                     }
                 }
 
                 if ((takenCash > maxCash)) {
                     message = pl.getMessages().getString("Withdraws.CashNote.Max");
-                    message = message.replaceAll("%maxcash%", pl.getUtils().formatDouble(maxCash));
+                    message = message.replaceAll("%max-amount%", pl.getUtils().formatDouble(maxCash));
                     pl.getUtils().sendMessage(p, message);
                     return;
                 }
             }
             double balance = pl.getEcon().getBalance(p);
 
-            if ((balance < takenCash * amount)) {
+            if (!pl.getEcon().has(p, takenCash * amount)) {
                 message = pl.getMessages().getString("Withdraws.CashNote.NotEnough");
-                message = message.replaceAll("%balance%", ""+pl.getUtils().formatDouble(balance));
-                message = message.replaceAll("%takencash%", ""+pl.getUtils().formatDouble(takenCash*amount));;
+                message = message.replaceAll("%balance%", "" + pl.getUtils().formatDouble(balance));
+                message = message.replaceAll("%taken-amount%", "" + pl.getUtils().formatDouble(takenCash * amount));
                 pl.getUtils().sendMessage(p, message);
                 return;
             }
 
             //Charge Fee
             if (!p.isPermissionSet("BeastWithdraw.CashNote.ByPass.Fee")) {
-                if (pl.getWithdrawManager().getCashNoteConfig().getBoolean("CashNote.Charges.Fee.Enabled")) {
+                if (pl.getWithdrawManager().getCashNoteConfig().getBoolean("Settings.Charges.Fee.Enabled")) {
 
-                    double bal = pl.getEcon().getBalance(p);
 
                     //Money Fee
-                    double moneyFee = pl.getWithdrawManager().getCashNoteConfig().getDouble("CashNote.Charges.Fee.Cost");
+                    double moneyFee = pl.getWithdrawManager().getCashNoteConfig().getDouble("Settings.Charges.Fee.Cost");
                     //lower the amount for fee in case 'all' argument is used!!
-                    if(args[0].equalsIgnoreCase("all")) takenCash = takenCash-moneyFee;
+                    if (args[0].equalsIgnoreCase("all")) takenCash = takenCash - moneyFee;
 
-                    if (bal < takenCash*amount +moneyFee*amount) {
+                    if (!pl.getEcon().has(p, takenCash * amount + moneyFee * amount)) {
                         String s = pl.getMessages().getString("Withdraws.CashNote.Fee.NotEnough");
-                        s = s.replaceAll("%fee%", "" + pl.getUtils().formatDouble(moneyFee*amount));
+                        s = s.replaceAll("%fee%", "" + pl.getUtils().formatDouble(moneyFee * amount));
                         pl.getUtils().sendMessage(p, s);
                         return;
                     }
-                    pl.getEcon().withdrawPlayer(p, moneyFee*amount);
+                    pl.getEcon().withdrawPlayer(p, moneyFee * amount);
                     String s = pl.getMessages().getString("Withdraws.CashNote.Fee.TakenFee");
-                    s = s.replaceAll("%fee%", "" + pl.getUtils().formatDouble(moneyFee*amount));
+                    s = s.replaceAll("%fee%", "" + pl.getUtils().formatDouble(moneyFee * amount));
                     pl.getUtils().sendMessage(p, s);
                 }
             }
             double tax = 0;
             //Charge Tax
             if (!p.isPermissionSet("BeastWithdraw.CashNote.ByPass.Tax")) {
-                if (pl.getWithdrawManager().getCashNoteConfig().getBoolean("CashNote.Charges.Tax.Enabled")) {
-                    double percentage = pl.getWithdrawManager().getCashNoteConfig().getDouble("CashNote.Charges.Tax.Percentage");
+                if (pl.getWithdrawManager().getCashNoteConfig().getBoolean("Settings.Charges.Tax.Enabled")) {
+                    double percentage = pl.getWithdrawManager().getCashNoteConfig().getDouble("Settings.Charges.Tax.Percentage");
                     if (percentage > 100.0) percentage = 100.0;
                     tax = (takenCash * (percentage / 100));
                     String s = pl.getMessages().getString("Withdraws.CashNote.Tax.TakenTax");
@@ -196,11 +194,11 @@ public class CashNoteCMD extends CommandModule implements CommandExecutor {
                     pl.getUtils().sendMessage(p, s);
                 }
             }
-            pl.getEcon().withdrawPlayer(p, takenCash*amount);
+            pl.getEcon().withdrawPlayer(p, takenCash * amount);
 
 
             String s = pl.getMessages().getString("Withdraws.CashNote.Withdraw");
-            s = s.replaceAll("%takencash%", "" + pl.getUtils().formatDouble(takenCash*amount));
+            s = s.replaceAll("%taken-amount%", "" + pl.getUtils().formatDouble(takenCash * amount));
             s = s.replaceAll("%balance%", "" + Utils.formatDouble(pl.getEcon().getBalance(p)));
             Utils.sendMessage(p, s);
 
@@ -209,14 +207,15 @@ public class CashNoteCMD extends CommandModule implements CommandExecutor {
 
             ItemStack cashNote = pl.getItemManger().getCashNote(p.getName(), takenCash, amount, true);
             if (p.getInventory().firstEmpty() != -1) {
-                p.getInventory().addItem(cashNote);
+                //p.getInventory().addItem(cashNote);
+                Utils.addItem(p, cashNote);
             } else {
                 p.getWorld().dropItem(p.getLocation(), cashNote);
             }
 
-            if (pl.getWithdrawManager().getCashNoteConfig().getBoolean("CashNote.Sounds.Withdraw.Enabled")) {
+            if (pl.getWithdrawManager().getCashNoteConfig().getBoolean("Settings.Sounds.Withdraw.Enabled")) {
                 try {
-                    String sound = pl.getWithdrawManager().getCashNoteConfig().getString("CashNote.Sounds.Withdraw.Sound");
+                    String sound = pl.getWithdrawManager().getCashNoteConfig().getString("Settings.Sounds.Withdraw.Sound");
                     p.playSound(p.getLocation(), Sound.valueOf(sound), 1f, 1f);
 
                 } catch (Exception e) {

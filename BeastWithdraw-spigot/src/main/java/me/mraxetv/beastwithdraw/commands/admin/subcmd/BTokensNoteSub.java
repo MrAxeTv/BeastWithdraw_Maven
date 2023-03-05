@@ -2,6 +2,7 @@ package me.mraxetv.beastwithdraw.commands.admin.subcmd;
 
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
 import me.mraxetv.beastwithdraw.commands.CommandModule;
+import me.mraxetv.beastwithdraw.utils.BeastUtils;
 import me.mraxetv.beastwithdraw.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -10,14 +11,14 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public class CashNoteSub  extends CommandModule {
+public class BTokensNoteSub extends CommandModule {
     /**
      * @param pl
      * @param permission - The label of the command.
      * @param minArgs    - The minimum amount of arguments.
      * @param maxArgs    - The maximum amount of arguments.
      */
-    public CashNoteSub(BeastWithdrawPlugin pl, String permission, int minArgs, int maxArgs) {
+    public BTokensNoteSub(BeastWithdrawPlugin pl, String permission, int minArgs, int maxArgs) {
         super(pl, permission, minArgs, maxArgs);
     }
 
@@ -33,7 +34,7 @@ public class CashNoteSub  extends CommandModule {
         }
 
         if (!hasEnoughArgs(args)) {
-            String s = pl.getMessages().getString("Withdraws.Admin.CashNote.GiveCMD");
+            String s = pl.getMessages().getString("Withdraws.Admin.BeastTokensNote.GiveCMD");
             s = s.replaceAll("%prefix%", Utils.getPrefix());
             pl.getUtils().sendMessage(sender, s);
             return;
@@ -74,26 +75,27 @@ public class CashNoteSub  extends CommandModule {
 
 
         Player target = Bukkit.getPlayer(args[1]);
-        double cash = Double.parseDouble(args[2]);
+        double bTokens = Double.parseDouble(args[2]);
 
-        ItemStack cashNote = pl.getItemManger().getCashNote(signer, cash, amount, signet);
+        ItemStack btokensNote = pl.getItemManger().getBTokensNote(signer, bTokens, amount, signet);
 
         //Add to inventory
         if (target.getInventory().firstEmpty() != -1) {
-            Utils.addItem(target,cashNote);
+            Utils.addItem(target,btokensNote);
+            //target.getInventory().addItem(btokensNote);
         }
         //Drop to floor
         else {
-            target.getWorld().dropItem(target.getLocation(), cashNote);
+            target.getWorld().dropItem(target.getLocation(), btokensNote);
         }
 
 
-        String message = pl.getMessages().getString("Withdraws.CashNote.RewardReceived");
-        message = message.replaceAll("%received-amount%", "" + pl.getUtils().formatDouble(cash)).replaceAll("%note-amount%", Utils.setAmount(amount));
+        String message = pl.getMessages().getString("Withdraws.BeastTokensNote.RewardReceived");
+        message = message.replaceAll("%received-amount%", "" + pl.getUtils().formatDouble(bTokens)).replaceAll("%note-amount%", Utils.setAmount(amount));
         pl.getUtils().sendMessage(target, message);
 
-        message = pl.getMessages().getString("Withdraws.Admin.CashNote.Given");
-        message = message.replaceAll("%received-amount%", "" + pl.getUtils().formatDouble(cash)).replaceAll("%note-amount%", Utils.setAmount(amount)).replaceAll("%player%",target.getName());
+        message = pl.getMessages().getString("Withdraws.Admin.BeastTokensNote.Given");
+        message = message.replaceAll("%received-amount%", "" + pl.getUtils().formatDouble(bTokens)).replaceAll("%note-amount%", Utils.setAmount(amount)).replaceAll("%player%",target.getName());
         pl.getUtils().sendMessage(sender, message);
         return;
 

@@ -8,6 +8,8 @@ Help:
   - "&e/BeastWithdraw giveXpBottleAll <xp> <amount> <enchanter> &e- &7Give an XP-Bottle to all players online. (<amount> and <enchanter> are optional!)"
   - "&e/BeastWithdraw giveCashNote <player> <cash> <amount> <signer> &e- &7Give an Cash-Note to a player. (<amount> and <signer> are optional!)"
   - "&e/BeastWithdraw giveCashNoteAll <cash> <amount> <signer> &e- &7Give an Cash-Note to all player online. (<amount> and <signer> are optional!)"
+  - "&e/BeastWithdraw giveTokenNote <player> <tokens> <amount> <signer> &e- &7Give an BeastTokens-Note to a player. (<amount> and <signer> are optional!)"
+  - "&e/BeastWithdraw giveTokenNoteAll <token> <amount> <signer> &e- &7Give an BeastTokens-Note to all player online. (<amount> and <signer> are optional!)"
   - "&e/BeastWithdraw reload &e- &7To reload the plugin!"
   - "&e/BeastWithdraw version &e- &7To check version!"
   - "&e/BeastWithdraw help &e- &7For this menu!"
@@ -15,50 +17,71 @@ Help:
 
 Withdraws:
   XpBottle:
-    NotEnough: "%prefix% &cYou don't have %takenxp%XP!&e(XpBalance: %xp%XP)"
-    Xpb: "%prefix% &2You have %xp%XP &e(Use /xpBottle <amount>)"
-    Withdraw: "&c-%takenxp%XP &e(XpBalance: %xp%XP)"
-    Redeem: "&a+%receivedxp%XP &e(XpBalance: %xp%XP)"
-    Min: "%prefix% &cYou must withdraw at last %minxp%XP per bottle."
-    Max: "%prefix% &cYou can only withdraw a maximum of %maxxp%XP!"
-    RewardReceived: "%prefix% &eYou have received an XP-Bottle with %xp%XP! %amount%"
+    NotEnough: "%prefix% &cYou don't have %taken-amount%XP!&e(XpBalance: %balance%XP)"
+    Help: "%prefix% &2You have %balance%XP &e(Use /xpBottle <xp>/<all>/<xp>L <note-amount>)"
+    Withdraw: "&c-%taken-amount%XP &e(XpBalance: %balance%XP)"
+    Redeem: "&a+%received-amount%XP &e(XpBalance: %balance%XP)"
+    Min: "%prefix% &cYou must withdraw at last %min-amount%XP per bottle."
+    Max: "%prefix% &cYou can only withdraw a maximum of %max-amount%XP!"
+    NotEnoughLevels: "%prefix% &cYou don't have %amount% XP levels!"
+    RewardReceived: "%prefix% &eYou have received an XP-Bottle with %received-amount%XP! %note-amount%"
     Tax:
       TakenTax: "%prefix% &eYou payed %tax%XP tax for this transaction!"
   CashNote:
-    NotEnough: "%prefix% &cYou don't have $%takencash%! &e(Current: $%balance%)"
-    Cash: "%prefix% &2You have $%balance% &e(Use /withdraw <amount>)"
-    Withdraw: "&c-$%takencash% &e(Balance: $%balance%)"
-    Redeem: "&a+$%receivedcash% &e(Balance: $%balance%)"
-    Min: "%prefix% &cYou must withdraw at least $%mincash%!."
-    Max: "%prefix% &cYou can withdraw a maximum of $%maxcash%!"
-    CashGiven: "%prefix% &b%player% has received $%cash%!"
-    RewardReceived: "%prefix% &bYou have received a cash note worth $%cash%! %amount%"
+    NotEnough: "%prefix% &cYou don't have $%taken-amount%! &e(Current: $%balance%)"
+    Help: "%prefix% &2You have $%balance% &e(Use /withdraw <money>/<all> <note-amount>)"
+    Withdraw: "&c-$%taken-amount% &e(Balance: $%balance%)"
+    Redeem: "&a+$%received-amount% &e(Balance: $%balance%)"
+    Min: "%prefix% &cYou must withdraw at least $%min-amount%!."
+    Max: "%prefix% &cYou can withdraw a maximum of $%max-amount%!"
+    RewardReceived: "%prefix% &bYou have received a cash note worth $%received-amount%! %note-amount%"
     GiveAll: "%prefix% &bAll players have received a cash note!"
     Tax:
       TakenTax: "%prefix% &eYou payed $%tax% tax for this transaction!"
     Fee:
       NotEnough: "%prefix% &cYou need $%fee% to pay fee for this transaction!"
       TakenFee: "%prefix% &eYou payed $%fee% fee for this transaction!"
+  BeastTokensNote:
+    NotEnough: "%prefix% &cYou don't have %taken-amount% Tokens! &e(Current: $%balance%)"
+    Help: "%prefix% &2You have %balance% Tokens &e(Use /btwithdraw <tokens>/<all> <note-amount>)"
+    Withdraw: "&c-%taken-amount% &e(Balance: %balance% Tokens)"
+    Redeem: "&a+%received-amount% &e(Balance: %balance% Tokens)"
+    Min: "%prefix% &cYou must withdraw at least %min-amount% Tokens!."
+    Max: "%prefix% &cYou can withdraw a maximum of %max-amount% Tokens!"
+    RewardReceived: "%prefix% &bYou have received a token note worth %received-amount% Tokens! %note-amount%"
+    GiveAll: "%prefix% &bAll players have received a token note!"
+    Tax:
+      TakenTax: "%prefix% &eYou payed $%tax% tax for this transaction!"
+    Fee:
+      NotEnough: "%prefix% &cYou need %fee% Tokens to pay fee for this transaction!"
+      TakenFee: "%prefix% &eYou payed %fee% Tokens fee for this transaction!"
   Admin:
     XpBottle:
      GiveCMD: "%prefix% &cUse /BeastWithdraw giveXpb <player> <xp> <bottle-amount>"
      GiveAllCMD: "%prefix% &cUse /BeastWithdraw giveXpbAll <xp> <bottle-amount>"
-     Given: "%prefix% &b%player% has received %xp%XP! %amount%"
-     GivenToAll: "%prefix% &bAll players have received an %xp%XP! %amount%"
+     Given: "%prefix% &b%player% has received %received-amount%XP! %note-amount%"
+     GivenToAll: "%prefix% &bAll players have received an %received-amount%XP! %note-amount%"
     CashNote:
      GiveCMD: "%prefix% &cUse /BeastWithdraw giveCashNote <player> <cash> <note-amount>"
      GiveAllCMD: "%prefix% &cUse /BeastWithdraw giveCashNoteAll <cash> <note-amount>"
-     Given: "%prefix% &b%player% has received $%cash%! %amount%"
-     GivenToAll: "%prefix% &bAll players have received an $%cash%! %amount%"
+     Given: "%prefix% &b%player% has received $%received-amount%! %note-amount%"
+     GivenToAll: "%prefix% &bAll players have received an $%received-amount%! %note-amount%"
+    BeastTokensNote:
+      GiveCMD: "%prefix% &cUse /BeastWithdraw giveTokenNote <player> <tokens> <note-amount>"
+      GiveAllCMD: "%prefix% &cUse /BeastWithdraw giveTokenNoteAll <tokens> <note-amount>"
+      Given: "%prefix% &b%player% has received %received-amount% Tokens! %note-amount%"
+      GivenToAll: "%prefix% &bAll players have received an %received-amount% Tokens! %note-amount%"
+
   FullInventory: "%prefix% &cError: Your Inventory is full!"
   CantFind: "%prefix% &cCan't find %player%!"
   NoPermission: "%prefix% &4You don't have permission to do that."
-  NoNumber: "%prefix% &4%value% is not a number!"
+  NoNumber: "%prefix% &4%amount% is not a number!"
+  ToBigNumber: "%prefix% &4%amount% is to big number!"
   NotOnline: "%prefix% &c%player% is not online!"
   CancelCrafting: "%prefix% &4Withdraw items can't be used in crafting recipe!"
   CancelVillagerTrade: "%prefix% &4Withdraw items can't be used for trading with villagers!"
   CancelGrindStone: "%prefix% &4Withdraw items can't be used in Grind Stone!"
 PlaceHolders:
-    AmountFormat: "&3(x%value%)"
+    AmountFormat: "&3(x%amount%)"
 
-ConfigVersion: 2.6
+ConfigVersion: 2.8

@@ -3,8 +3,10 @@ package me.mraxetv.beastwithdraw;
 
 import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion;
 import me.mraxetv.beastwithdraw.commands.cashwithdraw.CashNoteCMD;
+import me.mraxetv.beastwithdraw.commands.tokenwithdraw.BeastTokenNoteCMD;
 import me.mraxetv.beastwithdraw.filemanager.FileYml;
-import me.mraxetv.beastwithdraw.listener.CancelCrafting;
+import me.mraxetv.beastwithdraw.listener.BTokensNoteRedeemListener;
+import me.mraxetv.beastwithdraw.listener.CancelCraftingListener;
 import me.mraxetv.beastwithdraw.utils.*;
 import net.milkbowl.vault.economy.Economy;
 import org.bstats.bukkit.Metrics;
@@ -20,8 +22,8 @@ import me.mraxetv.beastwithdraw.Items.ItemManager;
 import me.mraxetv.beastwithdraw.commands.AliasesRegistration;
 import me.mraxetv.beastwithdraw.commands.admin.BeastWithdrawCMD;
 import me.mraxetv.beastwithdraw.commands.xpbottle.XpBottleCMD;
-import me.mraxetv.beastwithdraw.listener.CashNoteRedeem;
-import me.mraxetv.beastwithdraw.listener.XpBottleRedeem;
+import me.mraxetv.beastwithdraw.listener.CashNoteRedeemListener;
+import me.mraxetv.beastwithdraw.listener.XpBottleRedeemListener;
 
 public class BeastWithdrawPlugin extends JavaPlugin {
 
@@ -40,6 +42,7 @@ public class BeastWithdrawPlugin extends JavaPlugin {
         MinecraftVersion.disableBStats();
         MinecraftVersion.disablePackageWarning();
 
+        instance = this;
         setupEconomy();
         registerConfigs();
         configUtils = new ConfigUtils(this);
@@ -49,7 +52,7 @@ public class BeastWithdrawPlugin extends JavaPlugin {
         aliases = new AliasesRegistration(this);
         registerCommands();
         registerEvents();
-        instance = this;
+
 
         new BeastUtils(this, "13896").getBVersion(version -> {
             if (getDescription().getVersion().equalsIgnoreCase(version)) {
@@ -58,6 +61,9 @@ public class BeastWithdrawPlugin extends JavaPlugin {
                 Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&4Beast&bWithdraw&7] &4There is a new update available."));
             }
         });
+
+        //new ExtensionManager(this);
+
         int pluginId = 9409; // <-- Replace with the id of your plugin!
         Metrics metrics = new Metrics(this, pluginId);
         Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&4Beast&bWithdraw&7] &2Version " + getDescription().getVersion() + " : has been enabled!"));
@@ -75,8 +81,6 @@ public class BeastWithdrawPlugin extends JavaPlugin {
 
 
     public void registerConfigs() {
-        //ymlConfig = new YmlConfig(this,"config.yml");
-        //ymlConfig.saveDeafultConfig();
         fileYml = new FileYml(this, "config.yml");
         messages = new YmlFile(this, "messages.yml");
         messages.saveDeafultConfig();
@@ -84,27 +88,37 @@ public class BeastWithdrawPlugin extends JavaPlugin {
 
     public void registerCommands() {
 
-        if (getConfig().getBoolean("Settings.Withdraws.XpBottle.Enabled"))
-            getCommand("XpBottle").setExecutor(new XpBottleCMD(this));
-
         getCommand("BeastWithdraw").setExecutor(new BeastWithdrawCMD(this));
+
+        if (getConfig().getBoolean("Settings.Withdraws.XpBottle.Enabled")) {
+            getCommand("XpBottle").setExecutor(new XpBottleCMD(this));
+        }
         if (getConfig().getBoolean("Settings.Withdraws.CashNote.Enabled")) {
             if ((getServer().getPluginManager().isPluginEnabled("Vault"))) {
                 getCommand("bWithdraw").setExecutor(new CashNoteCMD(this));
-            }else{
-				Utils.sendMessage(getServer().getConsoleSender(), Utils.getPrefix()+" Server is missing 'Vault' plugin which you need for economy(money) to work!");
-			}
+            } else {
+                getServer().getConsoleSender().sendMessage( "["+getDescription().getPrefix()+ "] Server is missing 'Vault' plugin which you need for economy(money) to work!");
+            }
         }
+        if (getConfig().getBoolean("Settings.Withdraws.BeastTokensNote.Enabled")) {
+            if ((getServer().getPluginManager().isPluginEnabled("BeastTokens"))) {
+                getCommand("btWithdraw").setExecutor(new BeastTokenNoteCMD(this));
+            } else {
+                utils.sendMessage( getServer().getConsoleSender(),"&4["+getDescription().getName()+ "] &cServer is missing 'BeastTokens' plugin which you need for 'Tokens Note' to work!");
+            }
+        }
+        getAliasesManager().syncCommands();
     }
 
 
     public void registerEvents() {
         PluginManager pm = getServer().getPluginManager();
         if ((getServer().getPluginManager().isPluginEnabled("Vault"))) {
-            pm.registerEvents(new CashNoteRedeem(this), this);
+            pm.registerEvents(new CashNoteRedeemListener(this), this);
         }
-        new XpBottleRedeem(this);
-        new CancelCrafting(this);
+        if (getConfig().getBoolean("Settings.Withdraws.BeastTokensNote.Enabled")) new BTokensNoteRedeemListener(this);
+        if (getConfig().getBoolean("Settings.Withdraws.XpBottle.Enabled")) new XpBottleRedeemListener(this);
+        if (getConfig().getBoolean("Settings.Withdraws.CashNote.Enabled")) new CancelCraftingListener(this);
     }
 
 
@@ -116,7 +130,7 @@ public class BeastWithdrawPlugin extends JavaPlugin {
         return messages.getConfig();
     }
 
-    public AliasesRegistration getAliases() {
+    public AliasesRegistration getAliasesManager() {
         return aliases;
     }
 

@@ -3,20 +3,20 @@
 ##Notic all values of withdraw amount are stored as NBT data on items so make sure other plugins for storing items have support for storing NBT data.
 ##--------------------------------------------------------------------------------------------------------##
 ##Expiriance bottle xp storing.
-XpBottle:
+Settings:
     ##Set up your item display name & lores how do you like.
     ##This is part of configuration for item which player will get when they withdraw there xp /Xpbottle <xp>.
     Player:
       Name: "&a&lExperience-Bottle &7(Throw)"
       Lore:
-        - "&dValue:&r %value% XP"
+        - "&dValue:&r %amount% XP"
         - "&dEnchanter:&r %player%"
 
     ##This is part of configuration for item withdraw by staff or console /Xpbottle <xp> <player> <bottle-amount>.
     Server:
       Name: "&a&lExperience-Bottle &7(Throw)"
       Lore:
-        - "&dValue:&r %value% XP"
+        - "&dValue:&r %amount% XP"
         - "&dEnchanter:&r Thinkerer"
     CustomModel:
       #Custm model data is supported on 1.14+ versions
@@ -38,11 +38,11 @@ XpBottle:
     Max: 10000
 
     ##Min and Max amount per permissions.
-    ##Permission should be BeastWithdraw.PermNotes.<name_of_perm>
-    ##Here is one example: if player has "BeastWithdraw.PermNotes.Tomato" permission there max amount which they will be able to withdraw min 20 and max 50000.
+    ##Permission should be BeastWithdraw.XpBottle.PermissionNotes.<name_of_perm>
+    ##Here is one example: if player has "BeastWithdraw.XpBottle.PermissionNotes.Tomato" permission there max amount which they will be able to withdraw min 20 and max 50000.
     ##You can rename this permissions settings and add new ones how you like.
-    ##If PermNotes are enabled they will override default min and max setting if player has any of permissions for this groups.
-    PermNotes:
+    ##If PermissionNotes are enabled they will override default min and max setting if player has any of permissions for this groups.
+    PermissionNotes:
       Enabled: false
       Tomato:
         Min: 20
@@ -87,4 +87,4 @@ XpBottle:
     ##By setting this option to true xp from bottle will be automatically given to player it won't be dropped on floor.
     AutoCollect: true
 ##--------------------------------------------------------------------------------------------------------##
-ConfigVersion: 1.0
+ConfigVersion: 1.1

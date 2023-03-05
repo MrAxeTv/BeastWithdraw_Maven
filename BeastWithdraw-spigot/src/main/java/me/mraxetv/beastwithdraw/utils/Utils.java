@@ -60,7 +60,7 @@ implements Listener {
 	public static String setAmount(int amount){
 
 		if (amount == 1) return "";
-		return ConfigUtils.AMOUNT.replaceAll("%value%",""+amount);
+		return ConfigUtils.AMOUNT.replaceAll("%amount%",""+amount);
 	}
 
 	public static void sendMessage(CommandSender sender , String message){
@@ -108,16 +108,14 @@ implements Listener {
 	public static String setPlaceholders(Player p, String s) {
 		s = s.replaceAll("%prefix%", getPrefix());
 		s = s.replaceAll("%player%", p.getName());
-		s = s.replaceAll("%xp%", formatNumber(XpManager.getTotalExperience(p)));
+		//s = s.replaceAll("%balance%", formatNumber(XpManager.getTotalExperience(p)));
 		s = setColor(s);
 		return s;
 	}
 
 
-
-
 	public void noPermission(Player p) {
-		p.sendMessage(getPrefix() + ChatColor.translateAlternateColorCodes('&', pl.getMessages().getString("Withdraws.NoPermission")));
+		sendMessage(p,pl.getMessages().getString("Withdraws.NoPermission"));
 	}
     public static String formatDouble(double number) {
         return NumberFormat.getInstance(Locale.ENGLISH).format(number);
@@ -125,5 +123,33 @@ implements Listener {
     public static String formatNumber(int number) {
         return NumberFormat.getInstance(Locale.ENGLISH).format(number);
     }
+
+
+	public static void addItem(Player p, ItemStack item){
+
+		if(item.getAmount() < 65){
+
+			p.getInventory().addItem(item);
+			return;
+		}
+		int stacks = item.getAmount()/64;
+		int leftovers = item.getAmount()%64;
+
+		item.setAmount(64);
+		for(int i = 0; i < stacks; i++){
+			if(p.getInventory().firstEmpty() != -1){
+				p.getInventory().addItem(item);
+			}
+			else{p.getLocation().getWorld().dropItemNaturally(p.getLocation(),item);}
+		}
+		//Give leftovers of item stack!
+		item.setAmount(leftovers);
+		if(p.getInventory().firstEmpty() != -1){
+			p.getInventory().addItem(item);
+		}
+		else{p.getLocation().getWorld().dropItemNaturally(p.getLocation(),item);}
+
+	}
+
 }
 

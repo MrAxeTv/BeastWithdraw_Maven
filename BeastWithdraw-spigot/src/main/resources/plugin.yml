@@ -18,3 +18,6 @@ commands:
   bWithdraw:
     usage: /<command>
     description: Withdraw Money.
+  btWithdraw:
+    usage: /<command>
+    description: Withdraw Money.

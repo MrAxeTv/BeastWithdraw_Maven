@@ -22,25 +22,26 @@ import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
 import net.milkbowl.vault.economy.Economy;
 
 
-public class CashNoteRedeem implements Listener {
+public class CashNoteRedeemListener implements Listener {
     private BeastWithdrawPlugin pl;
     private Material material;
 
-    public CashNoteRedeem(BeastWithdrawPlugin plugin) {
+    public CashNoteRedeemListener(BeastWithdrawPlugin plugin) {
         pl = plugin;
-        material = Material.getMaterial(pl.getWithdrawManager().getCashNoteConfig().getString("CashNote.Item"));
+        material = Material.getMaterial(pl.getWithdrawManager().getCashNoteConfig().getString("Settings.Item"));
     }
 
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void mainHand(PlayerInteractEvent e) {
 
-        if (!e.hasItem()) return;
+        if ((!e.hasItem()) ) return;
+        if (e.getItem().getType() == Material.AIR) return;
         if (!e.getItem().hasItemMeta()) return;
         if (e.getAction() != Action.RIGHT_CLICK_AIR && e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-        if (e.getItem().getType() != material) return;
+        //if (e.getItem().getType() != material) return;
         NBTItem nbtItem = new NBTItem(e.getItem());
-        if (!nbtItem.hasKey(pl.getWithdrawManager().getCashNoteConfig().getString("CashNote.NBTLore"))) return;
+        if (!nbtItem.hasKey(pl.getWithdrawManager().getCashNoteConfig().getString("Settings.NBTLore"))) return;
 
         //Cancel dupe event on block click
         if (e.isCancelled() && e.getAction() == Action.RIGHT_CLICK_BLOCK) {
@@ -58,7 +59,7 @@ public class CashNoteRedeem implements Listener {
             }
         }
         pl.getServer().getPluginManager().
-                callEvent(new CashRedeemEvent(e.getPlayer(), e.getItem(), nbtItem.getDouble(pl.getWithdrawManager().getCashNoteConfig().getString("CashNote.NBTLore")), offHand));
+                callEvent(new CashRedeemEvent(e.getPlayer(), e.getItem(), nbtItem.getDouble(pl.getWithdrawManager().getCashNoteConfig().getString("Settings.NBTLore")), offHand));
         return;
 
     }
@@ -72,14 +73,14 @@ public class CashNoteRedeem implements Listener {
         double cash = e.getCash();
         pl.getEcon().depositPlayer(p, cash);
         String msg = pl.getMessages().getString("Withdraws.CashNote.Redeem");
-        msg = msg.replaceAll("%receivedcash%", "" + pl.getUtils().formatDouble(cash));
+        msg = msg.replaceAll("%received-amount%", "" + pl.getUtils().formatDouble(cash));
         msg = msg.replaceAll("%balance%", "" + pl.getUtils().formatDouble(pl.getEcon().getBalance(e.getPlayer())));
 
         pl.getUtils().sendMessage(p,msg);
 
-        if (pl.getWithdrawManager().getCashNoteConfig().getBoolean("CashNote.Sounds.Redeem.Enabled")) {
+        if (pl.getWithdrawManager().getCashNoteConfig().getBoolean("Settings.Sounds.Redeem.Enabled")) {
             try {
-                String sound = pl.getWithdrawManager().getCashNoteConfig().getString("CashNote.Sounds.Redeem.Sound");
+                String sound = pl.getWithdrawManager().getCashNoteConfig().getString("Settings.Sounds.Redeem.Sound");
                 e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.valueOf(sound), 1f, 1f);
 
             } catch (Exception e1) {

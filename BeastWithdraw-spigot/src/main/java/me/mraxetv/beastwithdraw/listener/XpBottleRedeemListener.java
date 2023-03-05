@@ -20,32 +20,31 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
-import me.mraxetv.beastwithdraw.utils.Version;
 
 
-
-public class XpBottleRedeem implements Listener {
+public class XpBottleRedeemListener implements Listener {
 	private BeastWithdrawPlugin pl;
 	private Material material;
 	
 
-	public XpBottleRedeem(BeastWithdrawPlugin plugin) {
+	public XpBottleRedeemListener(BeastWithdrawPlugin plugin) {
 		pl = plugin;
 		pl.getServer().getPluginManager().registerEvents(this, pl);
 		material = (MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_13_R1) ? Material.EXPERIENCE_BOTTLE : Material.valueOf("EXP_BOTTLE"));
 	}
+
 	
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void mainHand(PlayerInteractEvent e) {
-
-
 		if (!e.hasItem()) return;
+		if (e.getItem().getType() == Material.AIR) return;
 		if (!e.getItem().hasItemMeta()) return;
 		if (e.getAction() != Action.RIGHT_CLICK_AIR && e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-		if(e.getItem().getType() != material) return;
+		//if(e.getItem().getType() != material) return;
 		NBTItem nbtItem = new NBTItem(e.getItem());
-		if(!nbtItem.hasKey(pl.getWithdrawManager().getXpBottleConfig().getString("XpBottle.NBTLore"))) return;
+		if(!nbtItem.hasKey(pl.getWithdrawManager().getXpBottleConfig().getString("Settings.NBTLore"))) return;
 
+		Player p = e.getPlayer();
 		//Cancel dupe event on block click
 		if(e.isCancelled() && e.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			e.setCancelled(true);
@@ -62,9 +61,8 @@ public class XpBottleRedeem implements Listener {
 			}
 		}
 
-
 		pl.getServer().getPluginManager().
-				callEvent(new BottleRedeemEvent(e.getPlayer(),e.getItem(),nbtItem.getInteger(pl.getWithdrawManager().getXpBottleConfig().getString("XpBottle.NBTLore")),offHand));
+				callEvent(new BottleRedeemEvent(e.getPlayer(),e.getItem(),nbtItem.getInteger(pl.getWithdrawManager().getXpBottleConfig().getString("Settings.NBTLore")),offHand));
 		 return;
 
 		
@@ -72,21 +70,20 @@ public class XpBottleRedeem implements Listener {
 
 	@EventHandler
 	public void redeemEvent(BottleRedeemEvent e){
-
-        if(e.isCancelled()) return;
-
 		Player p = e.getPlayer();
 
-			if(pl.getWithdrawManager().getXpBottleConfig().getBoolean("XpBottle.AutoCollect")) {
+		if(e.isCancelled()) return;
 
-				int xp  = XpManager.getTotalExperience(p);
-				int receivedXp = e.getExp();
+		if(pl.getWithdrawManager().getXpBottleConfig().getBoolean("Settings.AutoCollect")) {
 
-				XpManager.setTotalExperience(p,xp+receivedXp);
+			int xp  = XpManager.getTotalExperience(p);
+			int receivedXp = e.getExp();
+
+			XpManager.setTotalExperience(p,xp+receivedXp);
 
 				String s = pl.getMessages().getString("Withdraws.XpBottle.Redeem");
-				s = s.replaceAll("%receivedxp%", ""+pl.getUtils().formatNumber(receivedXp));
-				s = s.replaceAll("%xp%", ""+pl.getUtils().formatNumber(XpManager.getTotalExperience(p)));
+				s = s.replaceAll("%received-amount%", ""+pl.getUtils().formatNumber(receivedXp));
+				s = s.replaceAll("%balance%", ""+pl.getUtils().formatNumber(XpManager.getTotalExperience(p)));
 				pl.getUtils().sendMessage(p,s);
 			}
 			else {
@@ -94,9 +91,9 @@ public class XpBottleRedeem implements Listener {
 				t.setCustomName("XPB:"+e.getExp());
 
 			}
-			if(pl.getWithdrawManager().getXpBottleConfig().getBoolean("XpBottle.Sounds.Redeem.Enabled")) {
+			if(pl.getWithdrawManager().getXpBottleConfig().getBoolean("Settings.Sounds.Redeem.Enabled")) {
 				try {
-					String sound = pl.getWithdrawManager().getXpBottleConfig().getString("XpBottle.Sounds.Redeem.Sound");
+					String sound = pl.getWithdrawManager().getXpBottleConfig().getString("Settings.Sounds.Redeem.Sound");
 					p.playSound(p.getLocation(), Sound.valueOf(sound), 1f, 1f);
 
 				} catch (Exception e1) {
@@ -131,13 +128,13 @@ public class XpBottleRedeem implements Listener {
 
    @EventHandler
 	public void PlayerDeath(PlayerDeathEvent e) {
-		if (!pl.getWithdrawManager().getXpBottleConfig().getBoolean("XpBottle.DropOnDeath")) return;
+		if (!pl.getWithdrawManager().getXpBottleConfig().getBoolean("Settings.DropOnDeath")) return;
 		Player p = e.getEntity();
 		
 		if(!p.hasPermission("BeastWithdraw.XpBottle.Drop"))return;
 		int xp = XpManager.getTotalExperience(p);
 		if(xp <= 0) return;
-		double dropPercentage = pl.getWithdrawManager().getXpBottleConfig().getDouble("XpBottle.DropPercentage")/100;
+		double dropPercentage = pl.getWithdrawManager().getXpBottleConfig().getDouble("Settings.DropPercentage")/100;
 		xp = (int) (xp * dropPercentage);
 
 		ItemStack Xpb = pl.getItemManger().getXpb(p.getName(), xp, 1, true);

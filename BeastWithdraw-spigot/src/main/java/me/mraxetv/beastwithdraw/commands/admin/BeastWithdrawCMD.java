@@ -1,9 +1,6 @@
 package me.mraxetv.beastwithdraw.commands.admin;
 
-import me.mraxetv.beastwithdraw.commands.admin.subcmd.CashNoteGiveAllSub;
-import me.mraxetv.beastwithdraw.commands.admin.subcmd.CashNoteSub;
-import me.mraxetv.beastwithdraw.commands.admin.subcmd.XpBottleGiveAllSub;
-import me.mraxetv.beastwithdraw.commands.admin.subcmd.XpBottleGiveSub;
+import me.mraxetv.beastwithdraw.commands.admin.subcmd.*;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -22,6 +19,9 @@ public class BeastWithdrawCMD implements CommandExecutor {
     private CashNoteSub cashNoteSub;
     private CashNoteGiveAllSub cashNoteAllSub;
 
+    private BTokensNoteSub bTokensNoteSub;
+    private BTokensNoteAllSub bTokensNoteAllSub;
+
     public BeastWithdrawCMD(BeastWithdrawPlugin plugin) {
         pl = plugin;
         xpBottleGiveSub = new XpBottleGiveSub(pl, "BeastWithdraw.admin", 3, 5);
@@ -29,6 +29,9 @@ public class BeastWithdrawCMD implements CommandExecutor {
 
         cashNoteSub = new CashNoteSub(pl, "BeastWithdraw.admin", 3, 5);
         cashNoteAllSub = new CashNoteGiveAllSub(pl, "BeastWithdraw.admin", 2, 4);
+
+        bTokensNoteSub = new BTokensNoteSub(pl, "BeastWithdraw.admin", 3, 5);
+        bTokensNoteAllSub = new BTokensNoteAllSub(pl, "BeastWithdraw.admin", 2, 4);
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -61,6 +64,12 @@ public class BeastWithdrawCMD implements CommandExecutor {
                     break;
                 case "givecsall":
                     cashNoteAllSub.run(sender, args);
+                    break;
+                case "givetokennote":
+                    bTokensNoteSub.run(sender, args);
+                    break;
+                case "givetokennoteall":
+                    bTokensNoteAllSub.run(sender, args);
                     break;
                 case "version":
                     pl.getUtils().sendMessage(sender, "&6========[&4Beast&bWithdraw&6]========");

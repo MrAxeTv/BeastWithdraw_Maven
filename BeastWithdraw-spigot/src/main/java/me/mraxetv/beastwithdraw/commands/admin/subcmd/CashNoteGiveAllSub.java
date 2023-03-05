@@ -41,7 +41,7 @@ public class CashNoteGiveAllSub extends CommandModule {
         if (!Utils.isDouble(args[1])) {
             String s = pl.getMessages().getString("Withdraws.NoNumber");
             s = s.replaceAll("%prefix%", Utils.getPrefix());
-            s = s.replaceAll("%value%", args[1]);
+            s = s.replaceAll("%amount%", args[1]);
             pl.getUtils().sendMessage(sender, s);
             return;
         }
@@ -51,7 +51,7 @@ public class CashNoteGiveAllSub extends CommandModule {
             if (!Utils.isInt(args[2])) {
                 String s = pl.getMessages().getString("Withdraws.NoNumber");
                 s = s.replaceAll("%prefix%", Utils.getPrefix());
-                s = s.replaceAll("%value%", args[2]);
+                s = s.replaceAll("%amount%", args[2]);
                 pl.getUtils().sendMessage(sender, s);
                 return;
             }
@@ -74,7 +74,7 @@ public class CashNoteGiveAllSub extends CommandModule {
 
             //Add to inventory
             if (target.getInventory().firstEmpty() != -1) {
-                target.getInventory().addItem(cashNote);
+                Utils.addItem(target,cashNote);
             }
             //Drop to floor
             else {
@@ -82,11 +82,11 @@ public class CashNoteGiveAllSub extends CommandModule {
             }
 
             String message = pl.getMessages().getString("Withdraws.CashNote.RewardReceived");
-            message = message.replaceAll("%cash%", "" + pl.getUtils().formatDouble(cash)).replaceAll("%amount%", Utils.setAmount(amount));
+            message = message.replaceAll("%received-amount%", "" + pl.getUtils().formatDouble(cash)).replaceAll("%note-amount%", Utils.setAmount(amount));
             pl.getUtils().sendMessage(target, message);
         }
         String message = pl.getMessages().getString("Withdraws.Admin.CashNote.GivenToAll");
-        message = message.replaceAll("%cash%", "" + pl.getUtils().formatDouble(cash)).replaceAll("%amount%", Utils.setAmount(amount));
+        message = message.replaceAll("%received-amount%", "" + pl.getUtils().formatDouble(cash)).replaceAll("%note-amount%", Utils.setAmount(amount));
         pl.getUtils().sendMessage(sender, message);
         return;
 

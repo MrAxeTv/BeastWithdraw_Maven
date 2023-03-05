@@ -18,12 +18,12 @@ import org.bukkit.inventory.ItemStack;
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
 
 
-public class CancelCrafting
+public class CancelCraftingListener
         implements Listener {
     BeastWithdrawPlugin pl;
     private boolean crafting;
 
-    public CancelCrafting(BeastWithdrawPlugin pl) {
+    public CancelCraftingListener(BeastWithdrawPlugin pl) {
         this.pl = pl;
         pl.getServer().getPluginManager().registerEvents(this, pl);
         crafting = pl.getConfig().getBoolean("Settings.CancelCrafting");

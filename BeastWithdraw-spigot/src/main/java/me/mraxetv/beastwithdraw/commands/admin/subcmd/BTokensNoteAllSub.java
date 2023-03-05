@@ -10,20 +10,19 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public class XpBottleGiveSub extends CommandModule {
+public class BTokensNoteAllSub extends CommandModule {
     /**
      * @param pl
      * @param permission - The label of the command.
      * @param minArgs    - The minimum amount of arguments.
      * @param maxArgs    - The maximum amount of arguments.
      */
-    public XpBottleGiveSub(BeastWithdrawPlugin pl, String permission, int minArgs, int maxArgs) {
+    public BTokensNoteAllSub(BeastWithdrawPlugin pl, String permission, int minArgs, int maxArgs) {
         super(pl, permission, minArgs, maxArgs);
     }
 
     @Override
     public void run(CommandSender sender, String[] args) {
-
 
         if (!sender.hasPermission(permission)) {
             String s = pl.getMessages().getString("Withdraws.NoPermission");
@@ -33,74 +32,65 @@ public class XpBottleGiveSub extends CommandModule {
         }
 
         if (!hasEnoughArgs(args)) {
-            String s = pl.getMessages().getString("Withdraws.Admin.XpBottle.GiveCMD");
+            String s = pl.getMessages().getString("Withdraws.Admin.CashNote.GiveAllCMD");
             s = s.replaceAll("%prefix%", Utils.getPrefix());
-            pl.getUtils().sendMessage(sender, s);
-            return;
-        }
-        if (!isOnline(args[1])) {
-            String s = pl.getMessages().getString("Withdraws.NotOnline");
-            s = s.replaceAll("%prefix%", Utils.getPrefix());
-            s = s.replaceAll("%player%", args[1]);
             pl.getUtils().sendMessage(sender, s);
             return;
         }
 
-        if (!Utils.isInt(args[2])) {
+        if (!Utils.isDouble(args[1])) {
             String s = pl.getMessages().getString("Withdraws.NoNumber");
             s = s.replaceAll("%prefix%", Utils.getPrefix());
-            s = s.replaceAll("%amount%", args[2]);
+            s = s.replaceAll("%amount%", args[1]);
             pl.getUtils().sendMessage(sender, s);
             return;
         }
         int amount = 1;
 
-        if (args.length > 3) {
-            if (!Utils.isInt(args[3])) {
+        if (args.length == 3) {
+            if (!Utils.isInt(args[2])) {
                 String s = pl.getMessages().getString("Withdraws.NoNumber");
                 s = s.replaceAll("%prefix%", Utils.getPrefix());
-                s = s.replaceAll("%amount%", args[3]);
+                s = s.replaceAll("%amount%", args[2]);
                 pl.getUtils().sendMessage(sender, s);
                 return;
             }
-            amount = Integer.parseInt(args[3]);
+            amount = Integer.parseInt(args[2]);
         }
 
         boolean signet = false;
         String signer = "";
-        if(args.length == 5) {
+        if(args.length == 4) {
             signet = true;
-            signer = args[4];
+            signer = args[3];
         }
 
 
-        Player target = Bukkit.getPlayer(args[1]);
-        int xp = Integer.parseInt(args[2]);
+        double bTokens = Double.parseDouble(args[1]);
 
-        ItemStack xpBottle = pl.getItemManger().getXpb(signer, xp, amount, signet);
+        ItemStack bTokensNote = pl.getItemManger().getBTokensNote(signer, bTokens, amount, signet);
 
-        //Add to inventory
-        if (target.getInventory().firstEmpty() != -1) {
-            Utils.addItem(target,xpBottle);
+        for (Player target : Bukkit.getOnlinePlayers()) {
+
+            //Add to inventory
+            if (target.getInventory().firstEmpty() != -1) {
+                Utils.addItem(target,bTokensNote);
+            }
+            //Drop to floor
+            else {
+                target.getWorld().dropItem(target.getLocation(), bTokensNote);
+            }
+
+            String message = pl.getMessages().getString("Withdraws.BeastTokensNote.RewardReceived");
+            message = message.replaceAll("%received-amount%", "" + pl.getUtils().formatDouble(bTokens)).replaceAll("%note-amount%", Utils.setAmount(amount));
+            pl.getUtils().sendMessage(target, message);
         }
-        //Drop to floor
-        else {
-            target.getWorld().dropItem(target.getLocation(), xpBottle);
-        }
-
-
-        String message = pl.getMessages().getString("Withdraws.XpBottle.RewardReceived");
-        message = message.replaceAll("%received-amount%", "" + pl.getUtils().formatNumber(xp)).replaceAll("%note-amount%", Utils.setAmount(amount));
-        pl.getUtils().sendMessage(target, message);
-
-        message = pl.getMessages().getString("Withdraws.Admin.XpBottle.Given");
-        message = message.replaceAll("%received-amount%", "" + pl.getUtils().formatNumber(xp)).replaceAll("%note-amount%", Utils.setAmount(amount)).replaceAll("%player%",target.getName());
+        String message = pl.getMessages().getString("Withdraws.Admin.BeastTokensNote.GivenToAll");
+        message = message.replaceAll("%received-amount%", "" + pl.getUtils().formatDouble(bTokens)).replaceAll("%note-amount%", Utils.setAmount(amount));
         pl.getUtils().sendMessage(sender, message);
         return;
 
-
     }
-
 
     @Override
     public List<String> getTabComplete(CommandSender sender, String[] args) {

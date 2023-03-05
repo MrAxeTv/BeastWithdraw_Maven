@@ -37,14 +37,14 @@ public class ItemManager {
 
     public void init() {
 
-        if (pl.getWithdrawManager().getXpBottleConfig().getBoolean("XpBottle.CustomModel.AmountModelData.Enabled")) {
+        if (pl.getWithdrawManager().getXpBottleConfig().getBoolean("Settings.CustomModel.AmountModelData.Enabled")) {
 
             xpList = new TreeMap<>(Collections.reverseOrder());
 
-            if (pl.getWithdrawManager().getXpBottleConfig().isSet("XpBottle.CustomModel.AmountModelData.Range")) {
+            if (pl.getWithdrawManager().getXpBottleConfig().isSet("Settings.CustomModel.AmountModelData.Range")) {
                 xpAmountModelsB = true;
 
-                for (String s : pl.getWithdrawManager().getXpBottleConfig().getStringList("XpBottle.CustomModel.AmountModelData.Range")) {
+                for (String s : pl.getWithdrawManager().getXpBottleConfig().getStringList("Settings.CustomModel.AmountModelData.Range")) {
                     String args[] = s.split("-");
                     if (!Utils.isInt(args[0])) continue;
                     String data[] = args[1].split(":");
@@ -54,13 +54,13 @@ public class ItemManager {
             }
 
         }
-        if (pl.getWithdrawManager().getCashNoteConfig().getBoolean("CashNote.CustomModel.AmountModelData.Enabled")) {
+        if (pl.getWithdrawManager().getCashNoteConfig().getBoolean("Settings.CustomModel.AmountModelData.Enabled")) {
             cashNote = new TreeMap<>(Collections.reverseOrder());
             cashAmountModelsB = true;
 
-            if (pl.getWithdrawManager().getCashNoteConfig().isSet("CashNote.CustomModel.AmountModelData.Range")) {
+            if (pl.getWithdrawManager().getCashNoteConfig().isSet("Settings.CustomModel.AmountModelData.Range")) {
 
-                for (String s : pl.getWithdrawManager().getCashNoteConfig().getStringList("CashNote.CustomModel.AmountModelData.Range")) {
+                for (String s : pl.getWithdrawManager().getCashNoteConfig().getStringList("Settings.CustomModel.AmountModelData.Range")) {
                     String args[] = s.split("-");
                     if (!Utils.isInt(args[0])) continue;
                     String data[] = args[1].split(":");
@@ -76,8 +76,8 @@ public class ItemManager {
     public ItemStack getXpb(String owner, int value, int amount, boolean signed) {
 
         ItemStack item = new ItemStack(MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_13_R1) ? Material.EXPERIENCE_BOTTLE : Material.valueOf("EXP_BOTTLE"), amount);
-        if (pl.getWithdrawManager().getXpBottleConfig().isSet("XpBottle.Data")) {
-            item.setDurability((short) pl.getWithdrawManager().getXpBottleConfig().getInt("XpBottle.Data"));
+        if (pl.getWithdrawManager().getXpBottleConfig().isSet("Settings.Data")) {
+            item.setDurability((short) pl.getWithdrawManager().getXpBottleConfig().getInt("Settings.Data"));
         }
         ItemMeta meta = item.getItemMeta();
         if (MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_14_R1)) {
@@ -87,45 +87,45 @@ public class ItemManager {
                         meta.setCustomModelData(xpList.get(i));
                         break;
                     }
-            }else meta.setCustomModelData(pl.getWithdrawManager().getXpBottleConfig().getInt("XpBottle.CustomModel.Data"));
+            }else meta.setCustomModelData(pl.getWithdrawManager().getXpBottleConfig().getInt("Settings.CustomModel.Data"));
         }
 
 
         if (signed) {
 
-            String n = pl.getWithdrawManager().getXpBottleConfig().getString("XpBottle.Player.Name");
+            String n = pl.getWithdrawManager().getXpBottleConfig().getString("Settings.Player.Name");
             n = n.replaceAll("%player%", owner);
-            n = n.replaceAll("%value%", "" + pl.getUtils().formatNumber(value));
+            n = n.replaceAll("%amount%", "" + pl.getUtils().formatNumber(value));
             meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', n));
             ArrayList<String> lore = new ArrayList<String>();
-            for (String s : pl.getWithdrawManager().getXpBottleConfig().getStringList("XpBottle.Player.Lore")) {
+            for (String s : pl.getWithdrawManager().getXpBottleConfig().getStringList("Settings.Player.Lore")) {
                 s = ChatColor.translateAlternateColorCodes('&', s);
                 s = s.replace("%player%", "" + owner);
-                s = s.replace("%value%", "" + pl.getUtils().formatNumber(value));
+                s = s.replace("%amount%", "" + pl.getUtils().formatNumber(value));
                 lore.add(s);
             }
             meta.setLore(lore);
             item.setItemMeta(meta);
             NBTItem tag = new NBTItem(item);
-            tag.setInteger(pl.getWithdrawManager().getXpBottleConfig().getString("XpBottle.NBTLore"), value);
+            tag.setInteger(pl.getWithdrawManager().getXpBottleConfig().getString("Settings.NBTLore"), value);
             tag.setBoolean("bCraft", true);
 
             item = tag.getItem();
             return item;
         }
-        String n = pl.getWithdrawManager().getXpBottleConfig().getString("XpBottle.Server.Name");
-        n = n.replaceAll("%value%", "" + pl.getUtils().formatNumber(value));
+        String n = pl.getWithdrawManager().getXpBottleConfig().getString("Settings.Server.Name");
+        n = n.replaceAll("%amount%", "" + pl.getUtils().formatNumber(value));
         meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', n));
         ArrayList<String> lore = new ArrayList<String>();
-        for (String s : pl.getWithdrawManager().getXpBottleConfig().getStringList("XpBottle.Server.Lore")) {
+        for (String s : pl.getWithdrawManager().getXpBottleConfig().getStringList("Settings.Server.Lore")) {
             s = ChatColor.translateAlternateColorCodes('&', s);
-            s = s.replace("%value%", "" + pl.getUtils().formatNumber(value));
+            s = s.replace("%amount%", "" + pl.getUtils().formatNumber(value));
             lore.add(s);
         }
         meta.setLore(lore);
         item.setItemMeta(meta);
         NBTItem tag = new NBTItem(item);
-        tag.setInteger(pl.getWithdrawManager().getXpBottleConfig().getString("XpBottle.NBTLore"), value);
+        tag.setInteger(pl.getWithdrawManager().getXpBottleConfig().getString("Settings.NBTLore"), value);
         tag.setBoolean("bCraft", true);
         item = tag.getItem();
         return item;
@@ -133,9 +133,9 @@ public class ItemManager {
 
     public ItemStack getCashNote(String owner, double value, int amount, boolean signed) {
 
-        ItemStack item = new ItemStack(Material.getMaterial(pl.getWithdrawManager().getCashNoteConfig().getString("CashNote.Item")), amount);
-        if (pl.getWithdrawManager().getCashNoteConfig().isSet("CashNote.Data")) {
-            item.setDurability((short) pl.getWithdrawManager().getCashNoteConfig().getInt("CashNote.Data"));
+        ItemStack item = new ItemStack(Material.getMaterial(pl.getWithdrawManager().getCashNoteConfig().getString("Settings.Item")), amount);
+        if (pl.getWithdrawManager().getCashNoteConfig().isSet("Settings.Data")) {
+            item.setDurability((short) pl.getWithdrawManager().getCashNoteConfig().getInt("Settings.Data"));
         }
         ItemMeta meta = item.getItemMeta();
 
@@ -146,54 +146,120 @@ public class ItemManager {
                         meta.setCustomModelData(cashNote.get(i));
                         break;
                     }
-            }else meta.setCustomModelData(pl.getWithdrawManager().getCashNoteConfig().getInt("CashNote.CustomModel.Data"));
+            }else meta.setCustomModelData(pl.getWithdrawManager().getCashNoteConfig().getInt("Settings.CustomModel.Data"));
         }
         if (signed) {
 
-            if (pl.getWithdrawManager().getCashNoteConfig().getBoolean("CashNote.Glow")) {
+            if (pl.getWithdrawManager().getCashNoteConfig().getBoolean("Settings.Glow")) {
                 meta.addEnchant(Enchantment.DURABILITY, 1, true);
                 meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
             }
-            String n = pl.getWithdrawManager().getCashNoteConfig().getString("CashNote.Player.Name");
+            String n = pl.getWithdrawManager().getCashNoteConfig().getString("Settings.Player.Name");
             n = n.replaceAll("%player%", owner);
-            n = n.replaceAll("%value%", "" + pl.getUtils().formatDouble(value));
+            n = n.replaceAll("%amount%", "" + pl.getUtils().formatDouble(value));
             meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', n));
             ArrayList<String> lore = new ArrayList<String>();
-            for (String s : pl.getWithdrawManager().getCashNoteConfig().getStringList("CashNote.Player.Lore")) {
+            for (String s : pl.getWithdrawManager().getCashNoteConfig().getStringList("Settings.Player.Lore")) {
                 s = ChatColor.translateAlternateColorCodes('&', s);
                 s = s.replace("%player%", "" + owner);
-                s = s.replace("%value%", "" + pl.getUtils().formatDouble(value));
+                s = s.replace("%amount%", "" + pl.getUtils().formatDouble(value));
                 lore.add(s);
             }
             meta.setLore(lore);
             item.setItemMeta(meta);
             NBTItem tag = new NBTItem(item);
-            tag.setDouble(pl.getWithdrawManager().getCashNoteConfig().getString("CashNote.NBTLore"), value);
+            tag.setDouble(pl.getWithdrawManager().getCashNoteConfig().getString("Settings.NBTLore"), value);
             tag.setBoolean("bCraft", true);
             item = tag.getItem();
             return item;
         }
-        if (pl.getWithdrawManager().getCashNoteConfig().getBoolean("CashNote.Glow")) {
+        if (pl.getWithdrawManager().getCashNoteConfig().getBoolean("Settings.Glow")) {
             meta.addEnchant(Enchantment.DURABILITY, 1, true);
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
-        String n = pl.getWithdrawManager().getCashNoteConfig().getString("CashNote.Server.Name");
-        n = n.replaceAll("%value%", "" + pl.getUtils().formatDouble(value));
+        String n = pl.getWithdrawManager().getCashNoteConfig().getString("Settings.Server.Name");
+        n = n.replaceAll("%amount%", "" + pl.getUtils().formatDouble(value));
         meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', n));
         ArrayList<String> lore = new ArrayList<String>();
-        for (String s : pl.getWithdrawManager().getCashNoteConfig().getStringList("CashNote.Server.Lore")) {
+        for (String s : pl.getWithdrawManager().getCashNoteConfig().getStringList("Settings.Server.Lore")) {
             s = ChatColor.translateAlternateColorCodes('&', s);
-            s = s.replace("%value%", "" + pl.getUtils().formatDouble(value));
+            s = s.replace("%amount%", "" + pl.getUtils().formatDouble(value));
             lore.add(s);
         }
         meta.setLore(lore);
         item.setItemMeta(meta);
         NBTItem tag = new NBTItem(item);
-        tag.setDouble(pl.getWithdrawManager().getCashNoteConfig().getString("CashNote.NBTLore"), value);
+        tag.setDouble(pl.getWithdrawManager().getCashNoteConfig().getString("Settings.NBTLore"), value);
         tag.setBoolean("bCraft", true);
         item = tag.getItem();
         return item;
     }
+
+    public ItemStack getBTokensNote(String owner, double value, int amount, boolean signed) {
+
+        ItemStack item = new ItemStack(Material.getMaterial(pl.getWithdrawManager().getTokensNoteConfig().getString("Settings.Item")), amount);
+        
+        if (pl.getWithdrawManager().getTokensNoteConfig().isSet("Settings.Data")) {
+            item.setDurability((short) pl.getWithdrawManager().getTokensNoteConfig().getInt("Settings.Data"));
+        }
+        ItemMeta meta = item.getItemMeta();
+
+        if (MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_14_R1)) {
+            if (cashAmountModelsB) {
+                for (int i : cashNote.keySet())
+                    if (value >= i) {
+                        meta.setCustomModelData(cashNote.get(i));
+                        break;
+                    }
+            }else meta.setCustomModelData(pl.getWithdrawManager().getTokensNoteConfig().getInt("Settings.CustomModel.Data"));
+        }
+        if (signed) {
+
+            if (pl.getWithdrawManager().getTokensNoteConfig().getBoolean("Settings.Glow")) {
+                meta.addEnchant(Enchantment.DURABILITY, 1, true);
+                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            }
+            String n = pl.getWithdrawManager().getTokensNoteConfig().getString("Settings.Player.Name");
+            n = n.replaceAll("%player%", owner);
+            n = n.replaceAll("%amount%", "" + pl.getUtils().formatDouble(value));
+            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', n));
+            ArrayList<String> lore = new ArrayList<String>();
+            for (String s : pl.getWithdrawManager().getTokensNoteConfig().getStringList("Settings.Player.Lore")) {
+                s = ChatColor.translateAlternateColorCodes('&', s);
+                s = s.replace("%player%", "" + owner);
+                s = s.replace("%amount%", "" + pl.getUtils().formatDouble(value));
+                lore.add(s);
+            }
+            meta.setLore(lore);
+            item.setItemMeta(meta);
+            NBTItem tag = new NBTItem(item);
+            tag.setDouble(pl.getWithdrawManager().getTokensNoteConfig().getString("Settings.NBTLore"), value);
+            tag.setBoolean("bCraft", true);
+            item = tag.getItem();
+            return item;
+        }
+        if (pl.getWithdrawManager().getTokensNoteConfig().getBoolean("Settings.Glow")) {
+            meta.addEnchant(Enchantment.DURABILITY, 1, true);
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        }
+        String n = pl.getWithdrawManager().getTokensNoteConfig().getString("Settings.Server.Name");
+        n = n.replaceAll("%amount%", "" + pl.getUtils().formatDouble(value));
+        meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', n));
+        ArrayList<String> lore = new ArrayList<String>();
+        for (String s : pl.getWithdrawManager().getTokensNoteConfig().getStringList("Settings.Server.Lore")) {
+            s = ChatColor.translateAlternateColorCodes('&', s);
+            s = s.replace("%amount%", "" + pl.getUtils().formatDouble(value));
+            lore.add(s);
+        }
+        meta.setLore(lore);
+        item.setItemMeta(meta);
+        NBTItem tag = new NBTItem(item);
+        tag.setDouble(pl.getWithdrawManager().getTokensNoteConfig().getString("Settings.NBTLore"), value);
+        tag.setBoolean("bCraft", true);
+        item = tag.getItem();
+        return item;
+    }
+    
 
 
 }
