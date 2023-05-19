@@ -17,6 +17,7 @@ Settings:
   CancelCrafting: true
   ##Drop withdraw item on floor if there is no space in player inventory
   WithdrawDropFloor: true
-
+  ##Don't allow decimals in withdraw amount
+  DisableDecimalAmounts: true
 ##Config version (PLEASE DO NOT EDIT & DON'T COPY PAST OLD CONFIG OVER)
-ConfigVersion: 2.8
+ConfigVersion: 2.9

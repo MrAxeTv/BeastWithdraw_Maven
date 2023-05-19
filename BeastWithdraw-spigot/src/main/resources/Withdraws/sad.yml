@@ -1,0 +1,19 @@
+Settings:
+  Player:
+    Name: '&a&lExperience-Bottle &7(Throw)'
+    Lore:
+      - '&dValue:&r %amount% XP'
+      - '&dEnchanter:&r %player%'
+  Server:
+    Name: '&a&lExperience-Bottle &7(Throw)'
+    Lore:
+      - '&dValue:&r %amount% XP'
+      - '&dEnchanter:&r Thinkerer'
+  CustomModel:
+    #Custm model data is supported on 1.14+ versions
+    Data: 0
+    AmountModelData:
+      Enabled: true
+      Range:
+        - '100-Data:1'
+        - '1000-Data:2'

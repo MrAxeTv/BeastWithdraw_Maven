@@ -51,4 +51,24 @@
         <module>beastwithdraw-spigot</module>
         <module>beastwithdraw-sponge</module>
     </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>me.mraxetv.beastcore</groupId>
+            <artifactId>BeastCore</artifactId>
+            <version>1.0</version>
+            <classifier>shaded</classifier>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+
+
+    </dependencies>
+
 </project>

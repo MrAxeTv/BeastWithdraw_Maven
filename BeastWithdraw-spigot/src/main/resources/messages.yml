@@ -36,6 +36,7 @@ Withdraws:
     Max: "%prefix% &cYou can withdraw a maximum of $%max-amount%!"
     RewardReceived: "%prefix% &bYou have received a cash note worth $%received-amount%! %note-amount%"
     GiveAll: "%prefix% &bAll players have received a cash note!"
+    TransactionFailed: "%prefix% &cTransaction failed, something went wrong please try some other amount!"
     Tax:
       TakenTax: "%prefix% &eYou payed $%tax% tax for this transaction!"
     Fee:

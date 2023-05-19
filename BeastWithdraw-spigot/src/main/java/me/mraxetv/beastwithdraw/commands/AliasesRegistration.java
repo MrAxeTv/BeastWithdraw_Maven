@@ -16,20 +16,17 @@ import org.bukkit.command.SimpleCommandMap;
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
 
 public class AliasesRegistration {
-	private BeastWithdrawPlugin pl;
 
+	public AliasesRegistration() {
 
-
-	public AliasesRegistration(BeastWithdrawPlugin plugin) {
-		pl = plugin;
 
 	}
 
-	public void setAliases(String cmdName, List<String> aliases) throws NoSuchMethodException,
+	public static void setAliases(String cmdName, List<String> aliases) throws NoSuchMethodException,
 	SecurityException, IllegalAccessException, IllegalArgumentException,
 	InvocationTargetException, NoSuchFieldException {
-		Method getCommandMap = pl.getServer().getClass().getMethod("getCommandMap");
-		SimpleCommandMap cmdMap = (SimpleCommandMap) getCommandMap.invoke(pl.getServer());
+		Method getCommandMap = Bukkit.getServer().getClass().getMethod("getCommandMap");
+		SimpleCommandMap cmdMap = (SimpleCommandMap) getCommandMap.invoke(Bukkit.getServer());
 
 		List<String> list = cmdMap.getCommand(cmdName).getAliases();
 		for(String s :aliases) {
@@ -40,10 +37,10 @@ public class AliasesRegistration {
 		Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', ("&7[&4Beast&bWithdraw&7] &2/" + cmdName + " command aliases &e" + list + " &2are registered.")));
 	}
 
-	public void syncCommands(){
+	public static void syncCommands(){
 		try {
-			Method syncCommands = pl.getServer().getClass().getMethod("syncCommands");
-			syncCommands.invoke(pl.getServer());
+			Method syncCommands = Bukkit.getServer().getClass().getMethod("syncCommands");
+			syncCommands.invoke(Bukkit.getServer());
 		} catch (NoSuchMethodException e) {
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {

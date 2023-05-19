@@ -1,8 +1,9 @@
 package me.mraxetv.beastwithdraw.listener;
 
 
-import de.tr7zw.changeme.nbtapi.NBTItem;
-import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion;
+
+import me.mraxetv.beastcore.utils.nbtapi.NBTItem;
+import me.mraxetv.beastcore.utils.nbtapi.utils.MinecraftVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

@@ -1,7 +1,7 @@
 package me.mraxetv.beastwithdraw.listener;
 
-import de.tr7zw.changeme.nbtapi.NBTItem;
-import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion;
+import me.mraxetv.beastcore.utils.nbtapi.NBTItem;
+import me.mraxetv.beastcore.utils.nbtapi.utils.MinecraftVersion;
 import me.mraxetv.beasttokens.BeastTokensAPI;
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
 import me.mraxetv.beastwithdraw.events.BTokensRedeemEvent;
@@ -26,7 +26,7 @@ public class BTokensNoteRedeemListener implements Listener {
         if (!plugin.getServer().getPluginManager().isPluginEnabled("BeastTokens")) return;
         pl = plugin;
         pl.getServer().getPluginManager().registerEvents(this,pl);
-        material = Material.getMaterial(pl.getWithdrawManager().getCashNoteConfig().getString("Settings.Item"));
+        material = Material.getMaterial(pl.getWithdrawManager().CASH_NOTE.getConfig().getString("Settings.Item"));
     }
 
 
@@ -39,7 +39,7 @@ public class BTokensNoteRedeemListener implements Listener {
         if (e.getAction() != Action.RIGHT_CLICK_AIR && e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         //if (e.getItem().getType() != material) return;
         NBTItem nbtItem = new NBTItem(e.getItem());
-        if (!nbtItem.hasKey(pl.getWithdrawManager().getTokensNoteConfig().getString("Settings.NBTLore"))) return;
+        if (!nbtItem.hasKey(pl.getWithdrawManager().CASH_NOTE.getConfig().getString("Settings.NBTLore"))) return;
 
         //Cancel dupe event on block click
         if (e.isCancelled() && e.getAction() == Action.RIGHT_CLICK_BLOCK) {
@@ -57,7 +57,7 @@ public class BTokensNoteRedeemListener implements Listener {
             }
         }
         pl.getServer().getPluginManager().
-                callEvent(new BTokensRedeemEvent(e.getPlayer(), e.getItem(), nbtItem.getDouble(pl.getWithdrawManager().getTokensNoteConfig().getString("Settings.NBTLore")), offHand));
+                callEvent(new BTokensRedeemEvent(e.getPlayer(), e.getItem(), nbtItem.getDouble(pl.getWithdrawManager().CASH_NOTE.getConfig().getString("Settings.NBTLore")), offHand));
         return;
 
     }
@@ -76,9 +76,9 @@ public class BTokensNoteRedeemListener implements Listener {
 
         pl.getUtils().sendMessage(p,msg);
 
-        if (pl.getWithdrawManager().getCashNoteConfig().getBoolean("Settings.Sounds.Redeem.Enabled")) {
+        if (pl.getWithdrawManager().CASH_NOTE.getConfig().getBoolean("Settings.Sounds.Redeem.Enabled")) {
             try {
-                String sound = pl.getWithdrawManager().getCashNoteConfig().getString("Settings.Sounds.Redeem.Sound");
+                String sound = pl.getWithdrawManager().CASH_NOTE.getConfig().getString("Settings.Sounds.Redeem.Sound");
                 e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.valueOf(sound), 1f, 1f);
 
             } catch (Exception e1) {

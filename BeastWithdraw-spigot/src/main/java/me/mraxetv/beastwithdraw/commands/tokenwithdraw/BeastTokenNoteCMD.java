@@ -2,6 +2,7 @@ package me.mraxetv.beastwithdraw.commands.tokenwithdraw;
 
 import me.mraxetv.beasttokens.BeastTokensAPI;
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
+import me.mraxetv.beastwithdraw.commands.AliasesRegistration;
 import me.mraxetv.beastwithdraw.commands.CommandModule;
 import me.mraxetv.beastwithdraw.utils.Utils;
 import org.bukkit.Bukkit;
@@ -27,7 +28,7 @@ public class BeastTokenNoteCMD extends CommandModule implements CommandExecutor 
         pl = plugin;
 
         try {
-            pl.getAliasesManager().setAliases("btWithdraw", pl.getWithdrawManager().getTokensNoteConfig().getStringList("Settings.Aliases"));
+            AliasesRegistration.setAliases("btWithdraw", pl.getWithdrawManager().CASH_NOTE.getConfig().getStringList("Settings.Aliases"));
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException | NoSuchFieldException e) {
             // TODO Auto-generated catch block
@@ -118,11 +119,11 @@ public class BeastTokenNoteCMD extends CommandModule implements CommandExecutor 
             double minCash = 0;
             //Limit min and max noteAmount of xp which can be withdrawn
             if (!sender.hasPermission("BeastWithdraw.BeastTokensNote.ByPass.WithdrawLimit")) {
-                minCash = pl.getWithdrawManager().getTokensNoteConfig().getDouble("Settings.Min");
-                if (pl.getWithdrawManager().getTokensNoteConfig().getBoolean("Settings.PermissionNotes.Enabled")) {
-                    for (String s : pl.getWithdrawManager().getTokensNoteConfig().getConfigurationSection("Settings.PermissionNotes").getKeys(false)) {
+                minCash = pl.getWithdrawManager().CASH_NOTE.getConfig().getDouble("Settings.Min");
+                if (pl.getWithdrawManager().CASH_NOTE.getConfig().getBoolean("Settings.PermissionNotes.Enabled")) {
+                    for (String s : pl.getWithdrawManager().CASH_NOTE.getConfig().getConfigurationSection("Settings.PermissionNotes").getKeys(false)) {
                         if (sender.hasPermission("BeastWithdraw.BeastTokensNote.PermissionNotes." + s)) {
-                            minCash = pl.getWithdrawManager().getTokensNoteConfig().getDouble("Settings.PermissionNotes." + s + ".Min");
+                            minCash = pl.getWithdrawManager().CASH_NOTE.getConfig().getDouble("Settings.PermissionNotes." + s + ".Min");
                         }
                     }
 
@@ -135,11 +136,11 @@ public class BeastTokenNoteCMD extends CommandModule implements CommandExecutor 
                 }
 
 
-                double maxAmount = pl.getWithdrawManager().getTokensNoteConfig().getDouble("Settings.Max");
-                if (pl.getWithdrawManager().getTokensNoteConfig().getBoolean("Settings.PermissionNotes.Enabled")) {
-                    for (String s : pl.getWithdrawManager().getTokensNoteConfig().getConfigurationSection("Settings.PermissionNotes").getKeys(false)) {
+                double maxAmount = pl.getWithdrawManager().CASH_NOTE.getConfig().getDouble("Settings.Max");
+                if (pl.getWithdrawManager().CASH_NOTE.getConfig().getBoolean("Settings.PermissionNotes.Enabled")) {
+                    for (String s : pl.getWithdrawManager().CASH_NOTE.getConfig().getConfigurationSection("Settings.PermissionNotes").getKeys(false)) {
                         if (sender.hasPermission("BeastWithdraw.BeastTokensNote.PermissionNotes." + s)) {
-                            maxAmount = pl.getWithdrawManager().getTokensNoteConfig().getDouble("Settings.PermissionNotes." + s + ".Max");
+                            maxAmount = pl.getWithdrawManager().CASH_NOTE.getConfig().getDouble("Settings.PermissionNotes." + s + ".Max");
                         }
                     }
                 }
@@ -163,11 +164,11 @@ public class BeastTokenNoteCMD extends CommandModule implements CommandExecutor 
 
             //Charge Fee
             if (!p.isPermissionSet("BeastWithdraw.BeastTokensNote.ByPass.Fee")) {
-                if (pl.getWithdrawManager().getTokensNoteConfig().getBoolean("Settings.Charges.Fee.Enabled")) {
+                if (pl.getWithdrawManager().CASH_NOTE.getConfig().getBoolean("Settings.Charges.Fee.Enabled")) {
                     
 
                     //Fee
-                    double fee = pl.getWithdrawManager().getTokensNoteConfig().getDouble("Settings.Charges.Fee.Cost");
+                    double fee = pl.getWithdrawManager().CASH_NOTE.getConfig().getDouble("Settings.Charges.Fee.Cost");
                     //lower the noteAmount for fee in case 'all' argument is used!!
                     if(args[0].equalsIgnoreCase("all")) takenAmount = takenAmount - fee;
 
@@ -186,8 +187,8 @@ public class BeastTokenNoteCMD extends CommandModule implements CommandExecutor 
             double tax = 0;
             //Charge Tax
             if (!p.isPermissionSet("BeastWithdraw.BeastTokensNote.ByPass.Tax")) {
-                if (pl.getWithdrawManager().getTokensNoteConfig().getBoolean("Settings.Charges.Tax.Enabled")) {
-                    double percentage = pl.getWithdrawManager().getTokensNoteConfig().getDouble("Settings.Charges.Tax.Percentage");
+                if (pl.getWithdrawManager().CASH_NOTE.getConfig().getBoolean("Settings.Charges.Tax.Enabled")) {
+                    double percentage = pl.getWithdrawManager().CASH_NOTE.getConfig().getDouble("Settings.Charges.Tax.Percentage");
                     if (percentage > 100.0) percentage = 100.0;
                     tax = (takenAmount * (percentage / 100));
                     String s = pl.getMessages().getString("Withdraws.BeastTokensNote.Tax.TakenTax");
@@ -212,9 +213,9 @@ public class BeastTokenNoteCMD extends CommandModule implements CommandExecutor 
 
             }
 
-            if (pl.getWithdrawManager().getTokensNoteConfig().getBoolean("Settings.Sounds.Withdraw.Enabled")) {
+            if (pl.getWithdrawManager().CASH_NOTE.getConfig().getBoolean("Settings.Sounds.Withdraw.Enabled")) {
                 try {
-                    String sound = pl.getWithdrawManager().getTokensNoteConfig().getString("Settings.Sounds.Withdraw.Sound");
+                    String sound = pl.getWithdrawManager().CASH_NOTE.getConfig().getString("Settings.Sounds.Withdraw.Sound");
                     p.playSound(p.getLocation(), Sound.valueOf(sound), 1f, 1f);
 
                 } catch (Exception e) {

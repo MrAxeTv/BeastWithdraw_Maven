@@ -13,7 +13,7 @@
     </parent>
 
     <artifactId>BeastWithdraw-spigot</artifactId>
-    <version>2.22</version>
+    <version>2.23</version>
     <packaging>jar</packaging>
 
     <name>BeastWithdraw</name>
@@ -36,19 +36,19 @@
 
                             <!--  Shading NBT API to PLUGIN -->
                             <relocations>
-                                <relocation>
+<!--                                <relocation>
                                     <pattern>de.tr7zw.changeme.nbtapi</pattern>
                                     <shadedPattern>me.mraxetv.beastwithdraw.utils.nbtapi</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>org.bstats</pattern>
-                                    <!-- Replace this with your package! -->
+                                    &lt;!&ndash; Replace this with your package! &ndash;&gt;
                                     <shadedPattern>me.mraxetv.beastwithdraw.bstats</shadedPattern>
-                                </relocation>
+                                </relocation>-->
                             </relocations>
 
                             <finalName>${project.name}-${project.version}</finalName>
-                            <outputFile>C:\Users\krist\Desktop\McServers\spigot 1.19\plugins\${project.name}-${project.version}.jar</outputFile>
+                            <outputFile>C:\Users\krist\Desktop\McServers\spigot-1.19\plugins\${project.name}-${project.version}.jar</outputFile>
 
                         </configuration>
                     </execution>
@@ -164,13 +164,6 @@
             <version>2.9-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
-<!--        bStats-->
-        <dependency>
-            <groupId>org.bstats</groupId>
-            <artifactId>bstats-bukkit</artifactId>
-            <version>1.7</version>
-            <scope>compile</scope>
-        </dependency>
 
         <dependency>
             <groupId>me.mraxetv.beasttokens</groupId>
@@ -178,8 +171,6 @@
             <version>2.1</version>
             <scope>provided</scope>
         </dependency>
-
-
 
         <!--Vault API-->
         <dependency>
@@ -192,6 +183,15 @@
                     <artifactId>bukkit</artifactId>
                 </exclusion>
             </exclusions>
+            <scope>provided</scope>
+        </dependency>
+
+
+      <!--PlayerPoints-->
+        <dependency>
+            <groupId>me.mraxetv.playerpoints</groupId>
+            <artifactId>PlayerPoint</artifactId>
+            <version>3.2.4</version>
             <scope>provided</scope>
         </dependency>
 
@@ -220,15 +220,6 @@
             <systemPath>${basedir}/res/CataMines-2.5.7.jar</systemPath>
 
         </dependency>-->
-
-
-
-        <!--        NBT API -->
-        <dependency>
-            <groupId>de.tr7zw</groupId>
-            <artifactId>item-nbt-api</artifactId>
-            <version>2.11.1-SNAPSHOT</version>
-        </dependency>
 
     </dependencies>
 </project>

@@ -82,5 +82,7 @@ Settings:
   NBTLore: "bCashNote"
   ##Set up aliases for /bWithdraw command
   Aliases: [cashnote, withdraw, moneywithdraw, moneynote]
+
+  ##Format of
 ##--------------------------------------------------------------------------------------------------------##
 ConfigVersion: 1.1

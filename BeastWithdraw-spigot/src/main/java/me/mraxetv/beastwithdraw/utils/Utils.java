@@ -2,14 +2,14 @@ package me.mraxetv.beastwithdraw.utils;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
-import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion;
-import org.bukkit.Bukkit;
+
+import me.mraxetv.beastcore.utils.nbtapi.utils.MinecraftVersion;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -23,14 +23,23 @@ implements Listener {
 	private BeastWithdrawPlugin pl;
 	private String version;
 	private final static Pattern PATTERN = Pattern.compile("&#[a-fA-F0-9]{6}");
-	public static DecimalFormat df2 = new DecimalFormat("#.###");
+	public static DecimalFormat df2;
+
 
 	static {
-		df2.setRoundingMode(RoundingMode.DOWN);
+
+
 	}
 
 	public Utils(BeastWithdrawPlugin plugin) {
+
 		this.pl = plugin;
+		if(pl.getConfig().getBoolean("Settings.DisableDecimalAmounts")){
+			df2 = new DecimalFormat("#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+
+		}else df2 = new DecimalFormat("#.##", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+		df2.setRoundingMode(RoundingMode.DOWN);
+
 	}
 
 
@@ -60,7 +69,7 @@ implements Listener {
 	public static String setAmount(int amount){
 
 		if (amount == 1) return "";
-		return ConfigUtils.AMOUNT.replaceAll("%amount%",""+amount);
+		return ConfigLang.AMOUNT.replaceAll("%amount%",""+amount);
 	}
 
 	public static void sendMessage(CommandSender sender , String message){
@@ -118,7 +127,8 @@ implements Listener {
 		sendMessage(p,pl.getMessages().getString("Withdraws.NoPermission"));
 	}
     public static String formatDouble(double number) {
-        return NumberFormat.getInstance(Locale.ENGLISH).format(number);
+
+        return ConfigLang.NUMBER_FORMAT.format(number);
     }
     public static String formatNumber(int number) {
         return NumberFormat.getInstance(Locale.ENGLISH).format(number);

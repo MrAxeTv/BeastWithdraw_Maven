@@ -1,7 +1,8 @@
 package me.mraxetv.beastwithdraw.listener;
 
-import de.tr7zw.changeme.nbtapi.NBTItem;
-import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion;
+
+import me.mraxetv.beastcore.utils.nbtapi.NBTItem;
+import me.mraxetv.beastcore.utils.nbtapi.utils.MinecraftVersion;
 import me.mraxetv.beastwithdraw.events.BottleRedeemEvent;
 import me.mraxetv.beastwithdraw.utils.XpManager;
 import org.bukkit.Bukkit;
@@ -42,7 +43,7 @@ public class XpBottleRedeemListener implements Listener {
 		if (e.getAction() != Action.RIGHT_CLICK_AIR && e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 		//if(e.getItem().getType() != material) return;
 		NBTItem nbtItem = new NBTItem(e.getItem());
-		if(!nbtItem.hasKey(pl.getWithdrawManager().getXpBottleConfig().getString("Settings.NBTLore"))) return;
+		if(!nbtItem.hasKey(pl.getWithdrawManager().XP_BOTTLE.getConfig().getString("Settings.NBTLore"))) return;
 
 		Player p = e.getPlayer();
 		//Cancel dupe event on block click
@@ -62,7 +63,7 @@ public class XpBottleRedeemListener implements Listener {
 		}
 
 		pl.getServer().getPluginManager().
-				callEvent(new BottleRedeemEvent(e.getPlayer(),e.getItem(),nbtItem.getInteger(pl.getWithdrawManager().getXpBottleConfig().getString("Settings.NBTLore")),offHand));
+				callEvent(new BottleRedeemEvent(e.getPlayer(),e.getItem(),nbtItem.getInteger(pl.getWithdrawManager().XP_BOTTLE.getConfig().getString("Settings.NBTLore")),offHand));
 		 return;
 
 		
@@ -74,7 +75,7 @@ public class XpBottleRedeemListener implements Listener {
 
 		if(e.isCancelled()) return;
 
-		if(pl.getWithdrawManager().getXpBottleConfig().getBoolean("Settings.AutoCollect")) {
+		if(pl.getWithdrawManager().XP_BOTTLE.getConfig().getBoolean("Settings.AutoCollect")) {
 
 			int xp  = XpManager.getTotalExperience(p);
 			int receivedXp = e.getExp();
@@ -91,9 +92,9 @@ public class XpBottleRedeemListener implements Listener {
 				t.setCustomName("XPB:"+e.getExp());
 
 			}
-			if(pl.getWithdrawManager().getXpBottleConfig().getBoolean("Settings.Sounds.Redeem.Enabled")) {
+			if(pl.getWithdrawManager().XP_BOTTLE.getConfig().getBoolean("Settings.Sounds.Redeem.Enabled")) {
 				try {
-					String sound = pl.getWithdrawManager().getXpBottleConfig().getString("Settings.Sounds.Redeem.Sound");
+					String sound = pl.getWithdrawManager().XP_BOTTLE.getConfig().getString("Settings.Sounds.Redeem.Sound");
 					p.playSound(p.getLocation(), Sound.valueOf(sound), 1f, 1f);
 
 				} catch (Exception e1) {
@@ -128,13 +129,13 @@ public class XpBottleRedeemListener implements Listener {
 
    @EventHandler
 	public void PlayerDeath(PlayerDeathEvent e) {
-		if (!pl.getWithdrawManager().getXpBottleConfig().getBoolean("Settings.DropOnDeath")) return;
+		if (!pl.getWithdrawManager().XP_BOTTLE.getConfig().getBoolean("Settings.DropOnDeath")) return;
 		Player p = e.getEntity();
 		
 		if(!p.hasPermission("BeastWithdraw.XpBottle.Drop"))return;
 		int xp = XpManager.getTotalExperience(p);
 		if(xp <= 0) return;
-		double dropPercentage = pl.getWithdrawManager().getXpBottleConfig().getDouble("Settings.DropPercentage")/100;
+		double dropPercentage = pl.getWithdrawManager().XP_BOTTLE.getConfig().getDouble("Settings.DropPercentage")/100;
 		xp = (int) (xp * dropPercentage);
 
 		ItemStack Xpb = pl.getItemManger().getXpb(p.getName(), xp, 1, true);

@@ -1,6 +1,6 @@
 package me.mraxetv.beastwithdraw;
 
-import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion;
+import me.mraxetv.beastcore.utils.nbtapi.utils.MinecraftVersion;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;

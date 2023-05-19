@@ -4,6 +4,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
+import me.mraxetv.beastwithdraw.commands.AliasesRegistration;
 import me.mraxetv.beastwithdraw.commands.CommandModule;
 import me.mraxetv.beastwithdraw.utils.Utils;
 import me.mraxetv.beastwithdraw.utils.XpManager;
@@ -30,7 +31,7 @@ public class XpBottleCMD extends CommandModule implements CommandExecutor {
         pl = plugin;
 
         try {
-            pl.getAliasesManager().setAliases("XpBottle", pl.getWithdrawManager().getXpBottleConfig().getStringList("Settings.Aliases"));
+            AliasesRegistration.setAliases("XpBottle", pl.getWithdrawManager().XP_BOTTLE.getConfig().getStringList("Settings.Aliases"));
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException | NoSuchFieldException e) {
             // TODO Auto-generated catch block
@@ -146,11 +147,11 @@ public class XpBottleCMD extends CommandModule implements CommandExecutor {
             int minXp = 0;
             //Limit min and max amount of xp which can be withdrawn
             if (!sender.hasPermission("BeastWithdraw.XpBottle.ByPass.WithdrawLimit")) {
-                minXp = pl.getWithdrawManager().getXpBottleConfig().getInt("Settings.Min");
-                if (pl.getWithdrawManager().getXpBottleConfig().getBoolean("Settings.PermissionNotes.Enabled")) {
-                    for (String s : pl.getWithdrawManager().getXpBottleConfig().getConfigurationSection("Settings.PermissionNotes").getKeys(false)) {
+                minXp = pl.getWithdrawManager().XP_BOTTLE.getConfig().getInt("Settings.Min");
+                if (pl.getWithdrawManager().XP_BOTTLE.getConfig().getBoolean("Settings.PermissionNotes.Enabled")) {
+                    for (String s : pl.getWithdrawManager().XP_BOTTLE.getConfig().getConfigurationSection("Settings.PermissionNotes").getKeys(false)) {
                         if (sender.hasPermission("BeastWithdraw.XpBottle.PermissionNotes." + s)) {
-                            minXp = pl.getWithdrawManager().getXpBottleConfig().getInt("Settings.PermissionNotes." + s + ".Min");
+                            minXp = pl.getWithdrawManager().XP_BOTTLE.getConfig().getInt("Settings.PermissionNotes." + s + ".Min");
                         }
                     }
 
@@ -163,11 +164,11 @@ public class XpBottleCMD extends CommandModule implements CommandExecutor {
                 }
 
 
-                int maxXp = pl.getWithdrawManager().getXpBottleConfig().getInt("Settings.Max");
-                if (pl.getWithdrawManager().getXpBottleConfig().getBoolean("Settings.PermissionNotes.Enabled")) {
-                    for (String s : pl.getWithdrawManager().getXpBottleConfig().getConfigurationSection("Settings.PermissionNotes").getKeys(false)) {
+                int maxXp = pl.getWithdrawManager().XP_BOTTLE.getConfig().getInt("Settings.Max");
+                if (pl.getWithdrawManager().XP_BOTTLE.getConfig().getBoolean("Settings.PermissionNotes.Enabled")) {
+                    for (String s : pl.getWithdrawManager().XP_BOTTLE.getConfig().getConfigurationSection("Settings.PermissionNotes").getKeys(false)) {
                         if (sender.hasPermission("BeastWithdraw.XpBottle.PermissionNotes." + s)) {
-                            maxXp = pl.getWithdrawManager().getXpBottleConfig().getInt("Settings.PermissionNotes." + s + ".Max");
+                            maxXp = pl.getWithdrawManager().XP_BOTTLE.getConfig().getInt("Settings.PermissionNotes." + s + ".Max");
                         }
                     }
                 }
@@ -200,11 +201,11 @@ public class XpBottleCMD extends CommandModule implements CommandExecutor {
 
             //Charge Fee
             if (!p.isPermissionSet("BeastWithdraw.XpBottle.ByPass.Fee")) {
-                if (pl.getWithdrawManager().getXpBottleConfig().getBoolean("Settings.Charges.Fee.Enabled")) {
+                if (pl.getWithdrawManager().XP_BOTTLE.getConfig().getBoolean("Settings.Charges.Fee.Enabled")) {
 
 
                     //Money Fee
-                    double moneyFee = pl.getWithdrawManager().getXpBottleConfig().getDouble("Settings.Charges.Fee.Cost");
+                    double moneyFee = pl.getWithdrawManager().XP_BOTTLE.getConfig().getDouble("Settings.Charges.Fee.Cost");
                     if (!pl.getEcon().has(p,moneyFee*amount)) {
                         String s = pl.getMessages().getString("Withdraws.CashNote.Fee.NotEnough");
                         s = s.replaceAll("%fee%", "" + pl.getUtils().formatDouble(moneyFee*amount));
@@ -220,8 +221,8 @@ public class XpBottleCMD extends CommandModule implements CommandExecutor {
             int tax = 0;
             //Charge Tax
             if (!p.isPermissionSet("BeastWithdraw.XpBottle.ByPass.Tax")) {
-                if (pl.getWithdrawManager().getXpBottleConfig().getBoolean("Settings.Charges.Tax.Enabled")) {
-                    double percentage = pl.getWithdrawManager().getXpBottleConfig().getDouble("Settings.Charges.Tax.Percentage");
+                if (pl.getWithdrawManager().XP_BOTTLE.getConfig().getBoolean("Settings.Charges.Tax.Enabled")) {
+                    double percentage = pl.getWithdrawManager().XP_BOTTLE.getConfig().getDouble("Settings.Charges.Tax.Percentage");
                     if (percentage > 100.0) percentage = 100.0;
                     tax = (int) (takenXp * (percentage / 100));
                     String s = pl.getMessages().getString("Withdraws.XpBottle.Tax.TakenTax");
@@ -246,9 +247,9 @@ public class XpBottleCMD extends CommandModule implements CommandExecutor {
                 p.getWorld().dropItem(p.getLocation(), xpBottle);
             }
 
-            if (pl.getWithdrawManager().getXpBottleConfig().getBoolean("Settings.Sounds.Withdraw.Enabled")) {
+            if (pl.getWithdrawManager().XP_BOTTLE.getConfig().getBoolean("Settings.Sounds.Withdraw.Enabled")) {
                 try {
-                    String sound = pl.getWithdrawManager().getXpBottleConfig().getString("Settings.Sounds.Withdraw.Sound");
+                    String sound = pl.getWithdrawManager().XP_BOTTLE.getConfig().getString("Settings.Sounds.Withdraw.Sound");
                     p.playSound(p.getLocation(), Sound.valueOf(sound), 1f, 1f);
 
                 } catch (Exception e) {
