@@ -2,13 +2,11 @@ package me.mraxetv.beastwithdraw.managers;
 
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
 import me.mraxetv.beastwithdraw.commands.AliasesRegistration;
-import me.mraxetv.beastwithdraw.filemanager.FolderYaml;
 import me.mraxetv.beastwithdraw.managers.assets.BeastTokensHandler;
 import me.mraxetv.beastwithdraw.managers.assets.CashNoteHandler;
 import me.mraxetv.beastwithdraw.managers.assets.PlayerPointsHandler;
 import me.mraxetv.beastwithdraw.managers.assets.XpBottleHandler;
 import me.mraxetv.beastwithdraw.utils.Utils;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;

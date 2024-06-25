@@ -78,7 +78,7 @@ public class PlayerPointsNoteCMD extends CommandModule implements CommandExecuto
         }
         int takenAmount;
 
-        int noteAmount = 1;
+        int stackSize = 1;
 
         if (args.length == 2) {
             if (!Utils.isInt(args[1])) {
@@ -88,7 +88,14 @@ public class PlayerPointsNoteCMD extends CommandModule implements CommandExecuto
                 pl.getUtils().sendMessage(sender, s);
                 return;
             }
-            noteAmount = Math.abs(Integer.parseInt(args[1]));
+            stackSize = Math.abs(Integer.parseInt(args[1]));
+            if(stackSize < 1) stackSize = 1;
+            if(stackSize > pl.getWithdrawManager().PLAYERPOINTS_NOTE.getConfig().getInt("Settings.MaxStackSize",64)){
+                String s = pl.getMessages().getString("Withdraws.MaxStackSize");
+                s = s.replaceAll("%stack%",""+pl.getWithdrawManager().PLAYERPOINTS_NOTE.getConfig().getInt("Settings.MaxStackSize",64));
+                Utils.sendMessage(sender,s);
+                return;
+            }
         }
         //Player Xp
         int amount = (int) pl.getWithdrawManager().getAssetHandler(handlerID).getBalance(p);
@@ -169,17 +176,17 @@ public class PlayerPointsNoteCMD extends CommandModule implements CommandExecuto
 
 
 
-            if(((double)takenAmount*noteAmount) > Integer.MAX_VALUE){
+            if(((double)takenAmount*stackSize) > Integer.MAX_VALUE){
                 message = pl.getMessages().getString("Withdraws.ToBigNumber");
-                message = message.replaceAll("%amount%", Utils.formatDouble((double) takenAmount*noteAmount));
+                message = message.replaceAll("%amount%", Utils.formatDouble((double) takenAmount*stackSize));
                 pl.getUtils().sendMessage(p, message);
               return;
             }
 
-            if ((amount < takenAmount * noteAmount)) {
+            if ((amount < takenAmount * stackSize)) {
                 message = pl.getMessages().getString("Withdraws.PlayerPointsNote.NotEnough");
                 message = message.replaceAll("%balance%", "" + pl.getUtils().formatNumber(amount));
-                message = message.replaceAll("%taken-amount%", "" + pl.getUtils().formatNumber(takenAmount*noteAmount));
+                message = message.replaceAll("%taken-amount%", "" + pl.getUtils().formatNumber(takenAmount*stackSize));
                 pl.getUtils().sendMessage(p, message);
                 return;
             }
@@ -191,15 +198,15 @@ public class PlayerPointsNoteCMD extends CommandModule implements CommandExecuto
                     double bal = pl.getWithdrawManager().getAssetHandler(handlerID).getBalance(p);
                     //Money Fee
                     double moneyFee = pl.getWithdrawManager().getAssetHandler(handlerID).getConfig().getDouble("Settings.Charges.Fee.Cost");
-                    if (bal < moneyFee*noteAmount) {
+                    if (bal < moneyFee*stackSize) {
                         String s = pl.getMessages().getString("Withdraws.CashNote.Fee.NotEnough");
-                        s = s.replaceAll("%fee%", "" + pl.getUtils().formatDouble(moneyFee*noteAmount));
+                        s = s.replaceAll("%fee%", "" + pl.getUtils().formatDouble(moneyFee*stackSize));
                         pl.getUtils().sendMessage(p, s);
                         return;
                     }
-                    pl.getWithdrawManager().getAssetHandler(handlerID).withdrawAmount(p, moneyFee*noteAmount);
+                    pl.getWithdrawManager().getAssetHandler(handlerID).withdrawAmount(p, moneyFee*stackSize);
                     String s = pl.getMessages().getString("Withdraws.CashNote.Fee.TakenFee");
-                    s = s.replaceAll("%fee%", "" + pl.getUtils().formatDouble(moneyFee*noteAmount));
+                    s = s.replaceAll("%fee%", "" + pl.getUtils().formatDouble(moneyFee*stackSize));
                     pl.getUtils().sendMessage(p, s);
                 }
             }
@@ -211,21 +218,21 @@ public class PlayerPointsNoteCMD extends CommandModule implements CommandExecuto
                     if (percentage > 100.0) percentage = 100.0;
                     tax = (int) (takenAmount * (percentage / 100));
                     String s = pl.getMessages().getString("Withdraws.PlayerPointsNote.Tax.TakenTax");
-                    s = s.replaceAll("%tax%", "" + pl.getUtils().formatNumber(tax * noteAmount));
+                    s = s.replaceAll("%tax%", "" + pl.getUtils().formatNumber(tax * stackSize));
                     pl.getUtils().sendMessage(p, s);
                 }
             }
-            pl.getWithdrawManager().getAssetHandler(handlerID).withdrawAmount(p,takenAmount*noteAmount);
+            pl.getWithdrawManager().getAssetHandler(handlerID).withdrawAmount(p,takenAmount*stackSize);
 
             String s = pl.getMessages().getString("Withdraws.PlayerPointsNote.Withdraw");
-            s = s.replaceAll("%taken-amount%", "" + pl.getUtils().formatNumber(takenAmount*noteAmount));
+            s = s.replaceAll("%taken-amount%", "" + pl.getUtils().formatNumber(takenAmount*stackSize));
             s = s.replaceAll("%balance%", "" + pl.getUtils().formatNumber(XpManager.getTotalExperience(p)));
             Utils.sendMessage(p, s);
 
             takenAmount = takenAmount - tax;
 
 
-            ItemStack xpBottle = pl.getWithdrawManager().getAssetHandler(handlerID).getItem(p.getName(), takenAmount, noteAmount, true);
+            ItemStack xpBottle = pl.getWithdrawManager().getAssetHandler(handlerID).getItem(p.getName(), takenAmount, stackSize, true);
             if (p.getInventory().firstEmpty() != -1) {
                 Utils.addItem(p,xpBottle);
             } else {

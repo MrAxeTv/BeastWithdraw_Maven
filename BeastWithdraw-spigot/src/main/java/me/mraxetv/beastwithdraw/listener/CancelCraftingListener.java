@@ -1,33 +1,40 @@
 package me.mraxetv.beastwithdraw.listener;
 
-
-
-import me.mraxetv.beastcore.utils.nbtapi.NBTItem;
-import me.mraxetv.beastcore.utils.nbtapi.utils.MinecraftVersion;
+import com.nisovin.shopkeepers.api.ShopkeepersAPI;
+import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
+import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
+import me.mraxetv.beastlib.lib.nbtapi.NBTItem;
+import me.mraxetv.beastlib.lib.nbtapi.utils.MinecraftVersion;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.AbstractVillager;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.event.inventory.PrepareItemCraftEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.*;
 
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
+
+import java.util.List;
 
 
 public class CancelCraftingListener
         implements Listener {
     BeastWithdrawPlugin pl;
     private boolean crafting;
+    private boolean hasShopKeeper;
 
     public CancelCraftingListener(BeastWithdrawPlugin pl) {
         this.pl = pl;
         pl.getServer().getPluginManager().registerEvents(this, pl);
         crafting = pl.getConfig().getBoolean("Settings.CancelCrafting");
+        hasShopKeeper = pl.getServer().getPluginManager().isPluginEnabled("Shopkeepers");
     }
 
 
@@ -50,7 +57,7 @@ public class CancelCraftingListener
 
     @EventHandler
     public void noGrindStone(InventoryClickEvent e) {
-        if(!MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_14_R1)) return;
+        if (!MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_14_R1)) return;
         if (e.getWhoClicked().getOpenInventory().getTopInventory().getType() != InventoryType.GRINDSTONE) return;
         ItemStack itemStack = e.getCurrentItem();
         if (e.getCurrentItem() == null) return;
@@ -68,8 +75,8 @@ public class CancelCraftingListener
 
     @EventHandler
     public void onClick(InventoryClickEvent e) {
-        if ((pl.getConfig().getBoolean("Settings.CancelVillagerTrade")) &&
-                (e.getWhoClicked().getOpenInventory().getTopInventory().getType() == InventoryType.MERCHANT)) {
+        if ((!pl.getConfig().getBoolean("Settings.VillagerTrade.Allow")) &&
+                (e.getInventory().getType() == InventoryType.MERCHANT)) {
             Player p = (Player) e.getWhoClicked();
             if (e.getCurrentItem() == null) return;
             if (e.getCurrentItem().getType() == Material.AIR) return;
@@ -80,13 +87,19 @@ public class CancelCraftingListener
 
 
             if (tag.hasKey("bCraft")) {
+
+                if (e.getWhoClicked().getOpenInventory().getTopInventory().getHolder() == null && pl.getConfig().getBoolean("Settings.VillagerTrade.AllowShopKeeperPlugin")) return;
+
                 String s = pl.getMessages().getString("Withdraws.CancelVillagerTrade");
                 pl.getUtils().sendMessage(p, s);
                 e.setCancelled(true);
-                return;
+
 
             }
         }
     }
+
+
+
 }
 

@@ -1,6 +1,7 @@
 package me.mraxetv.beastwithdraw.managers.assets;
 
-import me.mraxetv.beasttokens.BeastTokensAPI;
+
+import me.mraxetv.beasttokens.api.BeastTokensAPI;
 import me.mraxetv.beasttokens.api.handlers.BTTokensManager;
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
 import me.mraxetv.beastwithdraw.commands.tokenwithdraw.BeastTokenNoteCMD;
@@ -15,7 +16,7 @@ public class BeastTokensHandler extends AssetHandler {
     public BeastTokensHandler(BeastWithdrawPlugin pl, String id) {
         super(pl, id);
         api = BeastTokensAPI.getTokensManager();
-        pl.getCommand("btWithdraw").setExecutor(new BeastTokenNoteCMD(pl));
+        pl.getCommand("btWithdraw").setExecutor(new BeastTokenNoteCMD(pl,this));
         new BTokensNoteRedeemListener(pl);
     }
 

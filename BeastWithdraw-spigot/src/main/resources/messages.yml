@@ -16,6 +16,7 @@ Help:
   - "&7&l&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯"
 
 Withdraws:
+  MaxStackSize: "%prefix% &cYou can't make stack bigger than %stack% items!"
   XpBottle:
     NotEnough: "%prefix% &cYou don't have %taken-amount%XP!&e(XpBalance: %balance%XP)"
     Help: "%prefix% &2You have %balance%XP &e(Use /xpBottle <xp>/<all>/<xp>L <note-amount>)"
@@ -83,6 +84,6 @@ Withdraws:
   CancelVillagerTrade: "%prefix% &4Withdraw items can't be used for trading with villagers!"
   CancelGrindStone: "%prefix% &4Withdraw items can't be used in Grind Stone!"
 PlaceHolders:
-    AmountFormat: "&3(x%amount%)"
-
-ConfigVersion: 2.8
+  StackSize: "%amount%x"
+ ##Test Banana
+ConfigVersion: 2.9

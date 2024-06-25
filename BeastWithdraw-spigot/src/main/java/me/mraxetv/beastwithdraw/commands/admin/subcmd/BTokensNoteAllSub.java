@@ -2,6 +2,7 @@ package me.mraxetv.beastwithdraw.commands.admin.subcmd;
 
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
 import me.mraxetv.beastwithdraw.commands.CommandModule;
+import me.mraxetv.beastwithdraw.managers.WithdrawManager;
 import me.mraxetv.beastwithdraw.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -68,25 +69,19 @@ public class BTokensNoteAllSub extends CommandModule {
 
         double bTokens = Double.parseDouble(args[1]);
 
-        ItemStack bTokensNote = pl.getItemManger().getBTokensNote(signer, bTokens, amount, signet);
+        ItemStack bTokensNote = WithdrawManager.BEASTTOKENS_NOTE.getItem(signer, bTokens, amount, signet);
 
         for (Player target : Bukkit.getOnlinePlayers()) {
 
-            //Add to inventory
-            if (target.getInventory().firstEmpty() != -1) {
                 Utils.addItem(target,bTokensNote);
-            }
-            //Drop to floor
-            else {
-                target.getWorld().dropItem(target.getLocation(), bTokensNote);
-            }
+
 
             String message = pl.getMessages().getString("Withdraws.BeastTokensNote.RewardReceived");
-            message = message.replaceAll("%received-amount%", "" + pl.getUtils().formatDouble(bTokens)).replaceAll("%note-amount%", Utils.setAmount(amount));
+            message = message.replaceAll("%received-amount%", "" + pl.getUtils().formatDouble(bTokens)).replaceAll("%note-amount%", Utils.setStackSize(amount));
             pl.getUtils().sendMessage(target, message);
         }
         String message = pl.getMessages().getString("Withdraws.Admin.BeastTokensNote.GivenToAll");
-        message = message.replaceAll("%received-amount%", "" + pl.getUtils().formatDouble(bTokens)).replaceAll("%note-amount%", Utils.setAmount(amount));
+        message = message.replaceAll("%received-amount%", "" + pl.getUtils().formatDouble(bTokens)).replaceAll("%note-amount%", Utils.setStackSize(amount));
         pl.getUtils().sendMessage(sender, message);
         return;
 

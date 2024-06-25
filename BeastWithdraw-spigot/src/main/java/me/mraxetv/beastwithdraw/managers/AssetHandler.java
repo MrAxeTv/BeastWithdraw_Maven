@@ -1,8 +1,8 @@
 package me.mraxetv.beastwithdraw.managers;
 
 
-import me.mraxetv.beastcore.utils.nbtapi.NBTItem;
-import me.mraxetv.beastcore.utils.nbtapi.utils.MinecraftVersion;
+import me.mraxetv.beastlib.lib.nbtapi.NBTItem;
+import me.mraxetv.beastlib.lib.nbtapi.utils.MinecraftVersion;
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
 import me.mraxetv.beastwithdraw.filemanager.FolderYaml;
 import me.mraxetv.beastwithdraw.utils.Utils;
@@ -62,6 +62,10 @@ public abstract class AssetHandler {
         material = m;
     }
 
+    public Material getMaterial() {
+        return material;
+    }
+
     public String getFormattedNumber(double amount){
 
         return  decimalFormat.format(amount);
@@ -79,6 +83,7 @@ public abstract class AssetHandler {
 
     public ItemStack getItem(String owner, double value, int amount, boolean signed) {
         ItemStack item = new ItemStack(material, amount);
+
         if (getConfig().isSet("Settings.Data")) {
             item.setDurability((short) getConfig().getInt("Settings.Data"));
         }

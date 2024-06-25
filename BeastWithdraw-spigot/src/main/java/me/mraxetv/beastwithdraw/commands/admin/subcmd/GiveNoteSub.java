@@ -2,7 +2,6 @@ package me.mraxetv.beastwithdraw.commands.admin.subcmd;
 
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
 import me.mraxetv.beastwithdraw.commands.CommandModule;
-import me.mraxetv.beastwithdraw.managers.WithdrawManager;
 import me.mraxetv.beastwithdraw.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -11,14 +10,14 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public class BTokensNoteSub extends CommandModule {
+public class GiveNoteSub extends CommandModule {
     /**
      * @param pl
      * @param permission - The label of the command.
      * @param minArgs    - The minimum amount of arguments.
      * @param maxArgs    - The maximum amount of arguments.
      */
-    public BTokensNoteSub(BeastWithdrawPlugin pl, String permission, int minArgs, int maxArgs) {
+    public GiveNoteSub(BeastWithdrawPlugin pl, String permission, int minArgs, int maxArgs) {
         super(pl, permission, minArgs, maxArgs);
     }
 
@@ -34,20 +33,27 @@ public class BTokensNoteSub extends CommandModule {
         }
 
         if (!hasEnoughArgs(args)) {
-            String s = pl.getMessages().getString("Withdraws.Admin.BeastTokensNote.GiveCMD");
+            String s = pl.getMessages().getString("Withdraws.GiveCMD");
             s = s.replaceAll("%prefix%", Utils.getPrefix());
             pl.getUtils().sendMessage(sender, s);
             return;
         }
-        if (!isOnline(args[1])) {
+        if (!isOnline(args[2])) {
             String s = pl.getMessages().getString("Withdraws.NotOnline");
             s = s.replaceAll("%prefix%", Utils.getPrefix());
             s = s.replaceAll("%player%", args[1]);
             pl.getUtils().sendMessage(sender, s);
             return;
         }
+        if(!pl.getWithdrawManager().hasAssetHandler(args[1])){
+            String s = pl.getMessages().getString("Withdraws.WrongTypeName");
+            s = s.replaceAll("%prefix%", Utils.getPrefix()).replaceAll("%type%",args[1]);
+            s = s.replaceAll("%player%", args[1]);
+            pl.getUtils().sendMessage(sender, s);
+            return;
+        }
 
-        if (!Utils.isDouble(args[2])) {
+        if (!Utils.isDouble(args[3])) {
             String s = pl.getMessages().getString("Withdraws.NoNumber");
             s = s.replaceAll("%prefix%", Utils.getPrefix());
             s = s.replaceAll("%amount%", args[2]);
@@ -56,32 +62,30 @@ public class BTokensNoteSub extends CommandModule {
         }
         int amount = 1;
 
-        if (args.length > 3) {
-            if (!Utils.isInt(args[3])) {
+        if (args.length > 4) {
+            if (!Utils.isInt(args[4])) {
                 String s = pl.getMessages().getString("Withdraws.NoNumber");
                 s = s.replaceAll("%prefix%", Utils.getPrefix());
                 s = s.replaceAll("%amount%", args[3]);
                 pl.getUtils().sendMessage(sender, s);
                 return;
             }
-            amount = Integer.parseInt(args[3]);
+            amount = Integer.parseInt(args[4]);
         }
         boolean signet = false;
         String signer = "";
-        if(args.length == 5) {
+        if(args.length == 6) {
             signet = true;
-            signer = args[4];
+            signer = args[5];
         }
 
 
-        Player target = Bukkit.getPlayer(args[1]);
-        double bTokens = Double.parseDouble(args[2]);
+        Player target = Bukkit.getPlayer(args[2]);
+        double bTokens = Double.parseDouble(args[3]);
+        String handlerID = args[1];
+        ItemStack item = pl.getWithdrawManager().getAssetHandler(handlerID).getItem(signer, bTokens, amount, signet);
 
-        ItemStack btokensNote = WithdrawManager.BEASTTOKENS_NOTE.getItem(signer, bTokens, amount, signet);
-
-        //Add to inventory
-
-            Utils.addItem(target,btokensNote);
+        Utils.addItem(target,item);
 
 
 
@@ -103,4 +107,6 @@ public class BTokensNoteSub extends CommandModule {
     public List<String> getTabComplete(CommandSender sender, String[] args) {
         return null;
     }
+
+
 }

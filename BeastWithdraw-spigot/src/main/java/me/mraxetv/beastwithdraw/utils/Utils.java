@@ -9,16 +9,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-import me.mraxetv.beastcore.utils.nbtapi.utils.MinecraftVersion;
+import me.mraxetv.beastlib.lib.nbtapi.utils.MinecraftVersion;
+import me.mraxetv.beastlib.utils.SUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
 
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
 
-public class Utils
+public class Utils extends SUtils
 implements Listener {
 	private BeastWithdrawPlugin pl;
 	private String version;
@@ -32,13 +32,14 @@ implements Listener {
 	}
 
 	public Utils(BeastWithdrawPlugin plugin) {
-
+		super(plugin);
 		this.pl = plugin;
 		if(pl.getConfig().getBoolean("Settings.DisableDecimalAmounts")){
 			df2 = new DecimalFormat("#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 
 		}else df2 = new DecimalFormat("#.##", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 		df2.setRoundingMode(RoundingMode.DOWN);
+
 
 	}
 
@@ -66,10 +67,10 @@ implements Listener {
 	}
 
 
-	public static String setAmount(int amount){
+	public static String setStackSize(int amount){
 
 		if (amount == 1) return "";
-		return ConfigLang.AMOUNT.replaceAll("%amount%",""+amount);
+		return ConfigLang.STACK_SIZE.replaceAll("%amount%",""+amount);
 	}
 
 	public static void sendMessage(CommandSender sender , String message){
@@ -87,13 +88,6 @@ implements Listener {
 		
 	}
 
-	public boolean fullInv(Player p) {
-		int check = p.getInventory().firstEmpty();
-		if (check == -1) {
-			return true;
-		}
-		return false;
-	}
 
 	public static boolean isInt(String value) {
 		try {
@@ -133,33 +127,6 @@ implements Listener {
     public static String formatNumber(int number) {
         return NumberFormat.getInstance(Locale.ENGLISH).format(number);
     }
-
-
-	public static void addItem(Player p, ItemStack item){
-
-		if(item.getAmount() < 65){
-
-			p.getInventory().addItem(item);
-			return;
-		}
-		int stacks = item.getAmount()/64;
-		int leftovers = item.getAmount()%64;
-
-		item.setAmount(64);
-		for(int i = 0; i < stacks; i++){
-			if(p.getInventory().firstEmpty() != -1){
-				p.getInventory().addItem(item);
-			}
-			else{p.getLocation().getWorld().dropItemNaturally(p.getLocation(),item);}
-		}
-		//Give leftovers of item stack!
-		item.setAmount(leftovers);
-		if(p.getInventory().firstEmpty() != -1){
-			p.getInventory().addItem(item);
-		}
-		else{p.getLocation().getWorld().dropItemNaturally(p.getLocation(),item);}
-
-	}
 
 }
 

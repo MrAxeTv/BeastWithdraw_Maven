@@ -2,6 +2,7 @@ package me.mraxetv.beastwithdraw.commands.admin.subcmd;
 
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
 import me.mraxetv.beastwithdraw.commands.CommandModule;
+import me.mraxetv.beastwithdraw.managers.WithdrawManager;
 import me.mraxetv.beastwithdraw.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -68,26 +69,22 @@ public class XpBottleGiveAllSub extends CommandModule {
 
         int xp = Integer.parseInt(args[1]);
 
-        ItemStack xpBottle = pl.getItemManger().getXpb(signer, xp, amount, signet);
+        ItemStack xpBottle = WithdrawManager.XP_BOTTLE.getItem(signer, xp, amount, signet);
 
         for (Player target : Bukkit.getOnlinePlayers()) {
 
             //Add to inventory
-            if (target.getInventory().firstEmpty() != -1) {
+
                 //target.getInventory().addItem(xpBottle);
                 Utils.addItem(target,xpBottle);
-            }
-            //Drop to floor
-            else {
-                target.getWorld().dropItem(target.getLocation(), xpBottle);
-            }
+
 
             String message = pl.getMessages().getString("Withdraws.XpBottle.RewardReceived");
-            message = message.replaceAll("%received-amount%", "" + pl.getUtils().formatNumber(xp)).replaceAll("%note-amount%", Utils.setAmount(amount));
+            message = message.replaceAll("%received-amount%", "" + pl.getUtils().formatNumber(xp)).replaceAll("%note-amount%", Utils.setStackSize(amount));
             pl.getUtils().sendMessage(target, message);
         }
         String message = pl.getMessages().getString("Withdraws.Admin.XpBottle.GivenToAll");
-        message = message.replaceAll("%received-amount%", "" + pl.getUtils().formatNumber(xp)).replaceAll("%note-amount%", Utils.setAmount(amount));
+        message = message.replaceAll("%received-amount%", "" + pl.getUtils().formatNumber(xp)).replaceAll("%note-amount%", Utils.setStackSize(amount));
         pl.getUtils().sendMessage(sender, message);
         return;
 

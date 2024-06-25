@@ -13,7 +13,7 @@
     </parent>
 
     <artifactId>BeastWithdraw-spigot</artifactId>
-    <version>2.23</version>
+    <version>2.3.4</version>
     <packaging>jar</packaging>
 
     <name>BeastWithdraw</name>
@@ -26,6 +26,32 @@
                 <version>3.2.1</version>
 
                 <executions>
+<!--                    <execution>-->
+<!--                        <phase>package</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>shade</goal>-->
+<!--                        </goals>-->
+<!--                        &lt;!&ndash;Setting up specific output location for shaded jar &ndash;&gt;-->
+<!--                        <configuration>-->
+
+<!--                            &lt;!&ndash;  Shading NBT API to PLUGIN &ndash;&gt;-->
+<!--                            <relocations>-->
+<!--                                &lt;!&ndash;<relocation>-->
+<!--                                    <pattern>me.mraxetv.beastlib.lib.nbtapi</pattern>-->
+<!--                                    <shadedPattern>me.mraxetv.beastlib.lib.nbtapi</shadedPattern>-->
+<!--                                </relocation>&ndash;&gt;-->
+<!--                                <relocation>-->
+<!--                                    <pattern>org.bstats</pattern>-->
+<!--                                    &lt;!&ndash; Replace this with your package! &ndash;&gt;-->
+<!--                                    <shadedPattern>me.mraxetv.beastwithdraw.bstats</shadedPattern>-->
+<!--                                </relocation>-->
+<!--                            </relocations>-->
+
+<!--                            <finalName>${project.name}-${project.version}</finalName>-->
+<!--                            <outputFile>F:\McServers\spigot 1.20 legacy\plugins\${project.name}-${project.version}.jar</outputFile>-->
+
+<!--                        </configuration>-->
+<!--                    </execution>-->
                     <execution>
                         <phase>package</phase>
                         <goals>
@@ -33,23 +59,60 @@
                         </goals>
                         <!--Setting up specific output location for shaded jar -->
                         <configuration>
+                            <finalName>${project.name}-${project.parent.version}</finalName>
+                            <outputFile>F:\McServers\spigot 1.8\plugins\${project.name}.jar</outputFile>
+                        </configuration>
+                    </execution>
 
-                            <!--  Shading NBT API to PLUGIN -->
-                            <relocations>
-<!--                                <relocation>
-                                    <pattern>de.tr7zw.changeme.nbtapi</pattern>
-                                    <shadedPattern>me.mraxetv.beastwithdraw.utils.nbtapi</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.bstats</pattern>
-                                    &lt;!&ndash; Replace this with your package! &ndash;&gt;
-                                    <shadedPattern>me.mraxetv.beastwithdraw.bstats</shadedPattern>
-                                </relocation>-->
-                            </relocations>
+                    <execution>
+                        <id>Latest</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <!--Setting up specific output location for shaded jar -->
+                        <configuration>
+                            <finalName>${project.name}-${project.parent.version}</finalName>
+                            <outputFile>F:\McServers\spigot 1.20 legacy\plugins\${project.name}.jar</outputFile>
+                        </configuration>
+                    </execution>
 
-                            <finalName>${project.name}-${project.version}</finalName>
-                            <outputFile>C:\Users\krist\Desktop\McServers\spigot-1.19\plugins\${project.name}-${project.version}.jar</outputFile>
+                    <execution>
+                        <id>Bc 1</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <!--Setting up specific output location for shaded jar -->
+                        <configuration>
+                            <finalName>${project.name}-${project.parent.version}</finalName>
+                            <outputFile>F:\McServers\Bungee\BC\s1\plugins\${project.name}.jar</outputFile>
+                        </configuration>
+                    </execution>
 
+                    <execution>
+                        <id>Bc 2</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <!--Setting up specific output location for shaded jar -->
+                        <configuration>
+                            <finalName>${project.name}-${project.parent.version}</finalName>
+                            <outputFile>F:\McServers\Bungee\BC\s2\plugins\${project.name}.jar</outputFile>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>Production</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <!--Setting up specific output location for shaded jar -->
+                        <configuration>
+                            <finalName>${project.name}-${project.parent.version}</finalName>
+                            <outputFile>F:\McServers\production\${project.name}-${project.version}.jar</outputFile>
                         </configuration>
                     </execution>
                 </executions>
@@ -90,10 +153,6 @@
             </plugin>
 
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
         </plugins>
         <resources>
             <resource>
@@ -111,6 +170,12 @@
             <id>spigotmc-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
+
+        <repository>
+            <id>shopkeepers-repo</id>
+            <url>https://nexus.lichtspiele.org/repository/releases/</url>
+        </repository>
+
         <repository>
             <id>sonatype</id>
             <url>https://oss.sonatype.org/content/groups/public/</url>
@@ -168,7 +233,14 @@
         <dependency>
             <groupId>me.mraxetv.beasttokens</groupId>
             <artifactId>bt-api</artifactId>
-            <version>2.1</version>
+            <version>3.14.4</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>me.mraxetv.beasttokens</groupId>
+            <artifactId>core</artifactId>
+            <version>3.14.4</version>
             <scope>provided</scope>
         </dependency>
 
@@ -196,6 +268,7 @@
         </dependency>
 
 
+
        <!-- <dependency>
             <groupId>com.core</groupId>
             <artifactId>UltimatePrisonCore</artifactId>
@@ -220,6 +293,15 @@
             <systemPath>${basedir}/res/CataMines-2.5.7.jar</systemPath>
 
         </dependency>-->
+
+        <dependency>
+            <groupId>com.nisovin.shopkeepers</groupId>
+            <artifactId>ShopkeepersAPI</artifactId>
+            <!-- Replace this with the latest Shopkeepers version -->
+            <version>2.19.0</version>
+            <scope>provided</scope>
+        </dependency>
+
 
     </dependencies>
 </project>

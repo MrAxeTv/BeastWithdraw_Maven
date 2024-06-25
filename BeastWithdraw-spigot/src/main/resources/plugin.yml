@@ -1,6 +1,6 @@
 name: BeastWithdraw
 authors: [MrAxeTv]
-main: me.mraxetv.beastwithdraw.MyPlugin
+main: me.mraxetv.beastwithdraw.BeastWithdrawPlugin
 description: Simple handy withdraw plugin.
 version: ${project.version}
 softdepend: [Essentials, Vault, BeastTokens,BeastCore]

@@ -1,8 +1,10 @@
 package me.mraxetv.beastwithdraw.listener;
 
-import me.mraxetv.beastcore.utils.nbtapi.NBTItem;
-import me.mraxetv.beastcore.utils.nbtapi.utils.MinecraftVersion;
-import me.mraxetv.beasttokens.BeastTokensAPI;
+import me.mraxetv.beastlib.lib.nbtapi.NBTItem;
+import me.mraxetv.beastlib.lib.nbtapi.utils.MinecraftVersion;
+
+import me.mraxetv.beasttokens.BeastTokensPlugin;
+import me.mraxetv.beasttokens.api.BeastTokensAPI;
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
 import me.mraxetv.beastwithdraw.events.BTokensRedeemEvent;
 import me.mraxetv.beastwithdraw.events.CashRedeemEvent;
@@ -16,17 +18,22 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.HashSet;
+import java.util.UUID;
 
 
 public class BTokensNoteRedeemListener implements Listener {
     private BeastWithdrawPlugin pl;
-    private Material material;
+    private HashSet<UUID> delayList;
 
     public BTokensNoteRedeemListener(BeastWithdrawPlugin plugin) {
         if (!plugin.getServer().getPluginManager().isPluginEnabled("BeastTokens")) return;
         pl = plugin;
         pl.getServer().getPluginManager().registerEvents(this,pl);
-        material = Material.getMaterial(pl.getWithdrawManager().CASH_NOTE.getConfig().getString("Settings.Item"));
+        delayList = new HashSet<>();
+        if(pl.getServer().getPluginManager().getPlugin("BeastTokens") != null) BeastTokensPlugin.getInstance().getDeposit().disable();
     }
 
 
@@ -35,31 +42,34 @@ public class BTokensNoteRedeemListener implements Listener {
 
         if (!e.hasItem()) return;
         if (e.getItem().getType() == Material.AIR) return;
-        if (!e.getItem().hasItemMeta()) return;
+        ItemStack item = e.getItem();
+        if (!item.hasItemMeta()) return;
         if (e.getAction() != Action.RIGHT_CLICK_AIR && e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-        //if (e.getItem().getType() != material) return;
-        NBTItem nbtItem = new NBTItem(e.getItem());
-        if (!nbtItem.hasKey(pl.getWithdrawManager().CASH_NOTE.getConfig().getString("Settings.NBTLore"))) return;
+        //if (item.getType() != material) return;
+        NBTItem nbtItem = new NBTItem(item);
+        if (!nbtItem.hasKey(pl.getWithdrawManager().BEASTTOKENS_NOTE.getConfig().getString("Settings.NBTLore"))) return;
 
-        //Cancel dupe event on block click
-        if (e.isCancelled() && e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            e.setCancelled(true);
-            return;
-        }
-        //Cancel First Time
+        UUID uuid = e.getPlayer().getUniqueId();
+        if(delayList.contains(uuid)) return;
+        delayList.add(uuid);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                delayList.remove(uuid);
+            }
+        }.runTaskLater(pl,1);
+
         e.setCancelled(true);
 
         boolean offHand = false;
 
         if (MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_9_R1)) {
-            if (e.getItem().equals(e.getPlayer().getInventory().getItemInOffHand())) {
+            if (item.equals(e.getPlayer().getInventory().getItemInOffHand())) {
                 offHand = true;
             }
         }
         pl.getServer().getPluginManager().
-                callEvent(new BTokensRedeemEvent(e.getPlayer(), e.getItem(), nbtItem.getDouble(pl.getWithdrawManager().CASH_NOTE.getConfig().getString("Settings.NBTLore")), offHand));
-        return;
-
+                callEvent(new BTokensRedeemEvent(e.getPlayer(), item, nbtItem.getDouble(pl.getWithdrawManager().BEASTTOKENS_NOTE.getConfig().getString("Settings.NBTLore")), offHand));
     }
 
 
@@ -67,6 +77,7 @@ public class BTokensNoteRedeemListener implements Listener {
     public void redeemEvent(BTokensRedeemEvent e) {
 
         if (e.isCancelled()) return;
+        ItemStack item = e.getItem();
         Player p = e.getPlayer();
         double tokens = e.getTokens();
         BeastTokensAPI.getTokensManager().addTokens(p,tokens);
@@ -76,9 +87,9 @@ public class BTokensNoteRedeemListener implements Listener {
 
         pl.getUtils().sendMessage(p,msg);
 
-        if (pl.getWithdrawManager().CASH_NOTE.getConfig().getBoolean("Settings.Sounds.Redeem.Enabled")) {
+        if (pl.getWithdrawManager().BEASTTOKENS_NOTE.getConfig().getBoolean("Settings.Sounds.Redeem.Enabled")) {
             try {
-                String sound = pl.getWithdrawManager().CASH_NOTE.getConfig().getString("Settings.Sounds.Redeem.Sound");
+                String sound = pl.getWithdrawManager().BEASTTOKENS_NOTE.getConfig().getString("Settings.Sounds.Redeem.Sound");
                 e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.valueOf(sound), 1f, 1f);
 
             } catch (Exception e1) {
@@ -87,12 +98,12 @@ public class BTokensNoteRedeemListener implements Listener {
         }
 
 
-        if (e.getItem().getAmount() > 1) {
-            e.getItem().setAmount(e.getItem().getAmount() - 1);
+        if (item.getAmount() > 1) {
+            item.setAmount(item.getAmount() - 1);
         } else if (e.inOffHand()) {
             p.getInventory().setItemInOffHand(null);
         } else {
-            p.getInventory().removeItem(new ItemStack[]{e.getItem()});
+            p.getInventory().removeItem(new ItemStack[]{item});
         }
         p.updateInventory();
 

@@ -42,11 +42,11 @@ public class AliasesRegistration {
 			Method syncCommands = Bukkit.getServer().getClass().getMethod("syncCommands");
 			syncCommands.invoke(Bukkit.getServer());
 		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		} catch (InvocationTargetException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 

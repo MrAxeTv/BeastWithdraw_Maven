@@ -1,8 +1,9 @@
 package me.mraxetv.beastwithdraw.listener;
 
-import me.mraxetv.beastcore.utils.nbtapi.NBTItem;
-import me.mraxetv.beastcore.utils.nbtapi.utils.MinecraftVersion;
-import me.mraxetv.beasttokens.BeastTokensAPI;
+import me.mraxetv.beastlib.lib.nbtapi.NBTItem;
+import me.mraxetv.beastlib.lib.nbtapi.utils.MinecraftVersion;
+
+import me.mraxetv.beasttokens.api.BeastTokensAPI;
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
 import me.mraxetv.beastwithdraw.events.BTokensRedeemEvent;
 import org.bukkit.Bukkit;

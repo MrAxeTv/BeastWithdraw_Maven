@@ -54,20 +54,18 @@
 
     <dependencies>
         <dependency>
-            <groupId>me.mraxetv.beastcore</groupId>
-            <artifactId>BeastCore</artifactId>
-            <version>1.0</version>
+            <groupId>me.mraxetv.beastlib</groupId>
+            <artifactId>Core</artifactId>
+            <version>1.4.4</version>
             <classifier>shaded</classifier>
-            <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <groupId>*</groupId>
                     <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
+            <scope>provided</scope>
         </dependency>
-
-
 
     </dependencies>
 

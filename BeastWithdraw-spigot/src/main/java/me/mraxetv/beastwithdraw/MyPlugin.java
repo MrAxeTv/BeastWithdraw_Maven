@@ -1,18 +1,13 @@
 package me.mraxetv.beastwithdraw;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.*;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.net.URL;
-import java.util.logging.Handler;
 
 public class MyPlugin extends JavaPlugin {
 
@@ -35,7 +30,7 @@ public class MyPlugin extends JavaPlugin {
         LoggerContext context = new LoggerContext("logger2");
         context.setName(pluginName);
 
-       InputStream stream = getResource("log4j2.xml");
+       InputStream stream = getResource("log4j3.xml");
 
         ConfigurationSource source = null;
         try {

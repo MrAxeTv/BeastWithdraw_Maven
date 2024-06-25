@@ -1,53 +1,60 @@
 package me.mraxetv.beastwithdraw.listener;
 
 
-import me.mraxetv.beastcore.utils.nbtapi.NBTItem;
-import me.mraxetv.beastcore.utils.nbtapi.utils.MinecraftVersion;
+
+import me.mraxetv.beastlib.lib.nbtapi.NBTItem;
+import me.mraxetv.beastlib.lib.nbtapi.utils.MinecraftVersion;
 import me.mraxetv.beastwithdraw.events.CashRedeemEvent;
-import me.mraxetv.beastwithdraw.utils.Version;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.HashSet;
+import java.util.UUID;
 
 
 public class CashNoteRedeemListener implements Listener {
     private BeastWithdrawPlugin pl;
+    private HashSet<UUID> delayList;
 
 
     public CashNoteRedeemListener(BeastWithdrawPlugin plugin) {
         pl = plugin;
+        pl.getServer().getPluginManager().registerEvents(this,pl);
+        delayList = new HashSet<>();
     }
 
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGH)
     public void mainHand(PlayerInteractEvent e) {
 
         if ((!e.hasItem()) ) return;
         if (e.getItem().getType() == Material.AIR) return;
         if (!e.getItem().hasItemMeta()) return;
         if (e.getAction() != Action.RIGHT_CLICK_AIR && e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-        //if (e.getItem().getType() != material) return;
         NBTItem nbtItem = new NBTItem(e.getItem());
         if (!nbtItem.hasKey(pl.getWithdrawManager().CASH_NOTE.getConfig().getString("Settings.NBTLore"))) return;
-
-        //Cancel dupe event on block click
-        if (e.isCancelled() && e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            e.setCancelled(true);
-            return;
-        }
+        UUID uuid = e.getPlayer().getUniqueId();
+        if(delayList.contains(uuid)) return;
+        delayList.add(uuid);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                delayList.remove(uuid);
+            }
+        }.runTaskLater(pl,1);
         //Cancel First Time
         e.setCancelled(true);
 
@@ -60,7 +67,6 @@ public class CashNoteRedeemListener implements Listener {
         }
         pl.getServer().getPluginManager().
                 callEvent(new CashRedeemEvent(e.getPlayer(), e.getItem(), nbtItem.getDouble(pl.getWithdrawManager().CASH_NOTE.getConfig().getString("Settings.NBTLore")), offHand));
-        return;
 
     }
 

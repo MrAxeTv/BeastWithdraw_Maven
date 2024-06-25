@@ -12,7 +12,10 @@ Settings:
     BeastTokensNote:
       Enabled: false
   ##Cancle villager treading with withdraw items.
-  CancelVillagerTrade: true
+  VillagerTrade:
+    Allow: false
+    ##Suport for ShopKeeper plugin allow trading withdraw items keep in mined you will need to remove Signer Lore(&dEnchanter:&r %player%)... from configuration for this to work.
+    AllowShopKeeperPlugin: true
   ##Disable using withdraw items in crafting.
   CancelCrafting: true
   ##Drop withdraw item on floor if there is no space in player inventory
@@ -20,4 +23,4 @@ Settings:
   ##Don't allow decimals in withdraw amount
   DisableDecimalAmounts: true
 ##Config version (PLEASE DO NOT EDIT & DON'T COPY PAST OLD CONFIG OVER)
-ConfigVersion: 2.9
+ConfigVersion: 3.0

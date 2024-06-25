@@ -1,11 +1,11 @@
 package me.mraxetv.beastwithdraw.commands.xpbottle;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import me.mraxetv.beastwithdraw.commands.AliasesRegistration;
 import me.mraxetv.beastwithdraw.commands.CommandModule;
+import me.mraxetv.beastwithdraw.managers.AssetHandler;
 import me.mraxetv.beastwithdraw.utils.Utils;
 import me.mraxetv.beastwithdraw.utils.XpManager;
 import org.bukkit.Bukkit;
@@ -26,12 +26,12 @@ public class XpBottleCMD extends CommandModule implements CommandExecutor {
     List<String> messagel;
 
 
-    public XpBottleCMD(BeastWithdrawPlugin plugin) {
+    public XpBottleCMD(BeastWithdrawPlugin plugin, AssetHandler assetHandler) {
         super(plugin,"BeastWithdraw.XpBottle.Withdraw",1,2);
         pl = plugin;
 
         try {
-            AliasesRegistration.setAliases("XpBottle", pl.getWithdrawManager().XP_BOTTLE.getConfig().getStringList("Settings.Aliases"));
+            AliasesRegistration.setAliases("XpBottle", assetHandler.getConfig().getStringList("Settings.Aliases"));
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException | NoSuchFieldException e) {
             // TODO Auto-generated catch block
@@ -73,7 +73,7 @@ public class XpBottleCMD extends CommandModule implements CommandExecutor {
         }
         int takenXp;
 
-        int amount = 1;
+        int stackSize = 1;
 
         if (args.length == 2) {
             if (!Utils.isInt(args[1])) {
@@ -83,8 +83,16 @@ public class XpBottleCMD extends CommandModule implements CommandExecutor {
                 pl.getUtils().sendMessage(sender, s);
                 return;
             }
-            amount = Math.abs(Integer.parseInt(args[1]));
+            stackSize = Integer.parseInt(args[1]);
+            if(stackSize < 1) stackSize = 1;
+            if(stackSize > pl.getWithdrawManager().XP_BOTTLE.getConfig().getInt("Settings.MaxStackSize",64)){
+                String s = pl.getMessages().getString("Withdraws.MaxStackSize");
+                s = s.replaceAll("%stack%",""+pl.getWithdrawManager().XP_BOTTLE.getConfig().getInt("Settings.MaxStackSize",64));
+                Utils.sendMessage(sender,s);
+                return;
+            }
         }
+
         //Player Xp
         int xp = XpManager.getTotalExperience(p);
 
@@ -183,18 +191,17 @@ public class XpBottleCMD extends CommandModule implements CommandExecutor {
 
 
 
-
-            if(((double)takenXp*amount) > Integer.MAX_VALUE){
+            if((takenXp*stackSize) > Integer.MAX_VALUE){
                 message = pl.getMessages().getString("Withdraws.ToBigNumber");
-                message = message.replaceAll("%amount%", Utils.formatDouble((double) takenXp*amount));
+                message = message.replaceAll("%amount%", Utils.formatDouble(takenXp*stackSize));
                 pl.getUtils().sendMessage(p, message);
               return;
             }
 
-            if ((xp < takenXp * amount)) {
+            if ((xp < takenXp * stackSize)) {
                 message = pl.getMessages().getString("Withdraws.XpBottle.NotEnough");
                 message = message.replaceAll("%balance%", "" + pl.getUtils().formatNumber(xp));
-                message = message.replaceAll("%taken-amount%", "" + pl.getUtils().formatNumber(takenXp*amount));
+                message = message.replaceAll("%taken-amount%", "" + pl.getUtils().formatNumber(takenXp*stackSize));
                 pl.getUtils().sendMessage(p, message);
                 return;
             }
@@ -206,15 +213,15 @@ public class XpBottleCMD extends CommandModule implements CommandExecutor {
 
                     //Money Fee
                     double moneyFee = pl.getWithdrawManager().XP_BOTTLE.getConfig().getDouble("Settings.Charges.Fee.Cost");
-                    if (!pl.getEcon().has(p,moneyFee*amount)) {
+                    if (!pl.getEcon().has(p,moneyFee*stackSize)) {
                         String s = pl.getMessages().getString("Withdraws.CashNote.Fee.NotEnough");
-                        s = s.replaceAll("%fee%", "" + pl.getUtils().formatDouble(moneyFee*amount));
+                        s = s.replaceAll("%fee%", "" + pl.getUtils().formatDouble(moneyFee*stackSize));
                         pl.getUtils().sendMessage(p, s);
                         return;
                     }
-                    pl.getEcon().withdrawPlayer(p, moneyFee*amount);
+                    pl.getEcon().withdrawPlayer(p, moneyFee*stackSize);
                     String s = pl.getMessages().getString("Withdraws.CashNote.Fee.TakenFee");
-                    s = s.replaceAll("%fee%", "" + pl.getUtils().formatDouble(moneyFee*amount));
+                    s = s.replaceAll("%fee%", "" + pl.getUtils().formatDouble(moneyFee*stackSize));
                     pl.getUtils().sendMessage(p, s);
                 }
             }
@@ -226,21 +233,21 @@ public class XpBottleCMD extends CommandModule implements CommandExecutor {
                     if (percentage > 100.0) percentage = 100.0;
                     tax = (int) (takenXp * (percentage / 100));
                     String s = pl.getMessages().getString("Withdraws.XpBottle.Tax.TakenTax");
-                    s = s.replaceAll("%tax%", "" + pl.getUtils().formatNumber(tax * amount));
+                    s = s.replaceAll("%tax%", "" + pl.getUtils().formatNumber(tax * stackSize));
                     pl.getUtils().sendMessage(p, s);
                 }
             }
-            XpManager.setTotalExperience(p, (xp - takenXp*amount));
+            XpManager.setTotalExperience(p, (xp - takenXp*stackSize));
 
             String s = pl.getMessages().getString("Withdraws.XpBottle.Withdraw");
-            s = s.replaceAll("%taken-amount%", "" + pl.getUtils().formatNumber(takenXp*amount));
+            s = s.replaceAll("%taken-amount%", "" + pl.getUtils().formatNumber(takenXp*stackSize));
             s = s.replaceAll("%balance%", "" + pl.getUtils().formatNumber(XpManager.getTotalExperience(p)));
             Utils.sendMessage(p, s);
 
             takenXp = takenXp - tax;
 
 
-            ItemStack xpBottle = pl.getItemManger().getXpb(p.getName(), takenXp, amount, true);
+            ItemStack xpBottle = pl.getWithdrawManager().XP_BOTTLE.getItem(p.getName(), takenXp, stackSize, true);
             if (p.getInventory().firstEmpty() != -1) {
                 Utils.addItem(p,xpBottle);
             } else {
