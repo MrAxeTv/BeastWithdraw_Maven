@@ -13,7 +13,7 @@
     </parent>
 
     <artifactId>BeastWithdraw-spigot</artifactId>
-    <version>2.3.4</version>
+    <version>2.4.4</version>
     <packaging>jar</packaging>
 
     <name>BeastWithdraw</name>
@@ -73,7 +73,7 @@
                         <!--Setting up specific output location for shaded jar -->
                         <configuration>
                             <finalName>${project.name}-${project.parent.version}</finalName>
-                            <outputFile>F:\McServers\spigot 1.20 legacy\plugins\${project.name}.jar</outputFile>
+                            <outputFile>F:\McServers\spigot_1.20_legacy\plugins\${project.name}.jar</outputFile>
                         </configuration>
                     </execution>
 
@@ -233,14 +233,14 @@
         <dependency>
             <groupId>me.mraxetv.beasttokens</groupId>
             <artifactId>bt-api</artifactId>
-            <version>3.14.4</version>
+            <version>3.14.5</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>me.mraxetv.beasttokens</groupId>
             <artifactId>core</artifactId>
-            <version>3.14.4</version>
+            <version>3.15.0</version>
             <scope>provided</scope>
         </dependency>
 
@@ -267,38 +267,17 @@
             <scope>provided</scope>
         </dependency>
 
-
-
-       <!-- <dependency>
-            <groupId>com.core</groupId>
-            <artifactId>UltimatePrisonCore</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/res/UltraPrisonCore.jar</systemPath>
-
-        </dependency>
-        <dependency>
-            <groupId>com.core</groupId>
-            <artifactId>helper</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/res/helper.jar</systemPath>
-
-        </dependency>
-        <dependency>
-            <groupId>com.core</groupId>
-            <artifactId>CataMine</artifactId>
-            <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/res/CataMines-2.5.7.jar</systemPath>
-
-        </dependency>-->
-
         <dependency>
             <groupId>com.nisovin.shopkeepers</groupId>
             <artifactId>ShopkeepersAPI</artifactId>
             <!-- Replace this with the latest Shopkeepers version -->
             <version>2.19.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.30</version>
             <scope>provided</scope>
         </dependency>
 

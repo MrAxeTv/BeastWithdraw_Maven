@@ -30,7 +30,7 @@ public class BeastUtils {
                     konzumer.accept(sc.next());
                 }
             } catch (IOException exception) {
-                Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',"&7[&4Beast&bTokens&7] &4Update check failed : " + exception.getMessage()));
+                Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&',"&7[&4Beast&bWithdraw&7] &4Update check failed : " + exception.getMessage()));
             }
         });
     }

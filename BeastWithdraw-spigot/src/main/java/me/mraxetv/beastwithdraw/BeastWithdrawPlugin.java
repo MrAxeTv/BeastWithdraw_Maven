@@ -1,18 +1,21 @@
 package me.mraxetv.beastwithdraw;
 
 
+import lombok.Getter;
 import me.mraxetv.beastlib.api.BeastLibAPI;
 import me.mraxetv.beastlib.filemanager.MessagesYml;
 
 import me.mraxetv.beastlib.lib.boostedyaml.YamlDocument;
 import me.mraxetv.beastlib.lib.bstats.bukkit.Metrics;
 import me.mraxetv.beastlib.lib.nbtapi.utils.MinecraftVersion;
-import me.mraxetv.beastwithdraw.commands.AliasesRegistration;
+import me.mraxetv.beastlib.utils.BUtils;
 import me.mraxetv.beastwithdraw.commands.admin.BeastWithdrawCMD;
+import me.mraxetv.beastwithdraw.events.BTokensRedeemEvent;
 import me.mraxetv.beastwithdraw.filemanager.FileYml;
 import me.mraxetv.beastwithdraw.listener.CancelCraftingListener;
 import me.mraxetv.beastwithdraw.listener.DispenserXpBottleListener;
 import me.mraxetv.beastwithdraw.managers.WithdrawManager;
+import me.mraxetv.beastwithdraw.managers.redeem.RedeemEventFactory;
 import me.mraxetv.beastwithdraw.utils.*;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -24,54 +27,68 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class BeastWithdrawPlugin extends JavaPlugin implements BeastLibAPI {
 
 
     public MessagesYml messages;
+    @Getter
     private Utils utils;
     private ConfigLang configLang;
+    @Getter
+    private MessagesLang messagesLang;
     private FileYml fileYml;
+    @Getter
     private static BeastWithdrawPlugin instance;
+    @Getter
     private static Economy econ = null;
+    @Getter
     private WithdrawManager withdrawManager;
     private Metrics metrics;
 
 
+
+    //Commands
+    private BeastWithdrawCMD beastWithdrawCMD;
     private boolean setupBeastLib() {
         return getServer().getPluginManager().isPluginEnabled("BeastLib");
     }
 
 
-
     public void onEnable() {
 
         if (!setupBeastLib()) {
-
-            //new BeastLogger(this);
-            //new BeastLogger();
             new BukkitRunnable() {
                 @Override
                 public void run() {
-
-                    //new BeastLogger();
-
-                   // BeastLogger.log(Level.SEVERE, "is missing BeastCore dependency!");
                     getServer().getLogger().severe("[" + getDescription().getName() + "] is missing BeastLib dependency!");
                 }
             }.runTaskLater(this,100);
             return;
-
-
         }
         MinecraftVersion.disableUpdateCheck();
         MinecraftVersion.disableBStats();
         MinecraftVersion.disablePackageWarning();
 
+        if( MinecraftVersion.isNewerThan(MinecraftVersion.MC1_21_R5))
+        {
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    getServer().getLogger().warning("[" + getDescription().getName() + "] is not compatible with this minecraft version please do update to latest version!");
+                }
+            }.runTaskLater(this,100);
+
+            return;
+        }
+
         instance = this;
         setupEconomy();
         registerConfigs();
         configLang = new ConfigLang(this);
-        new MessagesLang(this);
+        messagesLang = new MessagesLang(this);
         utils = new Utils(this);
         //currencyLogger = new CurrencyLogger(this);
         withdrawManager = new WithdrawManager(this);
@@ -94,8 +111,6 @@ public class BeastWithdrawPlugin extends JavaPlugin implements BeastLibAPI {
         metrics = new Metrics(this, pluginId);
 
         Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&7[&4Beast&bWithdraw&7] &2Version " + getDescription().getVersion() + " : has been enabled!"));
-
-
     }
 
     public void reload() {
@@ -115,57 +130,29 @@ public class BeastWithdrawPlugin extends JavaPlugin implements BeastLibAPI {
 
     public void registerCommands() {
 
-        getCommand("BeastWithdraw").setExecutor(new BeastWithdrawCMD(this));
+        beastWithdrawCMD = new BeastWithdrawCMD(this,"beastwithdraw","Main admin command for BeastWithdraw plugin","/BeastWithdraw help",getConfig().getStringList("Settings.Aliases"));
 
-/*        if (getConfig().getBoolean("Settings.Withdraws.XpBottle.Enabled")) {
-            getCommand("XpBottle").setExecutor(new XpBottleCMD(this));
-        }
-        if (getConfig().getBoolean("Settings.Withdraws.CashNote.Enabled")) {
-            if ((getServer().getPluginManager().isPluginEnabled("Vault"))) {
-                getCommand("bWithdraw").setExecutor(new CashNoteCMD(this));
-            } else {
-                getServer().getConsoleSender().sendMessage( "["+getDescription().getPrefix()+ "] Server is missing 'Vault' plugin which you need for economy(money) to work!");
-            }
-        }
-        if (getConfig().getBoolean("Settings.Withdraws.BeastTokensNote.Enabled")) {
-            if ((getServer().getPluginManager().isPluginEnabled("BeastTokens"))) {
-                getCommand("btWithdraw").setExecutor(new BeastTokenNoteCMD(this));
-            } else {
-                utils.sendMessage( getServer().getConsoleSender(),"&4["+getDescription().getName()+ "] &cServer is missing 'BeastTokens' plugin which you need for 'Tokens Note' to work!");
-            }
-        }*/
-        AliasesRegistration.syncCommands();
+        //AliasesRegistration.syncCommands();
     }
 
 
     public void registerEvents() {
         PluginManager pm = getServer().getPluginManager();
-       // if ((getServer().getPluginManager().isPluginEnabled("Vault"))) {
-           // pm.registerEvents(new CashNoteRedeemListener(this), this);
-        //}
-       // if (getConfig().getBoolean("Settings.Withdraws.BeastTokensNote.Enabled")) new BTokensNoteRedeemListener(this);
-       // if (getConfig().getBoolean("Settings.Withdraws.XpBottle.Enabled")) new XpBottleRedeemListener(this);
         if (getConfig().getBoolean("Settings.Withdraws.CashNote.Enabled")) new CancelCraftingListener(this);
         new DispenserXpBottleListener(this);
     }
 
 
     public void onDisable() {
-        //getServer().getPluginManager().
-
         if(metrics != null) metrics.shutdown();
     }
 
-
     public YamlDocument getMessages() {
         return messages.getConfig();
-    }
-
-
-    public Utils getUtils() {
-        return utils;
 
     }
+
+
 
     private void setupEconomy() {
         if (!getServer().getPluginManager().isPluginEnabled("Vault")) return;
@@ -175,29 +162,10 @@ public class BeastWithdrawPlugin extends JavaPlugin implements BeastLibAPI {
         econ = rsp.getProvider();
     }
 
-    public static Economy getEcon() {
-        return econ;
-    }
-
     public FileConfiguration getConfig() {
         return fileYml.getConfig();
     }
 
-    public WithdrawManager getWithdrawManager() {
-        return withdrawManager;
-    }
-
-
-
-    public static final BeastWithdrawPlugin getInstance() {
-        return instance;
-    }
-
-
-    @Override
-    public YamlDocument getMessagesYml() {
-        return messages.getConfig();
-    }
 }
 
 

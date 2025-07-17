@@ -73,8 +73,6 @@ public class ExtensionManager {
             try {
                 description = loader.getExtensionsDescription(file);
 
-                Bukkit.broadcastMessage("Dec " + description.getMain());
-
             } catch (InvalidDescriptionException e) {
                 e.printStackTrace();
             }

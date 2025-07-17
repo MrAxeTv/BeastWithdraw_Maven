@@ -5,31 +5,23 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-
-import me.mraxetv.beastlib.lib.nbtapi.utils.MinecraftVersion;
-import me.mraxetv.beastlib.utils.SUtils;
-import org.bukkit.ChatColor;
+import me.mraxetv.beastlib.utils.BUtils;
+import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
 
-public class Utils extends SUtils
+public class Utils extends BUtils
 implements Listener {
 	private BeastWithdrawPlugin pl;
 	private String version;
-	private final static Pattern PATTERN = Pattern.compile("&#[a-fA-F0-9]{6}");
 	public static DecimalFormat df2;
 
-
-	static {
-
-
-	}
+	static {}
 
 	public Utils(BeastWithdrawPlugin plugin) {
 		super(plugin);
@@ -37,10 +29,8 @@ implements Listener {
 		if(pl.getConfig().getBoolean("Settings.DisableDecimalAmounts")){
 			df2 = new DecimalFormat("#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 
-		}else df2 = new DecimalFormat("#.##", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+		}else df2 = new DecimalFormat("0.00", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 		df2.setRoundingMode(RoundingMode.DOWN);
-
-
 	}
 
 
@@ -49,36 +39,18 @@ implements Listener {
 		return prefix;
 	}
 
-	public static String setColor(String s) {
-		s = setHexColors(s);
-		return net.md_5.bungee.api.ChatColor.translateAlternateColorCodes('&', s);
+	public static String formatStackSize(String message, int amount) {
+		if (amount <= 1) return message.replaceAll("%stack%", "");
+		return message.replaceAll("%stack%", MessagesLang.STACK_SIZE.replaceAll("%amount%", "" + amount));
 	}
 
-	public static String setHexColors(String s) {
-		if (!MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_16_R1)) return s;
-		Matcher matcher = PATTERN.matcher(s);
-		while (matcher.find()) {
-			String c = s.substring(matcher.start(), matcher.end());
-
-			s = s.replace(c, "" + net.md_5.bungee.api.ChatColor.of(c.replace("&", "")));
-			matcher = PATTERN.matcher(s);
-		}
-		return s;
-	}
-
-
-	public static String setStackSize(int amount){
-
-		if (amount == 1) return "";
-		return ConfigLang.STACK_SIZE.replaceAll("%amount%",""+amount);
-	}
-
-	public static void sendMessage(CommandSender sender , String message){
+	public void sendMessage(CommandSender sender , String message){
+		if(sender instanceof Player) message = setPlaceholders((Player) sender,message);
 		message = message.replaceAll("%prefix%",getPrefix());
 		sender.sendMessage(setColor(message));
 	}
 
-	public static void sendMessage(Player sender , String message){
+	public void sendMessage(Player sender , String message){
 		sender.sendMessage(setPlaceholders(sender,message));
 	}
 
@@ -87,8 +59,6 @@ implements Listener {
 		pl.getServer().getConsoleSender().sendMessage(getPrefix()+s);
 		
 	}
-
-
 	public static boolean isInt(String value) {
 		try {
 			Integer.parseInt(value);
@@ -99,9 +69,7 @@ implements Listener {
 		return true;
 	}
 	public static boolean isDouble(String value) {
-		try {
-		 Double.parseDouble(value);
-		}
+		try {Double.parseDouble(value);}
 		catch (Exception efr) {
 			return false;
 		}
@@ -115,6 +83,7 @@ implements Listener {
 		s = setColor(s);
 		return s;
 	}
+
 
 
 	public void noPermission(Player p) {

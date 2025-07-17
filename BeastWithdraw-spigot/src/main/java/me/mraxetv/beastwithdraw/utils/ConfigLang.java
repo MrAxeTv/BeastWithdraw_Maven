@@ -13,14 +13,12 @@ public final class ConfigLang {
 
     private BeastWithdrawPlugin pl;
 
-    public static String STACK_SIZE;
 
     public static NumberFormat NUMBER_FORMAT;
 
 
     public ConfigLang(BeastWithdrawPlugin pl) {
         this.pl = pl;
-        STACK_SIZE = pl.getMessages().getString("PlaceHolders.StackSize");
 
          if(pl.getConfig().getBoolean("Settings.DisableDecimalAmounts")){
              NUMBER_FORMAT = new DecimalFormat("#" + pl.getConfig().getString("Settings.BalanceFormat", "###,##0"), DecimalFormatSymbols.getInstance(Locale.ENGLISH));

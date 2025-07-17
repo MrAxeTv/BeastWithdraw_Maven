@@ -11,6 +11,9 @@ Settings:
     ##Dependency:  BeastTokens!
     BeastTokensNote:
       Enabled: false
+    ##Dependency:  PlayerPoints!
+    PlayerPointsNote:
+      Enabled: false
   ##Cancle villager treading with withdraw items.
   VillagerTrade:
     Allow: false
@@ -22,5 +25,9 @@ Settings:
   WithdrawDropFloor: true
   ##Don't allow decimals in withdraw amount
   DisableDecimalAmounts: true
+  ##Main command alias
+  Aliases:
+    - "bw"
+    - "bwa"
 ##Config version (PLEASE DO NOT EDIT & DON'T COPY PAST OLD CONFIG OVER)
-ConfigVersion: 3.0
+ConfigVersion: 3.1

@@ -1,46 +1,44 @@
 package me.mraxetv.beastwithdraw.managers.assets;
 
-
-import me.mraxetv.beastlib.lib.nbtapi.utils.MinecraftVersion;
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
 import me.mraxetv.beastwithdraw.commands.xpbottle.XpBottleCMD;
+import me.mraxetv.beastwithdraw.events.BottleRedeemEvent;
 import me.mraxetv.beastwithdraw.listener.XpBottleRedeemListener;
 import me.mraxetv.beastwithdraw.managers.AssetHandler;
+import me.mraxetv.beastwithdraw.managers.redeem.RedeemRegistry;
 import me.mraxetv.beastwithdraw.utils.XpManager;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
-public class XpBottleHandler extends AssetHandler {
+public class XpBottleHandler extends AssetHandler<Integer> {
+    private XpBottleCMD xpBottleCMD;
+
     public XpBottleHandler(BeastWithdrawPlugin pl, String id) {
         super(pl, id);
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                new XpBottleRedeemListener(pl);
-            }
-        }.runTaskLater(pl,1);
-
-        pl.getCommand("XpBottle").setExecutor(new XpBottleCMD(pl,this));
+        new XpBottleRedeemListener(pl,this);
+        xpBottleCMD = new XpBottleCMD(pl, this);
+        RedeemRegistry.register(id, BottleRedeemEvent::new);
     }
 
     @Override
-    public double getBalance(Player p) {
+    public Double getBalance(Player p) {
 
-        return XpManager.getTotalExperience(p);
+        return (double)XpManager.getTotalExperience(p);
     }
 
     @Override
-    public void withdrawAmount(Player p, double amount) {
-        XpManager.setTotalExperience(p, (int) (getBalance(p) - amount));
+    public void withdrawAmount(Player p, Double amount) {
+        XpManager.setTotalExperience(p, (getBalance(p).intValue() - amount.intValue()));
     }
 
     @Override
-    public void depositAmount(Player p, double amount) {
-        XpManager.setTotalExperience(p, (int) (getBalance(p) + amount));
+    public void depositAmount(Player p, Double amount) {
+        XpManager.setTotalExperience(p, (getBalance(p).intValue() + amount.intValue()));
 
+    }
+
+    @Override
+    public boolean isToBigAmount(double amount) {
+        return amount > Integer.MAX_VALUE;
     }
 
 

@@ -1,5 +1,4 @@
 ##Configuration for BeastWithdraw by MrAxeTv
-##Plugin use intended for MC 1.7 - 1.20+
 ##Notic all values of withdraw amount are stored as NBT data on items so make sure other plugins for storing items have support for storing NBT data.
 ##--------------------------------------------------------------------------------------------------------##
 ##Expiriance bottle xp storing.
@@ -29,21 +28,34 @@ Settings:
     Player:
       Name: "&a&lExperience-Bottle &7(Throw)"
       Lore:
-        - "&dValue:&r %amount% XP"
+        - "&dValue:&r %amount%"
         - "&dEnchanter:&r %player%"
+        - "%tax%"
 
     ##This is part of configuration for item withdraw by staff or console /Xpbottle <xp> <player> <bottle-amount>.
     Server:
       Name: "&a&lExperience-Bottle &7(Throw)"
       Lore:
-        - "&dValue:&r %amount% XP"
+        - "&dValue:&r %amount%"
         - "&dEnchanter:&r Thinkerer"
+        - "%tax%"
     ##Minimum amount which can be withdrawn to bottle.
     Min: 25
     ##Maximum amount which can be withdrawn to bottle.
     Max: 10000
     ## Max amount of bottle which can be created per execution of command
     MaxStackSize: 64
+    ##Set amount format
+    AmountFormat: "###,##0"
+
+    ##Tax will take specified percentage amount when player redeems XpBottle (0.01% to 100% Possible values).
+    ##Bypass Tax permission "BeastWithdraw.XpBottle.ByPass.Tax"
+    Tax:
+      Lore:
+        - ""
+        - "&dTax: &5%tax%"
+        - ""
+      Percentage: 5
 
     ##Min and Max amount per permissions.
     ##Permission should be BeastWithdraw.XpBottle.PermissionNotes.<name_of_perm>
@@ -55,23 +67,24 @@ Settings:
       Small:
         Min: 20
         Max: 50000
+        Tax:
+          Percentage: 10
         MaxStackSize: 64
       Medium:
         Min: 10
         Max: 100000
+        Tax:
+          Percentage: 15
         MaxStackSize: 64
       High:
         Min: 10
         Max: 100000
+        Tax:
+          Percentage: 25
         MaxStackSize: 64
 
     ##Charge "Tax" or "Fee" to players when they withdraw XpBottle.
     Charges:
-      ##Tax will take specified percentage amount when player withdraw's XpBottle (0.01% to 100% Possible values).
-      ##Bypass Tax permission "BeastWithdraw.XpBottle.ByPass.Tax"
-      Tax:
-        Enabled: false
-        Percentage: 5
       ##Fee will charge money when player withdraw's XpBottle.
       ##Bypass Fee permission "BeastWithdraw.XpBottle.ByPass.Fee"
       Fee:
@@ -99,8 +112,25 @@ Settings:
     Aliases: [xpb, beastxpb, bottle]
 
     ##This is invisible lore name in which is stored amount of xp change the name if you want disable old bottles.
-    NBTLore: "bWithdrawXp"
+    NBTKey: "bWithdrawXp"
     ##By setting this option to true xp from bottle will be automatically given to player it won't be dropped on floor.
     AutoCollect: true
+    Messages:
+      Prefix: ""
+      Suffix: "&eXP"
+      NotEnough: "%prefix% &cYou don't have %amount%!&e(XpBalance: %balance%)"
+      Help: "%prefix% &2You have %balance% &e(Use /xpBottle <xp>/<all>/<xp>L <note-amount>)"
+      Withdraw: "%prefix% &eYou have withdrawn &2%stack%&b%amount% &e(XpBalance: &b%balance%)"
+      Redeem: "%prefix% &a+%amount% &e(XpBalance: %balance%)"
+      RedeemAndTax: "%prefix% &a+%amount% Tax: -%tax% &e(Balance: %balance%)"
+      Min: "%prefix% &cYou must withdraw at last %min-amount% per bottle."
+      Max: "%prefix% &cYou can only withdraw a maximum of %max-amount%!"
+      NotEnoughLevels: "%prefix% &cYou don't have %amount% levels!"
+      RewardReceived: "%prefix% &eYou have received an XP-Bottle with &2%stack%%amount%!"
+      ToBigNumber: "%prefix% &4%amount% is to big number!"
+      MaxStackSize: "%prefix% &cYou can't make stack bigger than %stack% items!"
+      Fee:
+       NotEnough: "%prefix% &cYou need %fee% points to pay fee for this transaction!"
+       TakenFee: "%prefix% &eYou payed %fee% points fee for this transaction!"
 ##--------------------------------------------------------------------------------------------------------##
-ConfigVersion: 1.1
+ConfigVersion: 1.3

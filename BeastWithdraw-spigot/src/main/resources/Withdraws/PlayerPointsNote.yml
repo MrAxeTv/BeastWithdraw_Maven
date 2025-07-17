@@ -1,9 +1,9 @@
 ##Configuration for BeastWithdraw by MrAxeTv
 ##Notic all values of withdraw amount are stored as NBT data on items so make sure other plugins for storing items have support for storing NBT data.
 ##--------------------------------------------------------------------------------------------------------##
-##BeastTokens storing to a note.
+##PlayerPoints storing to a note.
 Settings:
-  ##Set which item you want to use for Token-Notes.
+  ##Set which item you want to use for PlayerPoints-Notes.
   ##Even if u changed to new item the old withdrawn items by player will be usable because of NBT  data storing.
   Item: "PAPER"
   # Used for version under 1.13!
@@ -15,37 +15,37 @@ Settings:
     Data: 0
     AmountModelData:
       #Amount Model Data will use different Custom models per specific amount
-      #for example all TokenNote from 100 up to 999 tokens will use CustomModelData: 1 and all TokenNotes with 1000 or more will use CustomModelData:2
+      #for example all PlayerPoints-Note from 100 up to 999 points will use CustomModelData: 1 and all PlayerPoints-Note with 1000 or more will use CustomModelData:2
       #you can add as many models you want just use syntax shown below in default config!
       Enabled: false
       Range:
         - "100-Data:1"
         - "1000-Data:2"
   ##Set up your item display name & lores how do you like.
-  ##This is part of configuration for item which player will get when they withdraw there money /BTWithdraw <tokens>.
+  ##This is part of configuration for item which player will get when they withdraw there money /PPWithdraw <points>.
   Player:
-    Name: "&a&lToken-Note &7(Right-Click)"
+    Name: "&a&lPlayerPoints-Note &7(Right-Click)"
     Lore:
       - "&dValue:&r %amount%"
       - "&dSigner:&r %player%"
       - "%tax%"
-  ##This is part of configuration for item withdraw by staff or console /BeastWithdraw giveTokenNote <player> <tokens> <note-amount>.
+  ##This is part of configuration for item withdraw by staff or console /BeastWithdraw givePlayerPointsNote <player> <points> <note-amount>.
   Server:
-    Name: "&a&lToken-Note &7(Throw)"
+    Name: "&a&lPlayerPoints-Note &7(Throw)"
     Lore:
       - "&dValue:&r %amount%"
-      - "&dSigner:&r Beast Tokenizer"
+      - "&dSigner:&r Server"
       - "%tax%"
-  ##Minimum amount which can be withdrawn to Token-note.
+  ##Minimum amount which can be withdrawn to PlayerPoints-Note.
   Min: 25
-  ##Maximum amount which can be withdrawn to Token-note.
+  ##Maximum amount which can be withdrawn to PlayerPoints-Note.
   Max: 10000
   ## Max amount of bottle which can be created per execution of command
   MaxStackSize: 64
   ##Set amount format
-  AmountFormat: "###,##0.00"
-  ##Tax will take specified percentage amount when player redeems BeastTokensNote (0.01% to 100% Possible values).
-  ##Bypass Tax permission "BeastWithdraw.BeastTokensNote.ByPass.Tax"
+  AmountFormat: "###,##0"
+  ##Tax will take specified percentage amount when player redeems PlayerPointsNote (0.01% to 100% Possible values).
+  ##Bypass Tax permission "BeastWithdraw.PlayerPointsNote.ByPass.Tax"
   Tax:
     Lore:
       - ""
@@ -54,8 +54,8 @@ Settings:
     Percentage: 5
 
   ##Min and Max amount per permissions.
-  ##Permission should be BeastWithdraw.BeastTokensNote.PermissionNotes.<name_of_perm>
-  ##Here is one example: if player has "BeastWithdraw.BeastTokensNote.PermissionNotes.Small" permission they will be able to withdraw minimum 20 and maximum 50000
+  ##Permission should be BeastWithdraw.PlayerPointsNote.PermissionNotes.<name_of_perm>
+  ##Here is one example: if player has "BeastWithdraw.PlayerPointsNote.PermissionNotes.Small" permission they will be able to withdraw minimum 20 and maximum 50000
   ##You can rename this permissions settings and add new ones how you like.
   ##If PermissionNotes are enabled they will override default min and max setting if player has any of permissions for this groups.
   PermissionNotes:
@@ -80,13 +80,13 @@ Settings:
       MaxStackSize: 64
 
   Charges:
-    ##Fee will take amount when player withdraw's TokenNote.
-    ##Bypass Fee permission "BeastWithdraw.BeastTokensNote.ByPass.Fee".
+    ##Fee will take amount when player withdraw's PlayerPoints-Note
+    ##Bypass Fee permission "BeastWithdraw.PlayerPointsNote.ByPass.Fee".
     Fee:
       Enabled: false
       Cost: 100
 
-  ##Play a sounds when player withdraw or redeem TokenNote!
+  ##Play a sounds when player withdraw or redeem PlayerPoints-Note!
   ##Sounds  for 1.9 and above: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
   ##Sounds for 1.7 and 1.8: https://www.spigotmc.org/wiki/cc-sounds-list/
   Sounds:
@@ -97,27 +97,26 @@ Settings:
       Sound: "ENTITY_EXPERIENCE_ORB_PICKUP"
       Enabled: true
 
-  ##This is invisible lore name in which is stored amount of money change the name if you want to disable old Token-Notes.
-  NBTKey: "bTokens"
+  ##This is invisible lore name in which is stored amount of money change the name if you want to disable old PlayerPoints-Notes.
+  NBTKey: "playerpoints"
   ##Set up aliases for /bWithdraw command
-  Aliases: [tokennote, tokenwithdraw]
+  Aliases: [playerpointswithdraw, pointswithdraw]
   Messages:
-    Prefix: "💎"
+    Prefix: ""
     Suffix: ""
-    Help: "%prefix% &2You have %balance% Tokens &e(Use /btwithdraw <tokens>/<all> <note-amount>)"
-    NotEnough: "%prefix% &cYou don't have %amount% Tokens! &e(Current: %balance%)"
-    Withdraw: "%prefix% &eYou have withdrawn &2%stack%&b%amount% &e(Balance: &b%balance% &eTokens)"
-    WithdrawAndTax: "%prefix% &eYou have withdrawn &2%stack%&b%amount% -%tax% &e(Balance: &b%balance%&e)"
-    Redeem: "%prefix% &a+%amount% &e(Balance: %balance% Tokens)"
+    Help: "%prefix% &2You have %balance% points &e(Use /btwithdraw <points>/<all> <note-amount>)"
+    NotEnough: "%prefix% &cYou don't have %amount% points! &e(Current: %balance%)"
+    Withdraw: "%prefix% &eYou have withdrawn &2%stack%&b%amount% &e(Balance: &b%balance% &epoints)"
+    Redeem: "%prefix% &a+%amount% &e(Balance: %balance% points)"
     RedeemAndTax: "%prefix% &a+%amount% Tax: -%tax% &e(Balance: %balance%)"
-    Min: "%prefix% &cYou must withdraw at least %min-amount% Tokens!."
-    Max: "%prefix% &cYou can withdraw a maximum of %max-amount% Tokens!"
-    RewardReceived: "%prefix% &bYou have received a token note worth &2%stack%%amount% &bTokens!"
+    Min: "%prefix% &cYou must withdraw at least %min-amount% points!."
+    Max: "%prefix% &cYou can withdraw a maximum of %max-amount% points!"
+    RewardReceived: "%prefix% &bYou have received a token note worth &2%stack%%amount% points!"
     GiveAll: "%prefix% &bAll players have received a token note!"
     ToBigNumber: "%prefix% &4%amount% is to big number!"
     MaxStackSize: "%prefix% &cYou can't make stack bigger than %stack% items!"
     Fee:
-      NotEnough: "%prefix% &cYou need %fee% Tokens to pay fee for this transaction!"
-      TakenFee: "%prefix% &eYou payed %fee% Tokens fee for this transaction!"
+      NotEnough: "%prefix% &cYou need %fee% points to pay fee for this transaction!"
+      TakenFee: "%prefix% &eYou payed %fee% points fee for this transaction!"
 ##--------------------------------------------------------------------------------------------------------##
 ConfigVersion: 1.3

@@ -39,7 +39,7 @@ public class DispenserXpBottleListener implements Listener {
     public DispenserXpBottleListener(BeastWithdrawPlugin pl) {
         if (MinecraftVersion.isNewerThan(MinecraftVersion.MC1_15_R1)) return;
         this.pl = pl;
-        id = pl.getWithdrawManager().XP_BOTTLE.getConfig().getString("Settings.NBTLore");
+        id = pl.getWithdrawManager().XP_BOTTLE.getConfig().getString("Settings.NBTKey");
         pl.getServer().getPluginManager().registerEvents(this,pl);
 
     }

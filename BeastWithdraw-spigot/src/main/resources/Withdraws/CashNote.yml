@@ -1,6 +1,6 @@
 ##Configuration for BeastWithdraw by MrAxeTv
 ##Plugin use intended for MC 1.7 - 1.20+
-##Notic all values of withdraw amount are stored as NBT data on items so make sure other plugins for storing items have support for storing NBT data.
+##Notic all values of withdraw amount apre stored as NBT data on items so make sure other plugins for storing items have support for storing NBT data.
 ##--------------------------------------------------------------------------------------------------------##
 ##Cash storing to a note.
 Settings:
@@ -29,18 +29,30 @@ Settings:
     Lore:
       - "&dValue:&r $%amount%"
       - "&dSigner:&r %player%"
+      - "%tax%"
   ##This is part of configuration for item withdraw by staff or console /bWithdraw <money> <player> <note-amount>.
   Server:
     Name: "&a&lCash-Note &7(Throw)"
     Lore:
       - "&dValue:&r $%amount%"
       - "&dSigner:&r Beast Bank"
+      - "%tax%"
   ##Minimum amount which can be withdrawn to cash-note.
   Min: 25
   ##Maximum amount which can be withdrawn to cash-note.
   Max: 10000
   ## Max amount of bottle which can be created per execution of command
   MaxStackSize: 64
+  ##Set amount format
+  AmountFormat: "###,##0.00"
+  ##Tax will take specified percentage amount when player redeems CashNote (0.01% to 100% Possible values).
+  ##Bypass Tax permission "BeastWithdraw.CashNote.ByPass.Tax"
+  Tax:
+   Lore:
+    - ""
+    - "&dTax: &5%tax%"
+    - ""
+   Percentage: 5
 
   ##Min and Max amount per permissions.
   ##Permission should be BeastWithdraw.CashNote.PermissionNotes.<name_of_perm>
@@ -52,22 +64,21 @@ Settings:
     Small:
       Min: 20
       Max: 50000
+      Tax:
+        Percentage: 10
       MaxStackSize: 64
     Medium:
       Min: 10
       Max: 100000
+      Tax:
+        Percentage: 15
       MaxStackSize: 64
     High:
       Min: 10
       Max: 100000
+      Tax:
+        Percentage: 25
       MaxStackSize: 64
-  ##Charge "Tax" or "Fee" to players when they withdraw CashNote.
-  Charges:
-    ##Tax will take specified percentage amount when player withdraw's CashNote (0.01% to 100% Possible values).
-    ##Bypass Tax permission "BeastWithdraw.CashNote.ByPass.Tax".
-    Tax:
-      Enabled: false
-      Percentage: 5
     ##Fee will take amount when player withdraw's CashNote.
     ##Bypass Fee permission "BeastWithdraw.CashNote.ByPass.Fee".
     Fee:
@@ -86,10 +97,28 @@ Settings:
       Enabled: true
 
   ##This is invisible lore name in which is stored amount of money change the name if you want disable old cashnotes.
-  NBTLore: "bCashNote"
+  NBTKey: "bCashNote"
   ##Set up aliases for /bWithdraw command
   Aliases: [cashnote, withdraw, moneywithdraw, moneynote]
+  Messages:
+    Prefix: "&a$"
+    Suffix: ""
+    NotEnough: "%prefix% &cYou don't have %amount%! &e(Current: %balance%)"
+    Help: "%prefix% &2You have %balance% &e(Use /withdraw <money>/<all> <note-amount>)"
+    Withdraw: "%prefix% &eYou have withdrawn &2%stack%&b%amount% &e(Balance: &b%balance%&e)"
+    Redeem: "%prefix% &a+%amount% &e(Balance: %balance%)"
+    RedeemAndTax: "%prefix% &a+%amount% Tax: -%tax% &e(Balance: %balance%)"
+    Min: "%prefix% &cYou must withdraw at least %min-amount%!."
+    Max: "%prefix% &cYou can withdraw a maximum of %max-amount%!"
+    RewardReceived: "%prefix% &bYou have received a cash note worth &2%stack%%amount%!"
+    GiveAll: "%prefix% &bAll players have received a cash note!"
+    TransactionFailed: "%prefix% &cTransaction failed, something went wrong please try some other amount!"
+    ToBigNumber: "%prefix% &4%amount% is to big number!"
+    MaxStackSize: "%prefix% &cYou can't make stack bigger than %stack% items!"
+    Fee:
+      NotEnough: "%prefix% &cYou need %fee% to pay fee for this transaction!"
+      TakenFee: "%prefix% &eYou payed %fee% fee for this transaction!"
 
   ##Format of
 ##--------------------------------------------------------------------------------------------------------##
-ConfigVersion: 1.1
+ConfigVersion: 1.3

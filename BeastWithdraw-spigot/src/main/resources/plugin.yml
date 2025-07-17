@@ -3,21 +3,7 @@ authors: [MrAxeTv]
 main: me.mraxetv.beastwithdraw.BeastWithdrawPlugin
 description: Simple handy withdraw plugin.
 version: ${project.version}
-softdepend: [Essentials, Vault, BeastTokens,BeastCore]
+softdepend: [Essentials, Vault, BeastTokens]
+depend: [BeastLib]
 api-version: 1.13
 website: www.BeastUniverseStudio.com
-commands:
-  Xpbottle:
-    usage: /<command>
-    aliases: []
-    description: Xp withdraw command.
-  Beastwithdraw:
-    usage: /<command>
-    aliases: []
-    description: Info command.
-  bWithdraw:
-    usage: /<command>
-    description: Withdraw Money.
-  btWithdraw:
-    usage: /<command>
-    description: Withdraw Money.
