@@ -1,0 +1,125 @@
+##Configuration for BeastWithdraw BeastLifeSteal heart withdraw.
+Settings:
+  ##Item material used for the withdrawn heart item.
+  Item: "PAPER"
+  ##Legacy durability/data value for older versions.
+  Data: 0
+  ##Simple glow toggle used by BeastWithdraw item builder.
+  Glow: false
+  ##Custom model data options for resource pack support.
+  CustomModel:
+    ##Fallback model data when no amount range matches.
+    DefaultModelData: 0
+    AmountModelData:
+      ##Enable amount-based custom model data switching.
+      Enabled: false
+      ##Range list is optional. Leave empty to always use DefaultModelData.
+      Ranges: []
+  ##Display used for player-created heart withdraw items.
+  Player:
+    Name: "<gradient:#ff5a5f:#ff9a44>Heart Satchel</gradient> <gray>(Right-Click)</gray>"
+    Lore:
+      - "<dark_gray>[</dark_gray><gradient:#ff5a5f:#ff9a44>Value</gradient><dark_gray>]</dark_gray> <white>%amount%</white>"
+      - "<dark_gray>[</dark_gray><gradient:#ff5a5f:#ff9a44>Created By</gradient><dark_gray>]</dark_gray> <#ff9a44>%player%</#ff9a44>"
+      - "<gray>Right-click to reclaim your hearts.</gray>"
+  ##Display used for admin/server-generated heart items.
+  Server:
+    Name: "<gradient:#ff5a5f:#ff9a44>Heart Satchel</gradient> <gray>(Right-Click)</gray>"
+    Lore:
+      - "<dark_gray>[</dark_gray><gradient:#ff5a5f:#ff9a44>Value</gradient><dark_gray>]</dark_gray> <white>%amount%</white>"
+      - "<dark_gray>[</dark_gray><gradient:#ff5a5f:#ff9a44>Issued By</gradient><dark_gray>]</dark_gray> <#ff5a5f>BeastLifeSteal</#ff5a5f>"
+      - "<gray>Right-click to reclaim your hearts.</gray>"
+  ##Hologram name shown when the item is dropped. Empty disables it.
+  CustomName: "<gradient:#ff5a5f:#ff9a44>Heart Satchel</gradient> <gray>x%amount%</gray>"
+  ##Optional Bukkit item flags.
+  Flags: []
+  ##Base minimum withdraw amount allowed by the generic BeastWithdraw validator.
+  Min: 1
+  ##Base maximum withdraw amount allowed by the generic BeastWithdraw validator.
+  Max: 999999
+  ##Maximum number of 1-heart items put into a single stack.
+  MaxStackSize: 64
+  ##Number format used in item text and messages.
+  AmountFormat: "###,##0"
+  ##Locale used by the amount formatter.
+  Locale: "en_US"
+  ##Hearts are whole numbers only.
+  DisableDecimals: true
+  ##Tax is kept at 0 for heart withdraws. BeastWithdraw redeem flow still expects this section.
+  Tax:
+    Lore: []
+    Percentage: 0
+  ##Permission-note overrides are unused for heart withdraw right now, but the section stays for config compatibility.
+  PermissionNotes:
+    Enabled: false
+  ##Withdraw fee support stays disabled for hearts.
+  Charges:
+    Fee:
+      Enabled: false
+      Cost: 0
+  ##Sounds played on withdraw and redeem.
+  Sounds:
+    Withdraw:
+      Enabled: true
+      Sound: "ENTITY_GENERIC_EXPLODE"
+      Volume: 1.0
+      Pitch: 1.0
+    Redeem:
+      Enabled: true
+      Sound: "ENTITY_EXPERIENCE_ORB_PICKUP"
+      Volume: 1.0
+      Pitch: 1.0
+  Logs:
+    ##Per-type transaction logging override.
+    ##Default true means BeastLifeSteal can be logged, but config.yml -> Settings.Logs.Enabled must also be true.
+    ##Set this to false to stop BeastLifeSteal from being written anywhere, including console, Combined, and BeastLifeSteal separate file.
+    Enabled: true
+    SeparateFile:
+      ##Also write BeastLifeSteal into its own file: plugins/BeastWithdraw/Logs/BeastLifeSteal/latest.log.
+      ##This works together with the main config and does not replace the optional Combined log file.
+      Enabled: false
+  ##Main permission checked by /heartwithdraw, /withdrawheart and /blswithdraw.
+  Permission: "beastlifesteal.withdraw"
+  ##Amount used when the player runs the command with no number.
+  DefaultAmount: 1
+  ##If false, any withdraw that would eliminate the player is blocked.
+  AllowLethalWithdraw: false
+  ##If true, lethal withdraws require the trailing confirm argument.
+  RequireConfirmOnLethal: true
+  ##Blocks heart withdraw while BeastLifeSteal grace period is active, if that runtime state is exposed.
+  BlockDuringGracePeriod: true
+  ##Checks inventory space before removing hearts.
+  CheckInventorySpace: true
+  ##NBT key holding the per-item redeem value for BeastWithdraw's redeem listener.
+  NBTKey: "bLifeStealHeart"
+  ##Aliases for the main command label /heartwithdraw.
+  Aliases: [ withdrawheart, blswithdraw ]
+  ##All feature-specific messages for heart withdraw.
+  Messages:
+    ##Value prefix/suffix formatting used by BeastWithdraw placeholders.
+    Prefix: ""
+    Suffix: " &4❤"
+    ##Shown if the player runs the command without arguments.
+    Help: "%prefix% &2You have %balance% &e(Use /heartwithdraw <hearts> <notes> confirm)"
+    PlayerOnly: "%prefix% &cOnly players can use this command."
+    MissingDependency: "%prefix% &cBeastLifeSteal is not available."
+    NoPermission: "%prefix% &4You don't have permission to withdraw hearts."
+    InvalidAmount: "%prefix% &4%amount% is not a valid heart amount."
+    NotEnough: "%prefix% &cYou don't have %amount%! &e(Current: %balance%)"
+    Withdraw: "%prefix% &eWithdrawn &b%stack%&7Heart Withdraw&8: &a+%stacked-amount% &8| &7Current Health: &b%balance%"
+    Redeem: "%prefix% &eRedeemed &b%stack%&7Heart Withdraw&8: &a+%stacked-amount% &8| &7Current Health: &b%balance%"
+    RedeemAndTax: "%prefix% &eRedeemed &b%stack%&7Heart Withdraw&8: &a+%stacked-amount% &8| &7Current Health: &b%balance%"
+    RewardReceived: "%prefix% &eYou received &b%stack%&7Heart Withdraw&8: &a+%amount%"
+    Min: "%prefix% &cYou must withdraw at least %min-amount% heart!"
+    Max: "%prefix% &cYou can withdraw a maximum of %max-amount% hearts!"
+    ToBigNumber: "%prefix% &4%amount% is too big!"
+    MaxStackSize: "%prefix% &cYou can't make stack bigger than %stack% items!"
+    InventoryFull: "%prefix% &cYou do not have enough inventory space for the withdrawn heart item(s)."
+    GracePeriodBlocked: "%prefix% &cYou cannot withdraw hearts during grace period."
+    LethalBlocked: "%prefix% &cThis withdraw would eliminate you and is disabled."
+    ConfirmRequired: "%prefix% &eThis withdraw would eliminate you. Type &6%usage% &eto continue."
+    Fee:
+      NotEnough: "%prefix% &cYou need %fee% to pay the fee for this transaction!"
+      TakenFee: "%prefix% &eYou paid %fee% fee for this transaction!"
+##Internal config version for auto-update checks.
+ConfigVersion: 1.1

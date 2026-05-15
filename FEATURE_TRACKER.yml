@@ -1,0 +1,162 @@
+meta:
+  purpose: "Track user-facing BeastWithdraw changes for later wiki/documentation work."
+  update_rule: "Whenever a new feature, permission, command, config option, or notable behavior change is added, update this file in the same task."
+  format_notes:
+    - "Keep entries focused on behavior visible to server owners, admins, or players."
+    - "Prefer command names, permission nodes, config paths, and short behavior notes."
+    - "Do not remove old entries unless the feature was removed from the plugin."
+
+features:
+  beastlifesteal_heart_withdraw:
+    status: "implemented"
+    module: "BeastWithdraw-spigot"
+    summary: "Adds a BeastLifeSteal-backed heart withdraw type with custom withdraw and redeem logic."
+    commands:
+      primary: "/heartwithdraw"
+      aliases:
+        - "/withdrawheart"
+        - "/blswithdraw"
+    permissions:
+      config_driven_withdraw_permission:
+        path: "Withdraws/BeastLifeSteal.yml -> Settings.Permission"
+        default_value: "beastlifesteal.withdraw"
+      redeem_permission: "BeastWithdraw.heartwithdraw.Redeem"
+      stacked_redeem_permission: "BeastWithdraw.heartwithdraw.Redeem.Stacked"
+    config_files:
+      - "BeastWithdraw-spigot/src/main/resources/Withdraws/BeastLifeSteal.yml"
+      - "BeastWithdraw-spigot/src/main/resources/config.yml"
+    config_options:
+      - "Settings.Withdraws.BeastLifeSteal.Enabled"
+      - "Settings.Permission"
+      - "Settings.DefaultAmount"
+      - "Settings.AllowLethalWithdraw"
+      - "Settings.RequireConfirmOnLethal"
+      - "Settings.BlockDuringGracePeriod"
+      - "Settings.CheckInventorySpace"
+      - "Settings.Logs.Enabled"
+      - "Settings.Logs.SeparateFile.Enabled"
+    behavior:
+      - "Uses BeastLifeSteal stored hearts as the withdrawable balance."
+      - "Supports lethal-withdraw blocking or confirm-to-continue flow."
+      - "Can block withdraw during BeastLifeSteal grace period."
+      - "Redeem logic supports stacked redeem and partial redeem when capacity is limited."
+
+  transaction_logging:
+    status: "implemented"
+    module: "BeastWithdraw-spigot"
+    summary: "Adds withdraw/redeem transaction logging with global and per-type controls."
+    commands:
+      - "/beastwithdraw debug"
+      - "/beastwithdraw debug on"
+      - "/beastwithdraw debug off"
+      - "/beastwithdraw debug reset"
+      - "/beastwithdraw debug status"
+    permissions:
+      - "BeastWithdraw.admin.debug"
+    config_files:
+      - "BeastWithdraw-spigot/src/main/resources/config.yml"
+      - "BeastWithdraw-spigot/src/main/resources/Withdraws/XpBottle.yml"
+      - "BeastWithdraw-spigot/src/main/resources/Withdraws/CashNote.yml"
+      - "BeastWithdraw-spigot/src/main/resources/Withdraws/BeastTokensNote.yml"
+      - "BeastWithdraw-spigot/src/main/resources/Withdraws/PlayerPointsNote.yml"
+      - "BeastWithdraw-spigot/src/main/resources/Withdraws/BeastLifeSteal.yml"
+    config_options:
+      - "config.yml -> Settings.Logs.Enabled"
+      - "config.yml -> Settings.Logs.Console.Enabled"
+      - "config.yml -> Settings.Logs.CombinedFile.Enabled"
+      - "<type>.yml -> Settings.Logs.Enabled"
+      - "<type>.yml -> Settings.Logs.SeparateFile.Enabled"
+    supported_types:
+      - "XpBottle"
+      - "CashNote"
+      - "BeastTokensNote"
+      - "PlayerPointsNote"
+      - "BeastLifeSteal"
+    behavior:
+      - "Global logging switch must be enabled before any transaction logging is active."
+      - "Per-type logging defaults to enabled and can disable logging for that type even when global logging is on."
+      - "Console logging can be disabled in config and temporarily overridden for the current session with /beastwithdraw debug."
+      - "Normal console logging goes through the plugin logger and appears in the server latest.log."
+      - "A combined shared file can be written to plugins/BeastWithdraw/Logs/Combined/latest.log for all enabled types together."
+      - "Separate per-type files are written to plugins/BeastWithdraw/Logs/<Type>/latest.log when enabled for that type."
+      - "On startup, an existing per-type latest.log is rotated into yyyy-MM-dd-N.log.gz in the same type folder."
+      - "On startup, an existing combined latest.log is rotated into yyyy-MM-dd-N.log.gz in the Combined folder."
+
+  boostedyaml_config_system:
+    status: "implemented"
+    module: "BeastWithdraw-spigot"
+    summary: "Replaces the old custom SnakeYAML/Bukkit config loader path with BeastLib BoostedYAML loading."
+    config_files:
+      - "config.yml"
+      - "Withdraws/*.yml"
+      - "Lang/en-US.yml"
+    behavior:
+      - "Main config, withdraw type configs, and language files now load through BeastLibAPI.getYamlFiles()."
+      - "Bundled defaults are merged through BoostedYAML update logic with keep-all behavior so custom user keys are preserved."
+      - "Legacy plugin messages.yml is migrated automatically into Lang/en-US.yml when the new language file does not exist yet."
+
+  language_file_selection:
+    status: "implemented"
+    module: "BeastWithdraw-spigot"
+    summary: "Moves messages into the Lang folder and adds language-file selection in config."
+    config_files:
+      - "BeastWithdraw-spigot/src/main/resources/config.yml"
+      - "BeastWithdraw-spigot/src/main/resources/Lang/en-US.yml"
+    config_options:
+      - "config.yml -> Settings.Language.Settings.File"
+      - "config.yml -> Settings.Language.Settings.ForceLanguage"
+    behavior:
+      - "Default bundled language file is Lang/en-US.yml."
+      - "Existing plugin messages.yml is migrated automatically to Lang/en-US.yml for upgraded servers."
+      - "If the configured language file is missing and not bundled, the plugin falls back to en-US.yml."
+
+  cashnote_bigdecimal_transactions:
+    status: "implemented"
+    module: "BeastWithdraw-spigot"
+    summary: "Moves cash note withdraw and redeem calculations to BigDecimal-aware logic with Vault transaction verification."
+    components:
+      - "Cash withdraw command"
+      - "Cash redeem flow"
+      - "Cash note NBT exact amount storage"
+    behavior:
+      - "Cash notes now store an exact decimal amount string in NBT for precise redeem calculations."
+      - "Cash withdraw combines note amount and fee into one verified Vault withdrawal before the note is created."
+      - "Cash redeem validates the Vault deposit result before consuming the note item."
+      - "Partial or failed Vault transactions are rolled back when possible and no note or money is granted on failure."
+      - "The 'all' amount path now accounts for withdraw fees before deciding the cash note amount."
+
+  withdraw_item_drop_display:
+    status: "implemented"
+    module: "BeastWithdraw-spigot"
+    summary: "Dropped withdraw items can show their configured custom display name and optional glow color."
+    config_files:
+      - "Each withdraw type yml file under BeastWithdraw-spigot/src/main/resources/Withdraws/"
+    config_options:
+      - "Settings.CustomName"
+      - "Settings.Glow.Enabled"
+      - "Settings.Glow.Color"
+    behavior:
+      - "If the dropped item contains a BeastWithdraw RedeemType tag, its dropped entity name is updated from the withdraw type config."
+      - "Glow color is applied through scoreboard teams when glow is enabled and a color is configured."
+
+  update_notifications:
+    status: "implemented"
+    module: "BeastWithdraw-spigot"
+    summary: "Adds update checking for free and premium channels with console and admin notifications."
+    permissions:
+      - "BeastWithdraw.Admin"
+    components:
+      - "Modrinth free update checker"
+      - "Spigot premium update checker"
+      - "Join/login admin notify listener"
+      - "Periodic async recheck task"
+    behavior:
+      - "Checks free BeastWithdraw updates from Modrinth."
+      - "Checks premium BeastWithdrawPlus updates from Spigot."
+      - "Sends repeated console notices and in-game admin notices."
+      - "Premium promo notice is shown when free is already current but premium is newer."
+
+documentation_todo:
+  - "Add future permissions here as soon as they are introduced."
+  - "Add future commands here as soon as they are introduced."
+  - "Add future config keys here as soon as they are introduced."
