@@ -33,7 +33,7 @@ public class CancelCraftingListener
     public CancelCraftingListener(BeastWithdrawPlugin pl) {
         this.pl = pl;
         pl.getServer().getPluginManager().registerEvents(this, pl);
-        crafting = pl.getConfig().getBoolean("Settings.CancelCrafting");
+        crafting = pl.getSettings().getBoolean("Settings.CancelCrafting");
         hasShopKeeper = pl.getServer().getPluginManager().isPluginEnabled("Shopkeepers");
     }
 
@@ -75,7 +75,7 @@ public class CancelCraftingListener
 
     @EventHandler
     public void onClick(InventoryClickEvent e) {
-        if ((!pl.getConfig().getBoolean("Settings.VillagerTrade.Allow")) &&
+        if ((!pl.getSettings().getBoolean("Settings.VillagerTrade.Allow")) &&
                 (e.getInventory().getType() == InventoryType.MERCHANT)) {
             Player p = (Player) e.getWhoClicked();
             if (e.getCurrentItem() == null) return;
@@ -88,7 +88,7 @@ public class CancelCraftingListener
 
             if (tag.hasKey("bCraft")) {
 
-                if (e.getWhoClicked().getOpenInventory().getTopInventory().getHolder() == null && pl.getConfig().getBoolean("Settings.VillagerTrade.AllowShopKeeperPlugin")) return;
+                if (e.getWhoClicked().getOpenInventory().getTopInventory().getHolder() == null && pl.getSettings().getBoolean("Settings.VillagerTrade.AllowShopKeeperPlugin")) return;
 
                 String s = pl.getMessages().getString("Withdraws.CancelVillagerTrade");
                 pl.getUtils().sendMessage(p, s);

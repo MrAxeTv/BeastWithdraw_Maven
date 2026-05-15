@@ -2,6 +2,13 @@
 ##Plugin use intended for MC 1.7 - 1.19+
 ##Notic all values of withdraw amount are stored as NBT data on items so make sure other plugins for storing items have support for storing NBT data.
 Settings:
+  ##Language selection for files stored in plugins/BeastWithdraw/Lang/.
+  Language:
+    Settings:
+      ##Language file loaded from the Lang folder.
+      File: "en-US.yml"
+      ##Reserved for future per-player language support.
+      ForceLanguage: false
   Withdraws:
     XpBottle:
       Enabled: true
@@ -14,6 +21,27 @@ Settings:
     ##Dependency:  PlayerPoints!
     PlayerPointsNote:
       Enabled: false
+    ##Dependency: BeastLifeSteal
+    BeastLifeSteal:
+      Enabled: false
+  Logs:
+    ##Main switch for withdraw and redeem transaction logging.
+    ##When disabled, no transaction logs are written anywhere.
+    Enabled: true
+    Console:
+      ##Show transaction logs in the normal server console/latest.log output.
+      ##This can be temporarily overridden until restart with /BeastWithdraw debug.
+      Enabled: true
+    CombinedFile:
+      ##Write all logged withdraw and redeem actions from every enabled type into one shared file.
+      ##File path: plugins/BeastWithdraw/Logs/Combined/latest.log
+      ##This only writes entries for types that still have Settings.Logs.Enabled: true in their own withdraw file.
+      Enabled: true
+    ##Per-type separate files are controlled inside each Withdraws/<type>.yml file.
+    ##Logging order is:
+    ##1) Settings.Logs.Enabled in this file must be true.
+    ##2) Settings.Logs.Enabled in the specific withdraw type file must be true.
+    ##3) Console / CombinedFile / per-type SeparateFile then decide where that type is written.
   ##Cancle villager treading with withdraw items.
   VillagerTrade:
     Allow: false
@@ -23,11 +51,9 @@ Settings:
   CancelCrafting: true
   ##Drop withdraw item on floor if there is no space in player inventory
   WithdrawDropFloor: true
-  ##Don't allow decimals in withdraw amount
-  DisableDecimalAmounts: true
   ##Main command alias
   Aliases:
     - "bw"
     - "bwa"
 ##Config version (PLEASE DO NOT EDIT & DON'T COPY PAST OLD CONFIG OVER)
-ConfigVersion: 3.1
+ConfigVersion: 3.3

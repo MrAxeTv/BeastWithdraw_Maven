@@ -1,6 +1,8 @@
 package me.mraxetv.beastwithdraw.managers.assets;
 
+import lombok.Getter;
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
+import me.mraxetv.beastwithdraw.commands.WithdrawCMD;
 import me.mraxetv.beastwithdraw.commands.xpbottle.XpBottleCMD;
 import me.mraxetv.beastwithdraw.events.BottleRedeemEvent;
 import me.mraxetv.beastwithdraw.listener.XpBottleRedeemListener;
@@ -10,7 +12,8 @@ import me.mraxetv.beastwithdraw.utils.XpManager;
 import org.bukkit.entity.Player;
 
 public class XpBottleHandler extends AssetHandler<Integer> {
-    private XpBottleCMD xpBottleCMD;
+    @Getter
+    private WithdrawCMD xpBottleCMD;
 
     public XpBottleHandler(BeastWithdrawPlugin pl, String id) {
         super(pl, id);
@@ -20,25 +23,33 @@ public class XpBottleHandler extends AssetHandler<Integer> {
     }
 
     @Override
-    public Double getBalance(Player p) {
-
-        return (double)XpManager.getTotalExperience(p);
+    public Integer getBalance(Player p) {
+        return XpManager.getTotalExperience(p);
     }
 
     @Override
-    public void withdrawAmount(Player p, Double amount) {
-        XpManager.setTotalExperience(p, (getBalance(p).intValue() - amount.intValue()));
+    protected void withdrawAmountExact(Player p, Integer amount) {
+        XpManager.setTotalExperience(p, getBalance(p) - amount);
     }
 
     @Override
-    public void depositAmount(Player p, Double amount) {
-        XpManager.setTotalExperience(p, (getBalance(p).intValue() + amount.intValue()));
+    protected void depositAmountExact(Player p, Integer amount) {
+        XpManager.setTotalExperience(p, getBalance(p) + amount);
 
+    }
+
+    @Override
+    protected Integer convertAmount(double amount) {
+        return Double.valueOf(amount).intValue();
     }
 
     @Override
     public boolean isToBigAmount(double amount) {
         return amount > Integer.MAX_VALUE;
+    }
+
+    public WithdrawCMD getWithdrawCMD() {
+        return xpBottleCMD;
     }
 
 

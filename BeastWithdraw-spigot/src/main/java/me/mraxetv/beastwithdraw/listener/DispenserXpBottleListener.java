@@ -5,7 +5,6 @@ import me.mraxetv.beastlib.lib.nbtapi.utils.MinecraftVersion;
 import me.mraxetv.beastlib.lib.xmaterials.XMaterial;
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
 import me.mraxetv.beastwithdraw.utils.Utils;
-import net.minecraft.world.entity.monster.Drowned;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -54,7 +53,9 @@ public class DispenserXpBottleListener implements Listener {
             World world = dispenserLocation.getWorld();
             ThrownExpBottle thrownExpBottle = world.spawn(getBlockFacingDispenser(e.getBlock()).getLocation().add(0.5,0.5,0.5), ThrownExpBottle.class);
            thrownExpBottle.setVelocity(e.getVelocity());
-            thrownExpBottle.setCustomName("XPB:" + nbtItem.getInteger(id));
+
+            int singleTax = (int) Math.ceil(pl.getWithdrawManager().XP_BOTTLE.calculateTax(nbtItem.getInteger(id), e.getItem()));
+            thrownExpBottle.setCustomName("XPB:" + (nbtItem.getInteger(id)-singleTax));
             Dispenser state = (Dispenser) e.getBlock().getState();
 
             e.setCancelled(true);

@@ -1,6 +1,5 @@
 package me.mraxetv.beastwithdraw.events;
 
-import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -10,15 +9,10 @@ import org.bukkit.inventory.ItemStack;
 public class CustomRedeemEvent extends Event implements Cancellable {
 
     private static final HandlerList HANDLERS = new HandlerList();
-    @Getter
     private final Player player;
-    @Getter
     private final ItemStack item;
-    @Getter
     private final double amount;
-    @Getter
     private final String type;
-    @Getter
     private final boolean offHand;
     private boolean cancelled;
 
@@ -38,5 +32,25 @@ public class CustomRedeemEvent extends Event implements Cancellable {
     @Override
     public HandlerList getHandlers() { return HANDLERS; }
     public static HandlerList getHandlerList() { return HANDLERS; }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public ItemStack getItem() {
+        return item;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public boolean isOffHand() {
+        return offHand;
+    }
 }
 

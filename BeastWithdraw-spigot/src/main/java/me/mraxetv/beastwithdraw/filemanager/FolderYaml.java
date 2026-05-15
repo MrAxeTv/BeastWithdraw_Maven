@@ -1,102 +1,64 @@
 package me.mraxetv.beastwithdraw.filemanager;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.configuration.file.FileConfiguration;
-
-import org.bukkit.configuration.file.YamlConfiguration;
+import me.mraxetv.beastlib.api.BeastLibAPI;
+import me.mraxetv.beastlib.api.yaml.YamlFileOptions;
+import me.mraxetv.beastlib.lib.boostedyaml.YamlDocument;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.File;
+import java.io.IOException;
 
 public class FolderYaml {
-    private JavaPlugin pl;
-    private String name;
-    private String folder;
-    public File configf;
-    public FileConfiguration config;
+    private final JavaPlugin pl;
+    private final String folder;
+    private final String name;
+    private YamlDocument config;
 
-    public FolderYaml(JavaPlugin plugin, String folder , String n) {
+    public FolderYaml(JavaPlugin plugin, String folder, String n) {
         this.pl = plugin;
-        this.name = n;
         this.folder = folder;
-        createFiles(name);
-        configUpdate();
+        this.name = n;
+        loadConfig();
     }
 
     public void reloadConfig() {
-        createFiles(name);
+        try {
+            config.reload();
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to reload " + folder + "/" + name, e);
+        }
     }
 
-    public FileConfiguration getConfig() {
+    public YamlDocument getConfig() {
         return config;
+    }
+
+    public File getFile() {
+        return config.getFile();
     }
 
     public void saveConfig() {
         try {
-            config.save(configf);
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void createFiles(String name) {
-
-        configf = new File(pl.getDataFolder()+"/"+folder, name);
-        if (!configf.exists()) {
-            configf.getParentFile().mkdirs();
-            pl.saveResource(folder+"\\"+name, false);
-        }
-        this.config = new YamlConfiguration();
-        try {
-            config.load(configf);
-        }
-        catch (Exception e) {
-            e.printStackTrace();
+            config.save();
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to save " + folder + "/" + name, e);
         }
     }
 
-    private void configUpdate() {
-        InputStreamReader jarInputStream = null;
-        YamlConfiguration jarConfig = null;
-        /**
-         * Reading file from plugin jar
-         */
+    private void loadConfig() {
+        String relativePath = folder + "/" + name;
         try {
-
-            jarInputStream = new InputStreamReader(pl.getResource(folder+"/"+this.name), "UTF-8");
-            if (jarInputStream != null) {
-                jarConfig = YamlConfiguration.loadConfiguration((Reader)jarInputStream);
-            }
-        }
-        catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        /**
-         * Checking if jar file config is newer
-         */
-
-        if (getConfig().getDouble("ConfigVersion") < jarConfig.getDouble("ConfigVersion") || !getConfig().isSet("ConfigVersion")) {
-            double oldVersion = getConfig().getDouble("ConfigVersion");
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd-HH.mm.ss");
-            Date date = new Date();
-            boolean renameResult = configf.renameTo(
-                    new File(pl.getDataFolder()+"/"+folder, name.replaceAll("\\.yml", "") + "_" + dateFormat.format(date) + "_old.yml"));
-            if (renameResult) {
-                pl.saveResource(folder+"\\"+name, false);
-                this.createFiles(name);
-                Bukkit.getConsoleSender().sendMessage(
-                        ChatColor.translateAlternateColorCodes('&',
-                                ("&7[&4Beast&bTokens&7] &4Old " + name + " " + oldVersion + " has been replaced with new "+jarConfig.getDouble("ConfigVersion") +" version!")));
-            } else {
-                Bukkit.getConsoleSender().sendMessage(
-                        ChatColor.translateAlternateColorCodes('&',
-                                ("&7[&4Beast&bTokens&7] &4Server has failed to replace old version of " + config + " please contact author MrAxeTv!")));
-            }
+            config = ((BeastLibAPI) pl).getYamlFiles().load(
+                    pl,
+                    YamlFileOptions.builder(relativePath)
+                            .setResourcePath(relativePath)
+                            .setAutoUpdate(true)
+                            .setCreateFileIfMissing(true)
+                            .setRequireDefaultResource(true)
+                            .build()
+            );
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to load " + relativePath, e);
         }
     }
 }
-

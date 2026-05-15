@@ -1,18 +1,19 @@
 package me.mraxetv.beastwithdraw.commands;
 
 import me.mraxetv.beastlib.commands.builder.ShortCommand;
+import me.mraxetv.beastlib.utils.LegacyCommandUtils;
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
 import me.mraxetv.beastwithdraw.managers.AssetHandler;
 import me.mraxetv.beastwithdraw.utils.Utils;
-import me.mraxetv.beastwithdraw.utils.XpManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,11 +23,13 @@ public class WithdrawCMD extends ShortCommand {
 
     private final BeastWithdrawPlugin pl;
     private final AssetHandler assetHandler;
+    // generate instace of current time
 
     public WithdrawCMD(BeastWithdrawPlugin pl, AssetHandler assetHandler) {
         super(pl, assetHandler.getID(), assetHandler.getConfig().getStringList("Settings.Aliases"), "BeastWithdraw." + assetHandler.getID() + ".Withdraw");
         this.pl = pl;
         this.assetHandler = assetHandler;
+        LegacyCommandUtils.applyLegacyCommandFix(pl,this);
     }
 
     @Override
@@ -64,7 +67,7 @@ public class WithdrawCMD extends ShortCommand {
         int stackSize = parseStackSize(p, args);
         if (stackSize == -1) return;
 
-        double balance = assetHandler.getBalance(p);
+        double balance = assetHandler.getBalanceAsDouble(p);
         double takenAmount = parseWithdrawAmount(p, args[0], balance);
         if (takenAmount == -1) return;
 
@@ -80,7 +83,7 @@ public class WithdrawCMD extends ShortCommand {
 
     protected void sendHelpMessage(Player p) {
         String helpMessage = assetHandler.getMessageSection().getString("Help");
-        helpMessage = helpMessage.replace("%balance%", assetHandler.formatWithPreSuffix(assetHandler.getBalance(p)));
+        helpMessage = helpMessage.replace("%balance%", assetHandler.formatWithPreSuffix(assetHandler.getBalanceAsDouble(p)));
         helpMessage = ChatColor.translateAlternateColorCodes('&', helpMessage);
         pl.getUtils().sendMessage(p, helpMessage);
     }
@@ -98,7 +101,7 @@ public class WithdrawCMD extends ShortCommand {
         int maxStack = assetHandler.getConfig().getInt("Settings.MaxStackSize", 64);
         if (stackSize > maxStack) {
             String s = assetHandler.getMessageSection().getString("MaxStackSize");
-            s = s.replace("%stack%",Utils.formatNumber(stackSize));
+            s = s.replace("%stack%",Utils.formatNumber(maxStack));
             pl.getUtils().sendMessage(p,s);
 
             return maxStack;
@@ -116,19 +119,25 @@ public class WithdrawCMD extends ShortCommand {
             return balance;
         }
 
-        if (!Utils.isInt(arg)) {
+        if (!Utils.isDouble(arg)) {
             String s = pl.getMessages().getString("Withdraws.InvalidNumber");
             s = s.replace("%amount%",arg);
             pl.getUtils().sendMessage(p,s);
 
             return -1;
         }
+        int scale = 2;
+        if(assetHandler.getConfig().getBoolean("Settings.DisableDecimals")) {
+            scale = 0;
+        }
+        BigDecimal bd = new BigDecimal(arg)
+                .setScale(scale, RoundingMode.DOWN); // truncate
 
-        return Math.abs(Double.parseDouble(arg));
+        return bd.doubleValue();
     }
 
     protected boolean validateInventorySpace(Player p) {
-        if (pl.getConfig().getBoolean("Settings.WithdrawDropFloor")) return true;
+        if (pl.getSettings().getBoolean("Settings.WithdrawDropFloor")) return true;
 
         if (p.getInventory().firstEmpty() == -1) {
             String s = pl.getMessages().getString("Withdraws.FullInventory");
@@ -164,7 +173,7 @@ public class WithdrawCMD extends ShortCommand {
         double min = assetHandler.getConfig().getDouble("Settings.Min");
 
         if (assetHandler.getConfig().getBoolean("Settings.PermissionNotes.Enabled")) {
-            for (String key : assetHandler.getConfig().getConfigurationSection("Settings.PermissionNotes").getKeys(false)) {
+            for (String key : assetHandler.getConfig().getSection("Settings.PermissionNotes").getRoutesAsStrings(false)) {
                 if (p.isPermissionSet("BeastWithdraw." + assetHandler.getID() + ".PermissionNotes." + key)) {
                     min = assetHandler.getConfig().getDouble("Settings.PermissionNotes." + key + ".Min");
                 }
@@ -177,7 +186,7 @@ public class WithdrawCMD extends ShortCommand {
         double max = assetHandler.getConfig().getDouble("Settings.Max");
 
         if (assetHandler.getConfig().getBoolean("Settings.PermissionNotes.Enabled")) {
-            for (String key : assetHandler.getConfig().getConfigurationSection("Settings.PermissionNotes").getKeys(false)) {
+            for (String key : assetHandler.getConfig().getSection("Settings.PermissionNotes").getRoutesAsStrings(false)) {
                 if (p.isPermissionSet("BeastWithdraw." + assetHandler.getID() + ".PermissionNotes." + key)) {
                     max = assetHandler.getConfig().getDouble("Settings.PermissionNotes." + key + ".Max");
                 }
@@ -213,7 +222,7 @@ public class WithdrawCMD extends ShortCommand {
         if (!assetHandler.getConfig().getBoolean("Settings.Charges.Fee.Enabled")) return true;
 
         double fee = assetHandler.getConfig().getDouble("Settings.Charges.Fee.Cost") * stackSize;
-        double balance = assetHandler.getBalance(p);
+        double balance = assetHandler.getBalanceAsDouble(p);
 
         if (balance < fee) {
             String s = assetHandler.getMessageSection().getString("Tax.NotEnough");
@@ -237,8 +246,9 @@ public class WithdrawCMD extends ShortCommand {
 
         String s = assetHandler.getMessageSection().getString("Withdraw");
         s = s.replace("%amount%", assetHandler.formatWithPreSuffix(takenAmount));
+        s = s.replace("%stacked-amount%", assetHandler.formatWithPreSuffix(takenAmount* stackSize));
         s = Utils.formatStackSize(s,stackSize);
-        s = s.replace("%balance%", assetHandler.formatWithPreSuffix(assetHandler.getBalance(p)));
+        s = s.replace("%balance%", assetHandler.formatWithPreSuffix(assetHandler.getBalanceAsDouble(p)));
         pl.getUtils().sendMessage(p, s);
         double tax = calculateTax(p);
         ItemStack item = assetHandler.getItem(p.getName(), takenAmount, stackSize, true,tax);
@@ -248,14 +258,16 @@ public class WithdrawCMD extends ShortCommand {
             p.getWorld().dropItem(p.getLocation(), item);
         }
 
+        pl.getWithdrawLogger().logWithdraw(assetHandler, p, takenAmount, stackSize, takenAmount * stackSize, assetHandler.getBalanceAsDouble(p));
+
         playWithdrawSound(p);
     }
     protected double calculateTax(Player p){
 
         if (p.hasPermission("BeastWithdraw." + assetHandler.getID() + ".ByPass.Tax")) return 0;
-            double tax = assetHandler.getConfig().getDouble("Settings.Charges.Tax.Percentage");
-            if (assetHandler.getConfig().getBoolean("Settings.PermissionNotes.Enabled")) {
-                for (String key : assetHandler.getConfig().getConfigurationSection("Settings.PermissionNotes").getKeys(false)) {
+            double tax = assetHandler.getConfig().getDouble("Settings.Tax.Percentage");
+        if (assetHandler.getConfig().getBoolean("Settings.PermissionNotes.Enabled")) {
+                for (String key : assetHandler.getConfig().getSection("Settings.PermissionNotes").getRoutesAsStrings(false)) {
                     if (p.isPermissionSet("BeastWithdraw." + assetHandler.getID() + ".PermissionNotes." + key)) {
                         tax = assetHandler.getConfig().getDouble("Settings.PermissionNotes." + key + ".Tax.Percentage");
                     }
@@ -268,12 +280,18 @@ public class WithdrawCMD extends ShortCommand {
         if (!assetHandler.getConfig().getBoolean("Settings.Sounds.Withdraw.Enabled")) return;
 
         try {
-            String sound = assetHandler.getConfig().getString("Settings.Sounds.Withdraw.Sound");
-            p.playSound(p.getLocation(), Sound.valueOf(sound), 1f, 1f);
+            String soundName = assetHandler.getConfig().getString("Settings.Sounds.Withdraw.Sound");
+            float volume = assetHandler.getConfig().getDouble("Settings.Sounds.Withdraw.Volume", 1.0).floatValue();
+            float pitch = assetHandler.getConfig().getDouble("Settings.Sounds.Withdraw.Pitch", 1.0).floatValue();
+
+            Sound sound = Sound.valueOf(soundName.toUpperCase());
+            p.playSound(p.getLocation(), sound, volume, pitch);
         } catch (Exception e) {
-            Bukkit.getConsoleSender().sendMessage(pl.getUtils().getPrefix() + "§cBroken sound in " + assetHandler.getID() + " Withdraw section!");
+            Bukkit.getConsoleSender().sendMessage(
+                    pl.getUtils().getPrefix() + "§cBroken sound in " + assetHandler.getID() + " Withdraw section!");
         }
     }
+
 
 
 
@@ -301,5 +319,7 @@ public class WithdrawCMD extends ShortCommand {
                 .filter(s -> s.toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
                 .collect(Collectors.toList());
     }
+
+
 
 }

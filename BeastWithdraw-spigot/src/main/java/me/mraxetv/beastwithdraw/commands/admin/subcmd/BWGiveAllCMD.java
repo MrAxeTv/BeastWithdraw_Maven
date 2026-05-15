@@ -60,7 +60,7 @@ public class BWGiveAllCMD extends SubCommand {
         if (!BeastWithdrawPlugin.getInstance().getWithdrawManager().hasAssetHandler(handlerID)) {
             BeastWithdrawPlugin.getInstance().getUtils().sendMessage(sender,
                     BeastWithdrawPlugin.getInstance().getMessages().getString("Withdraws.WrongTypeName")
-                            .replace("%prefix%", Utils.getPrefix())
+                            .replace("%prefix%", BeastWithdrawPlugin.getInstance().getUtils().getPrefix())
                             .replace("%type%", handlerID));
             return;
         }
@@ -68,7 +68,7 @@ public class BWGiveAllCMD extends SubCommand {
         if (!Utils.isDouble(args[2])) {
             BeastWithdrawPlugin.getInstance().getUtils().sendMessage(sender,
                     BeastWithdrawPlugin.getInstance().getMessages().getString("Withdraws.InvalidNumber")
-                            .replace("%prefix%", Utils.getPrefix())
+                            .replace("%prefix%", BeastWithdrawPlugin.getInstance().getUtils().getPrefix())
                             .replace("%amount%", args[1]));
             return;
         }
@@ -127,7 +127,12 @@ public class BWGiveAllCMD extends SubCommand {
             Utils.addItem(player, item.clone()); // Clone to ensure separate item stacks
             if (!silent) {
                 String message = assetHandler.getMessageSection().getString("RewardReceived");
+                if (message == null || message.trim().isEmpty()) {
+                    message = BeastWithdrawPlugin.getInstance().getUtils().getPrefix() + " &aYou received %stack%%amount%.";
+                }
+                message = message.replace("%prefix%", BeastWithdrawPlugin.getInstance().getUtils().getPrefix());
                 message = message.replace("%amount%", assetHandler.formatWithPreSuffix(amount));
+            message = message.replace("%balance%", assetHandler.formatWithPreSuffix(assetHandler.getBalanceAsDouble(player)));
                 message = Utils.formatStackSize(message, stackSize);
                 BeastWithdrawPlugin.getInstance().getUtils().sendMessage(player, message);
             }

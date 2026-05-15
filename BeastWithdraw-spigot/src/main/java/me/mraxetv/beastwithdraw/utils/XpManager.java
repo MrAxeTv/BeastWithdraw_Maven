@@ -81,4 +81,24 @@ public class XpManager {
         int nextLevel = player.getLevel();
         return getExpAtLevel(nextLevel) - exp;
     }
+
+    public static int getLevelFromExp(int exp) {
+        if (exp <= 0) return 0;
+
+        int level = 0;
+        int xpForNextLevel = getExpAtLevel(level);
+
+        while (exp >= xpForNextLevel) {
+            exp -= xpForNextLevel;
+            level++;
+            xpForNextLevel = getExpAtLevel(level);
+
+            // Prevent overflow
+            if (level >= 21863) break; // Level 21863 is near Integer.MAX_VALUE in XP
+        }
+
+        return level;
+    }
+
+
 }

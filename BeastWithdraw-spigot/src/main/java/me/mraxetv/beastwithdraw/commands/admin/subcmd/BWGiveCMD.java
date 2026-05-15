@@ -60,7 +60,7 @@ public class BWGiveCMD extends SubCommand {
         if (target == null) {
             BeastWithdrawPlugin.getInstance().getUtils().sendMessage(sender,
                     BeastWithdrawPlugin.getInstance().getMessages().getString("Withdraws.NotOnline")
-                            .replace("%prefix%", Utils.getPrefix())
+                            .replace("%prefix%", BeastWithdrawPlugin.getInstance().getUtils().getPrefix())
                             .replace("%player%", args[1]));
             return;
         }
@@ -69,7 +69,7 @@ public class BWGiveCMD extends SubCommand {
         if (!BeastWithdrawPlugin.getInstance().getWithdrawManager().hasAssetHandler(handlerID)) {
             BeastWithdrawPlugin.getInstance().getUtils().sendMessage(sender,
                     BeastWithdrawPlugin.getInstance().getMessages().getString("Withdraws.WrongTypeName")
-                            .replace("%prefix%", Utils.getPrefix())
+                            .replace("%prefix%", BeastWithdrawPlugin.getInstance().getUtils().getPrefix())
                             .replace("%type%", handlerID)
                             .replace("%player%", args[1]));
             return;
@@ -78,7 +78,7 @@ public class BWGiveCMD extends SubCommand {
         if (!Utils.isDouble(args[3])) {
             BeastWithdrawPlugin.getInstance().getUtils().sendMessage(sender,
                     BeastWithdrawPlugin.getInstance().getMessages().getString("Withdraws.InvalidNumber")
-                            .replace("%prefix%", Utils.getPrefix())
+                            .replace("%prefix%", BeastWithdrawPlugin.getInstance().getUtils().getPrefix())
                             .replace("%amount%", args[3]));
             return;
         }
@@ -136,7 +136,12 @@ public class BWGiveCMD extends SubCommand {
 
         if (!silent) {
             String message = assetHandler.getMessageSection().getString("RewardReceived");
+            if (message == null || message.trim().isEmpty()) {
+                message = BeastWithdrawPlugin.getInstance().getUtils().getPrefix() + " &aYou received %stack%%amount%.";
+            }
+            message = message.replace("%prefix%", BeastWithdrawPlugin.getInstance().getUtils().getPrefix());
             message = message.replace("%amount%", assetHandler.formatWithPreSuffix(amount));
+            message = message.replace("%balance%", assetHandler.formatWithPreSuffix(assetHandler.getBalanceAsDouble(target)));
             message = Utils.formatStackSize(message, stackSize);
             BeastWithdrawPlugin.getInstance().getUtils().sendMessage(target, message);
         }

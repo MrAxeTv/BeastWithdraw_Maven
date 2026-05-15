@@ -1,14 +1,11 @@
 package me.mraxetv.beastwithdraw.utils;
 
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Locale;
 
 import me.mraxetv.beastlib.utils.BUtils;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -19,39 +16,32 @@ public class Utils extends BUtils
 implements Listener {
 	private BeastWithdrawPlugin pl;
 	private String version;
-	public static DecimalFormat df2;
+
 
 	static {}
 
 	public Utils(BeastWithdrawPlugin plugin) {
 		super(plugin);
 		this.pl = plugin;
-		if(pl.getConfig().getBoolean("Settings.DisableDecimalAmounts")){
-			df2 = new DecimalFormat("#", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 
-		}else df2 = new DecimalFormat("0.00", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
-		df2.setRoundingMode(RoundingMode.DOWN);
 	}
 
 
-	public static String getPrefix() {
-		String prefix = ChatColor.translateAlternateColorCodes('&', BeastWithdrawPlugin.getInstance().getMessages().getString("Prefix"));
-		return prefix;
+	public String getPrefix() {
+		return BeastWithdrawPlugin.getInstance().getMessages().getString("Prefix");
+
 	}
 
 	public static String formatStackSize(String message, int amount) {
-		if (amount <= 1) return message.replaceAll("%stack%", "");
-		return message.replaceAll("%stack%", MessagesLang.STACK_SIZE.replaceAll("%amount%", "" + amount));
+		if (amount <= 1) return message.replace("%stack%", "");
+		return message.replace("%stack%", MessagesLang.STACK_SIZE.replace("%amount%", "" + amount));
 	}
 
-	public void sendMessage(CommandSender sender , String message){
-		if(sender instanceof Player) message = setPlaceholders((Player) sender,message);
-		message = message.replaceAll("%prefix%",getPrefix());
-		sender.sendMessage(setColor(message));
-	}
 
-	public void sendMessage(Player sender , String message){
-		sender.sendMessage(setPlaceholders(sender,message));
+
+	public void sendMessage(CommandSender sender, String message) {
+
+		super.sendMessage(sender, message);
 	}
 
 	public void sendLog(String s) {
@@ -76,9 +66,11 @@ implements Listener {
 		return true;
 	}
 
-	public static String setPlaceholders(Player p, String s) {
-		s = s.replaceAll("%prefix%", getPrefix());
-		s = s.replaceAll("%player%", p.getName());
+	public String setPlaceholders(CommandSender sender, String s) {
+		s = s.replace("%prefix%", getPrefix());
+		if(sender instanceof Player){
+		s = s.replace("%player%", sender.getName());
+		}
 		//s = s.replaceAll("%balance%", formatNumber(XpManager.getTotalExperience(p)));
 		s = setColor(s);
 		return s;

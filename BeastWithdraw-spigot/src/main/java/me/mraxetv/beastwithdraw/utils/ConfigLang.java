@@ -20,9 +20,9 @@ public final class ConfigLang {
     public ConfigLang(BeastWithdrawPlugin pl) {
         this.pl = pl;
 
-         if(pl.getConfig().getBoolean("Settings.DisableDecimalAmounts")){
-             NUMBER_FORMAT = new DecimalFormat("#" + pl.getConfig().getString("Settings.BalanceFormat", "###,##0"), DecimalFormatSymbols.getInstance(Locale.ENGLISH));
-         }else NUMBER_FORMAT = new DecimalFormat("#" + pl.getConfig().getString("Settings.BalanceFormat", "###,##0.##"), DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+         if(pl.getSettings().getBoolean("Settings.DisableDecimalAmounts")){
+             NUMBER_FORMAT = new DecimalFormat("#" + pl.getSettings().getString("Settings.BalanceFormat", "###,##0"), DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+         }else NUMBER_FORMAT = new DecimalFormat("#" + pl.getSettings().getString("Settings.BalanceFormat", "###,##0.##"), DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 
         NUMBER_FORMAT.setRoundingMode(RoundingMode.DOWN);
     }

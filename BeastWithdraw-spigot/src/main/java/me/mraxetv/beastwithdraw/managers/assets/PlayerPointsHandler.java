@@ -1,6 +1,8 @@
 package me.mraxetv.beastwithdraw.managers.assets;
 
+import lombok.Getter;
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
+import me.mraxetv.beastwithdraw.commands.WithdrawCMD;
 import me.mraxetv.beastwithdraw.commands.playerpoints.PlayerPointsNoteCMD;
 import me.mraxetv.beastwithdraw.events.BTokensRedeemEvent;
 import me.mraxetv.beastwithdraw.events.CustomRedeemEvent;
@@ -13,6 +15,7 @@ import org.bukkit.entity.Player;
 public class PlayerPointsHandler extends AssetHandler<Integer> {
 
     private PlayerPointsAPI playerPointsAPI;
+    @Getter
     private  PlayerPointsNoteCMD playerPointsNoteCMD;
 
     public PlayerPointsHandler(BeastWithdrawPlugin pl, String id) {
@@ -25,26 +28,36 @@ public class PlayerPointsHandler extends AssetHandler<Integer> {
 
 
     @Override
-    public Double getBalance(Player p) {
-        return (double) playerPointsAPI.look(p.getUniqueId());
+    public Integer getBalance(Player p) {
+        return playerPointsAPI.look(p.getUniqueId());
     }
 
     @Override
-    public void withdrawAmount(Player p, Double amount) {
+    protected void withdrawAmountExact(Player p, Integer amount) {
 
-        playerPointsAPI.take(p.getUniqueId(), amount.intValue());
+        playerPointsAPI.take(p.getUniqueId(), amount);
 
     }
 
     @Override
-    public void depositAmount(Player p, Double amount) {
+    protected void depositAmountExact(Player p, Integer amount) {
 
-        playerPointsAPI.give(p.getUniqueId(),amount.intValue());
+        playerPointsAPI.give(p.getUniqueId(),amount);
 
+    }
+
+    @Override
+    protected Integer convertAmount(double amount) {
+        return Double.valueOf(amount).intValue();
     }
 
     @Override
     public boolean isToBigAmount(double amount) {
         return amount > Integer.MAX_VALUE;
+    }
+
+    @Override
+    public WithdrawCMD getWithdrawCMD() {
+        return playerPointsNoteCMD;
     }
 }

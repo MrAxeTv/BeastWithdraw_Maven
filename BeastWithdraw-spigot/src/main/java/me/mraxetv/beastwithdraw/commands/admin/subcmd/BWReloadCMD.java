@@ -6,6 +6,7 @@ import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
 import me.mraxetv.beastwithdraw.commands.admin.BeastWithdrawCMD;
 import org.bukkit.command.CommandSender;
 
+import java.util.Collections;
 import java.util.List;
 
 public class BWReloadCMD extends SubCommand {
@@ -25,12 +26,12 @@ public class BWReloadCMD extends SubCommand {
 
     @Override
     public List<String> getAliases() {
-        return List.of("rl");
+        return Collections.singletonList("rl");
     }
 
     @Override
     public boolean allowConsole() {
-        return false;
+        return true;
     }
 
     @Override
@@ -50,6 +51,6 @@ public class BWReloadCMD extends SubCommand {
 
     @Override
     public List<String> tabComplete(CommandSender commandSender, String[] strings) {
-        return List.of();
+        return Collections.emptyList();
     }
 }

@@ -5,6 +5,7 @@ import me.mraxetv.beastlib.commands.builder.SubCommand;
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
 import org.bukkit.command.CommandSender;
 
+import java.util.Collections;
 import java.util.List;
 
 public class BWVersionCMD extends SubCommand {
@@ -24,7 +25,7 @@ public class BWVersionCMD extends SubCommand {
 
     @Override
     public List<String> getAliases() {
-        return List.of("rl");
+        return Collections.singletonList("rl");
     }
 
     @Override
@@ -56,6 +57,6 @@ public class BWVersionCMD extends SubCommand {
 
     @Override
     public List<String> tabComplete(CommandSender commandSender, String[] strings) {
-        return List.of();
+        return Collections.emptyList();
     }
 }

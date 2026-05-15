@@ -8,7 +8,10 @@ import me.mraxetv.beastwithdraw.events.BTokensRedeemEvent;
 import me.mraxetv.beastwithdraw.events.CashRedeemEvent;
 import me.mraxetv.beastwithdraw.events.CustomRedeemEvent;
 import me.mraxetv.beastwithdraw.managers.AssetHandler;
+import me.mraxetv.beastwithdraw.managers.assets.CashNoteHandler;
 import me.mraxetv.beastwithdraw.managers.redeem.RedeemRegistry;
+import me.mraxetv.beastwithdraw.utils.MessagesLang;
+import me.mraxetv.beastwithdraw.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -23,6 +26,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
 import java.util.UUID;
+import java.math.BigDecimal;
 
 
 public class RedeemListener implements Listener {
@@ -43,13 +47,15 @@ public class RedeemListener implements Listener {
         if (!item.hasItemMeta()) return;
         if (e.getAction() != Action.RIGHT_CLICK_AIR && e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         //if (item.getType() != material) return;
-
         NBTItem nbtItem = new NBTItem(item);
         if (!nbtItem.hasKey("RedeemType")) return;
-        String type = nbtItem.getString("RedeemType").toLowerCase();
+        if(e.getClickedBlock() != null && e.getClickedBlock().getType().toString().toLowerCase().contains("shelf")) return;
 
+        String type = nbtItem.getString("RedeemType").toLowerCase();
         AssetHandler assetHandler = pl.getWithdrawManager().getAssetHandler(type);
-        double amount = nbtItem.getDouble(assetHandler.getNbtTag());
+        double amount = assetHandler instanceof CashNoteHandler
+                ? ((CashNoteHandler) assetHandler).getStoredAmount(item).doubleValue()
+                : nbtItem.getDouble(assetHandler.getNbtTag());
         UUID uuid = e.getPlayer().getUniqueId();
         if (delayList.contains(uuid)) return;
         delayList.add(uuid);
@@ -87,39 +93,190 @@ public class RedeemListener implements Listener {
         handleGenericRedeem(e);
     }
 
+
+
     private void handleGenericRedeem(CustomRedeemEvent e) {
         if (e.isCancelled()) return;
-        ItemStack item = e.getItem();
+
         Player p = e.getPlayer();
+        ItemStack item = e.getItem();
+        int stackSize = 1;
+
         AssetHandler assetHandler = pl.getWithdrawManager().getAssetHandler(e.getType());
-        double tax = assetHandler.calculateTax(p, e.getAmount(), e.getItem());
-        double amount = e.getAmount() - tax;
-        assetHandler.depositAmount(p, amount);
+        if (assetHandler instanceof CashNoteHandler) {
+            handleCashRedeem(e, (CashNoteHandler) assetHandler);
+            return;
+        }
+
+        if(!p.hasPermission("BeastWithdraw." + assetHandler.getID() + ".Redeem")){
+            pl.getUtils().noPermission(p);
+            return;
+        }
+        boolean fullStack = false;
+
+        // Sneaking + stack permission check
+        if (item.getAmount() > 1 && p.isSneaking() &&
+                (p.hasPermission("BeastWithdraw." + assetHandler.getID() + ".Redeem.Stacked") )) {
+
+            stackSize = item.getAmount();
+            fullStack = true;
+        }
+
+        double singleAmount = e.getAmount();
+        double singleTax = Math.ceil(assetHandler.calculateTax(singleAmount, item));
+        double singleAfterTax = singleAmount - singleTax;
+
+        double totalAmount = singleAmount * stackSize;
+        double totalTax = singleTax * stackSize;
+        double finalAmount = totalAmount - totalTax;
+
+        assetHandler.depositAmount(p, finalAmount);
+
+        // Message logic
         String msg;
-        if (tax == 0) {
+        if (totalTax == 0) {
             msg = assetHandler.getMessageSection().getString("Redeem");
         } else {
             msg = assetHandler.getMessageSection().getString("RedeemAndTax");
         }
-        msg = msg.replace("%amount%", "" + assetHandler.formatWithPreSuffix(amount));
-        msg = msg.replace("%balance%", "" + assetHandler.formatWithPreSuffix(assetHandler.getBalance(p)));
-        msg = msg.replace("%tax%", "" + assetHandler.formatWithPreSuffix(tax));
+
+        msg = msg.replace("%amount%", assetHandler.formatWithPreSuffix(singleAfterTax));
+        msg = msg.replace("%tax%", assetHandler.formatWithPreSuffix(singleTax));
+        msg = msg.replace("%balance%", assetHandler.formatWithPreSuffix(assetHandler.getBalanceAsDouble(p)));
+        msg = Utils.formatStackSize(msg,stackSize);
+
+        msg = msg.replace("%stacked-amount%", assetHandler.formatWithPreSuffix(finalAmount));
+        msg = msg.replace("%stacked-tax%", assetHandler.formatWithPreSuffix(totalTax));
         pl.getUtils().sendMessage(p, msg);
-        if (assetHandler.getConfig().getBoolean("Settings.Sounds.Redeem.Enabled")) {
-            try {
-                String sound = assetHandler.getConfig().getString("Settings.Sounds.Redeem.Sound");
-                e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.valueOf(sound), 1f, 1f);
-            } catch (Exception e1) {
-                Bukkit.getServer().getConsoleSender().sendMessage(pl.getUtils().getPrefix() + "�cBroken sound in BeastTokensNote Redeem section!");
+
+        // Item removal
+        if (fullStack) {
+            if (e.isOffHand()) {
+                p.getInventory().setItemInOffHand(null);
+            } else {
+                p.getInventory().removeItem(item);
+            }
+        } else {
+            if (item.getAmount() > 1) {
+                item.setAmount(item.getAmount() - 1);
+            } else if (e.isOffHand()) {
+                p.getInventory().setItemInOffHand(null);
+            } else {
+                p.getInventory().removeItem(item);
             }
         }
-        if (item.getAmount() > 1) {
-            item.setAmount(item.getAmount() - 1);
-        } else if (e.isOffHand()) {
-            p.getInventory().setItemInOffHand(null);
-        } else {
-            p.getInventory().removeItem(new ItemStack[]{item});
-        }
+
         p.updateInventory();
+
+        // Sound handling
+        if (assetHandler.getConfig().getBoolean("Settings.Sounds.Redeem.Enabled")) {
+            String soundName = assetHandler.getConfig().getString("Settings.Sounds.Redeem.Sound");
+            float volume = assetHandler.getConfig().getDouble("Settings.Sounds.Redeem.Volume", 1.0).floatValue();
+            float pitch = assetHandler.getConfig().getDouble("Settings.Sounds.Redeem.Pitch", 1.0).floatValue();
+
+            try {
+                Sound sound = Sound.valueOf(soundName.toUpperCase());
+                p.playSound(p.getLocation(), sound, volume, pitch);
+            } catch (Exception ex) {
+                Bukkit.getServer().getConsoleSender().sendMessage(
+                        pl.getUtils().getPrefix() + "§cBroken sound in BeastWithdraw redeem section!");
+            }
+        }
+
+        pl.getWithdrawLogger().logRedeem(assetHandler, p, singleAmount, stackSize, totalAmount, totalTax, finalAmount, assetHandler.getBalanceAsDouble(p));
     }
+
+    private void handleCashRedeem(CustomRedeemEvent e, CashNoteHandler assetHandler) {
+        Player player = e.getPlayer();
+        ItemStack item = e.getItem();
+        int stackSize = 1;
+
+        if (!player.hasPermission("BeastWithdraw." + assetHandler.getID() + ".Redeem")) {
+            pl.getUtils().noPermission(player);
+            return;
+        }
+
+        boolean fullStack = false;
+        if (item.getAmount() > 1 && player.isSneaking()
+                && player.hasPermission("BeastWithdraw." + assetHandler.getID() + ".Redeem.Stacked")) {
+            stackSize = item.getAmount();
+            fullStack = true;
+        }
+
+        BigDecimal singleAmount = assetHandler.getStoredAmount(item);
+        BigDecimal singleTax = assetHandler.calculateRedeemTax(singleAmount, item);
+        BigDecimal singleAfterTax = singleAmount.subtract(singleTax);
+
+        BigDecimal totalAmount = singleAmount.multiply(BigDecimal.valueOf(stackSize));
+        BigDecimal totalTax = singleTax.multiply(BigDecimal.valueOf(stackSize));
+        BigDecimal finalAmount = totalAmount.subtract(totalTax);
+
+        if (finalAmount.compareTo(BigDecimal.ZERO) <= 0) {
+            pl.getUtils().sendMessage(player, MessagesLang.TRANSACTION_FAILED);
+            return;
+        }
+
+        CashNoteHandler.CashTransactionResult transaction = assetHandler.redeemNote(player, finalAmount);
+        if (!transaction.isSuccess()) {
+            pl.getUtils().sendMessage(player, MessagesLang.TRANSACTION_FAILED);
+            return;
+        }
+
+        String message = totalTax.compareTo(BigDecimal.ZERO) == 0
+                ? assetHandler.getMessageSection().getString("Redeem")
+                : assetHandler.getMessageSection().getString("RedeemAndTax");
+
+        message = message.replace("%amount%", assetHandler.formatWithPreSuffix(singleAfterTax.doubleValue()));
+        message = message.replace("%tax%", assetHandler.formatWithPreSuffix(singleTax.doubleValue()));
+        message = message.replace("%balance%", assetHandler.formatWithPreSuffix(transaction.getBalanceAfter().doubleValue()));
+        message = Utils.formatStackSize(message, stackSize);
+        message = message.replace("%stacked-amount%", assetHandler.formatWithPreSuffix(finalAmount.doubleValue()));
+        message = message.replace("%stacked-tax%", assetHandler.formatWithPreSuffix(totalTax.doubleValue()));
+        pl.getUtils().sendMessage(player, message);
+
+        if (fullStack) {
+            if (e.isOffHand()) {
+                player.getInventory().setItemInOffHand(null);
+            } else {
+                player.getInventory().removeItem(item);
+            }
+        } else {
+            if (item.getAmount() > 1) {
+                item.setAmount(item.getAmount() - 1);
+            } else if (e.isOffHand()) {
+                player.getInventory().setItemInOffHand(null);
+            } else {
+                player.getInventory().removeItem(item);
+            }
+        }
+
+        player.updateInventory();
+
+        if (assetHandler.getConfig().getBoolean("Settings.Sounds.Redeem.Enabled")) {
+            String soundName = assetHandler.getConfig().getString("Settings.Sounds.Redeem.Sound");
+            float volume = assetHandler.getConfig().getDouble("Settings.Sounds.Redeem.Volume", 1.0).floatValue();
+            float pitch = assetHandler.getConfig().getDouble("Settings.Sounds.Redeem.Pitch", 1.0).floatValue();
+
+            try {
+                Sound sound = Sound.valueOf(soundName.toUpperCase());
+                player.playSound(player.getLocation(), sound, volume, pitch);
+            } catch (Exception ex) {
+                Bukkit.getServer().getConsoleSender().sendMessage(
+                        pl.getUtils().getPrefix() + "Â§cBroken sound in BeastWithdraw redeem section!");
+            }
+        }
+
+        pl.getWithdrawLogger().logRedeem(
+                assetHandler,
+                player,
+                singleAmount.doubleValue(),
+                stackSize,
+                totalAmount.doubleValue(),
+                totalTax.doubleValue(),
+                finalAmount.doubleValue(),
+                transaction.getBalanceAfter().doubleValue()
+        );
+    }
+
+
 }

@@ -5,6 +5,7 @@ import me.mraxetv.beastlib.lib.nbtapi.utils.MinecraftVersion;
 import me.mraxetv.beastlib.lib.xmaterials.XMaterial;
 import me.mraxetv.beastwithdraw.events.BottleRedeemEvent;
 import me.mraxetv.beastwithdraw.managers.assets.XpBottleHandler;
+import me.mraxetv.beastwithdraw.utils.Utils;
 import me.mraxetv.beastwithdraw.utils.XpManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -17,6 +18,7 @@ import org.bukkit.event.entity.ExpBottleEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
+import org.bukkit.projectiles.BlockProjectileSource;
 
 import java.util.HashSet;
 import java.util.UUID;
@@ -43,46 +45,101 @@ public class XpBottleRedeemListener implements Listener {
         if (e.isCancelled()) return;
         ItemStack item = e.getItem();
 
-        int tax = (int)Math.ceil(assetHandler.calculateTax(p, e.getAmount(), e.getItem()));
-        int amount = (int)e.getAmount() - tax;
+        int stackSize = 1;
+        boolean fullStack = false;
+
+        if (!p.hasPermission("BeastWithdraw." + assetHandler.getID() + ".Redeem")) {
+            pl.getUtils().noPermission(p);
+            return;
+        }
+
+        // Check for stacked redeem
+        if (item.getAmount() > 1 && p.isSneaking() &&
+                p.hasPermission("BeastWithdraw." + assetHandler.getID() + ".Redeem.Stacked")) {
+            stackSize = item.getAmount();
+            fullStack = true;
+        }
+
+        int singleAmount = (int) e.getAmount();
+        int singleTax = (int) Math.ceil(assetHandler.calculateTax(singleAmount, item));
+        int singleAfterTax = singleAmount - singleTax;
+
+        int totalAmount = singleAmount * stackSize;
+        int totalTax = singleTax * stackSize;
+        int finalAmount = totalAmount - totalTax;
+
         if (autoCollect) {
-            XpManager.setTotalExperience(p, XpManager.getTotalExperience(p) + amount);
+            XpManager.setTotalExperience(p, XpManager.getTotalExperience(p) + finalAmount);
+
             String msg;
-            if (tax == 0) {
+            if (totalTax == 0) {
                 msg = assetHandler.getMessageSection().getString("Redeem");
             } else {
                 msg = assetHandler.getMessageSection().getString("RedeemAndTax");
             }
-            msg = msg.replace("%amount%", "" + assetHandler.formatWithPreSuffix(amount));
-            msg = msg.replace("%balance%", "" + assetHandler.formatWithPreSuffix(assetHandler.getBalance(p)));
-            msg = msg.replace("%tax%", "" + assetHandler.formatWithPreSuffix(tax));
+
+            msg = msg.replace("%amount%", assetHandler.formatWithPreSuffix(singleAfterTax));
+            msg = msg.replace("%tax%", assetHandler.formatWithPreSuffix(singleTax));
+            msg = msg.replace("%balance%", assetHandler.formatWithPreSuffix(assetHandler.getBalance(p)));
+            msg = msg.replace("%level-amount%", assetHandler.formatNumber(XpManager.getLevelFromExp(singleAfterTax)));
+            msg = msg.replace("%level-tax%", assetHandler.formatNumber(XpManager.getLevelFromExp(singleTax)));
+            msg = Utils.formatStackSize(msg,stackSize);
+
+            msg = msg.replace("%stacked-amount%", assetHandler.formatWithPreSuffix(finalAmount));
+            msg = msg.replace("%stacked-tax%", assetHandler.formatWithPreSuffix(totalTax));
+
+
             pl.getUtils().sendMessage(p, msg);
         } else {
-            ThrownExpBottle t = e.getPlayer().launchProjectile(ThrownExpBottle.class);
+            // Launch a single bottle for the total XP
+            ThrownExpBottle t = p.launchProjectile(ThrownExpBottle.class);
             if (MinecraftVersion.isAtLeastVersion(MinecraftVersion.MC1_15_R1)) {
-                t.setItem(item);
+                NBTItem nbtItem = new NBTItem(item);
+                nbtItem.setInteger(assetHandler.getConfig().getString("Settings.NBTKey"), finalAmount);
+                t.setItem(nbtItem.getItem());
             } else {
-                t.setCustomName("XPB:" + amount);
+                t.setCustomName("XPB:" + finalAmount);
             }
         }
-        if (assetHandler.getConfig().getBoolean("Settings.Sounds.Redeem.Enabled")) {
-            try {
-                String sound = assetHandler.getConfig().getString("Settings.Sounds.Redeem.Sound");
-                p.playSound(p.getLocation(), Sound.valueOf(sound), 1f, 1f);
 
+        // Play redeem sound
+        if (assetHandler.getConfig().getBoolean("Settings.Sounds.Redeem.Enabled")) {
+            String soundName = assetHandler.getConfig().getString("Settings.Sounds.Redeem.Sound");
+            float volume = assetHandler.getConfig().getDouble("Settings.Sounds.Redeem.Volume", 1.0).floatValue();
+            float pitch = assetHandler.getConfig().getDouble("Settings.Sounds.Redeem.Pitch", 1.0).floatValue();
+
+            try {
+                Sound sound = Sound.valueOf(soundName.toUpperCase());
+                p.playSound(p.getLocation(), sound, volume, pitch);
             } catch (Exception e1) {
-                Bukkit.getServer().getConsoleSender().sendMessage(pl.getUtils().getPrefix() + "§cBroken sound in XpBottle Redeem section!");
+                Bukkit.getServer().getConsoleSender().sendMessage(
+                        pl.getUtils().getPrefix() + "§cBroken sound in XpBottle Redeem section!");
             }
         }
-        if (item.getAmount() > 1) {
-            item.setAmount(item.getAmount() - 1);
-        } else if (e.isOffHand()) {
-            p.getInventory().setItemInOffHand(null);
+
+        // Remove the stack or just 1 item
+        if (fullStack) {
+            if (e.isOffHand()) {
+                p.getInventory().setItemInOffHand(null);
+            } else {
+                p.getInventory().removeItem(item);
+            }
         } else {
-            p.getInventory().removeItem(new ItemStack[]{item});
+            if (item.getAmount() > 1) {
+                item.setAmount(item.getAmount() - 1);
+            } else if (e.isOffHand()) {
+                p.getInventory().setItemInOffHand(null);
+            } else {
+                p.getInventory().removeItem(new ItemStack[]{item});
+            }
         }
+
         p.updateInventory();
+
+        pl.getWithdrawLogger().logRedeem(assetHandler, p, singleAmount, stackSize, totalAmount, totalTax, finalAmount, assetHandler.getBalance(p));
     }
+
+
 
     @EventHandler(priority = EventPriority.LOW)
     public void xpThrow(ExpBottleEvent e) {
@@ -93,11 +150,16 @@ public class XpBottleRedeemListener implements Listener {
             NBTItem nbtItem = new NBTItem(e.getEntity().getItem());
             if (!nbtItem.hasKey(assetHandler.getConfig().getString("Settings.NBTKey"))) return;
             int xp = nbtItem.getInteger(assetHandler.getConfig().getString("Settings.NBTKey"));
-            e.setExperience(xp - (int)assetHandler.calculateTax(((Player) e.getEntity().getShooter()),xp,e.getEntity().getItem()));
+            // Apply tax if dispensed from a dispenser
+            if(e.getEntity().getShooter() instanceof BlockProjectileSource){
+                int singleTax = (int) Math.ceil(pl.getWithdrawManager().XP_BOTTLE.calculateTax(xp, e.getEntity().getItem()));
+                xp = xp-singleTax;
+            }
+            e.setExperience(xp);
         } else {
             if (e.getEntity().getCustomName() == null) return;
             if (!e.getEntity().getCustomName().startsWith("XPB:")) return;
-            int xp = Integer.parseInt(e.getEntity().getCustomName().replaceAll("XPB:", ""));
+            int xp = Integer.parseInt(e.getEntity().getCustomName().replace("XPB:", ""));
             e.setExperience(xp);
 
         }
