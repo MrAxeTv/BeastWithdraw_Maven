@@ -1,0 +1,90 @@
+##==============================================================##
+## BeastTokens per-currency depositor template
+##==============================================================##
+## Set Enabled true to register a direct deposit command for each generated currency.
+## Example command after generation: /tokensdeposit or /gemsdeposit.
+## This GUI accepts only notes for the matching currency.
+## The shared /depositnotes GUI is configured in deposit-settings.yml.
+## Slot numbers are 1-based.
+Enabled: false
+##Direct depositor command: /%currency_id_lower%deposit
+##Hardcoded permission: BeastWithdraw.<currency_id>.Depositor.Use
+Command:
+  Name: "%currency_id_lower%deposit"
+  Aliases:
+    - "%currency_id_lower%depositor"
+    - "%currency_id_lower%depositnotes"
+GUI:
+  Size: 54
+  Title: "<gradient:#6dff8a:#ffd76a>%currency_name% Depositor</gradient>"
+  ##Slots are 1-based, matching the shop layout style used by BeastTokens.
+  DepositSlots:
+    - 11
+    - 12
+    - 13
+    - 14
+    - 15
+    - 16
+    - 17
+    - 20
+    - 21
+    - 22
+    - 23
+    - 24
+    - 25
+    - 26
+    - 29
+    - 30
+    - 31
+    - 32
+    - 33
+    - 34
+    - 35
+  ##Close the GUI after at least one note was deposited.
+  CloseAfterDeposit: true
+  Items:
+    DepositButton:
+      Enabled: true
+      Slot: 5
+      Material: EMERALD
+      DisplayName: "&a&lDeposit %currency_name% Notes"
+      DisplayLore:
+        - "&7Place accepted notes in the open slots."
+        - "&eClick to deposit %currency_name% notes."
+      Glow: true
+    CloseButton:
+      Enabled: true
+      Slot: 50
+      Material: BARRIER
+      DisplayName: "&c&lBack"
+      DisplayLore:
+        - "&7Return all notes and close."
+      Glow: false
+  EmptySlot:
+    Enabled: true
+    Pattern:
+      # Supported: ALL, BORDER, TOP, BOTTOM, TOP_BOTTOM, LEFT, RIGHT,
+      # SIDES, RECTANGLE, CHECKERBOARD.
+      # Deposit slots and action buttons override fillers.
+      Type: ALL
+      # RECTANGLE only:
+      # From:
+      #   Row: 2
+      #   Column: 2
+      # To:
+      #   Row: 3
+      #   Column: 8
+    Items:
+      Dummy_1:
+        Material: BLUE_STAINED_GLASS_PANE
+        DisplayName: "&7&l[&4&lB&b&lW&7&l]"
+        DisplayLore:
+          - "&e====="
+        Glow: true
+      Dummy_2:
+        Material: GRAY_STAINED_GLASS_PANE
+        DisplayName: "&7&l[&4&lB&b&lW&7&l]"
+        DisplayLore:
+          - "&e====="
+        Glow: true
+ConfigVersion: 1.4

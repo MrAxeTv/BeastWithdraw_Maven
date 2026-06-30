@@ -8,6 +8,8 @@ import me.mraxetv.beastwithdraw.events.BTokensRedeemEvent;
 import me.mraxetv.beastwithdraw.events.CashRedeemEvent;
 import me.mraxetv.beastwithdraw.events.CustomRedeemEvent;
 import me.mraxetv.beastwithdraw.managers.AssetHandler;
+import me.mraxetv.beastwithdraw.managers.NoteItemSettings;
+import me.mraxetv.beastwithdraw.managers.assets.BeastMcMMORedeemHandler;
 import me.mraxetv.beastwithdraw.managers.assets.CashNoteHandler;
 import me.mraxetv.beastwithdraw.managers.redeem.RedeemRegistry;
 import me.mraxetv.beastwithdraw.utils.MessagesLang;
@@ -52,7 +54,11 @@ public class RedeemListener implements Listener {
         if(e.getClickedBlock() != null && e.getClickedBlock().getType().toString().toLowerCase().contains("shelf")) return;
 
         String type = nbtItem.getString("RedeemType").toLowerCase();
+
         AssetHandler assetHandler = pl.getWithdrawManager().getAssetHandler(type);
+        if (assetHandler == null) return;
+        if (!nbtItem.hasKey(assetHandler.getNbtTag())) return;
+
         double amount = assetHandler instanceof CashNoteHandler
                 ? ((CashNoteHandler) assetHandler).getStoredAmount(item).doubleValue()
                 : nbtItem.getDouble(assetHandler.getNbtTag());
@@ -103,12 +109,18 @@ public class RedeemListener implements Listener {
         int stackSize = 1;
 
         AssetHandler assetHandler = pl.getWithdrawManager().getAssetHandler(e.getType());
+        if (assetHandler == null) return;
         if (assetHandler instanceof CashNoteHandler) {
             handleCashRedeem(e, (CashNoteHandler) assetHandler);
             return;
         }
+        if (assetHandler instanceof BeastMcMMORedeemHandler
+                && ((BeastMcMMORedeemHandler) assetHandler).isSkillNote(item)) {
+            handleMcMMOSkillRedeem(e, (BeastMcMMORedeemHandler) assetHandler);
+            return;
+        }
 
-        if(!p.hasPermission("BeastWithdraw." + assetHandler.getID() + ".Redeem")){
+        if(!assetHandler.hasRedeemPermission(p)){
             pl.getUtils().noPermission(p);
             return;
         }
@@ -116,7 +128,7 @@ public class RedeemListener implements Listener {
 
         // Sneaking + stack permission check
         if (item.getAmount() > 1 && p.isSneaking() &&
-                (p.hasPermission("BeastWithdraw." + assetHandler.getID() + ".Redeem.Stacked") )) {
+                (assetHandler.hasStackedRedeemPermission(p) )) {
 
             stackSize = item.getAmount();
             fullStack = true;
@@ -129,6 +141,11 @@ public class RedeemListener implements Listener {
         double totalAmount = singleAmount * stackSize;
         double totalTax = singleTax * stackSize;
         double finalAmount = totalAmount - totalTax;
+
+        if (assetHandler instanceof BeastMcMMORedeemHandler
+                && !canAcceptMcMMORedeemCredits(p, (BeastMcMMORedeemHandler) assetHandler, finalAmount)) {
+            return;
+        }
 
         assetHandler.depositAmount(p, finalAmount);
 
@@ -147,6 +164,7 @@ public class RedeemListener implements Listener {
 
         msg = msg.replace("%stacked-amount%", assetHandler.formatWithPreSuffix(finalAmount));
         msg = msg.replace("%stacked-tax%", assetHandler.formatWithPreSuffix(totalTax));
+        msg = assetHandler.applyPlaceholders(msg, p);
         pl.getUtils().sendMessage(p, msg);
 
         // Item removal
@@ -169,7 +187,8 @@ public class RedeemListener implements Listener {
         p.updateInventory();
 
         // Sound handling
-        if (assetHandler.getConfig().getBoolean("Settings.Sounds.Redeem.Enabled")) {
+        playRedeemSound(assetHandler, p, singleAmount, item);
+        if (false && assetHandler.getConfig().getBoolean("Settings.Sounds.Redeem.Enabled")) {
             String soundName = assetHandler.getConfig().getString("Settings.Sounds.Redeem.Sound");
             float volume = assetHandler.getConfig().getDouble("Settings.Sounds.Redeem.Volume", 1.0).floatValue();
             float pitch = assetHandler.getConfig().getDouble("Settings.Sounds.Redeem.Pitch", 1.0).floatValue();
@@ -179,11 +198,119 @@ public class RedeemListener implements Listener {
                 p.playSound(p.getLocation(), sound, volume, pitch);
             } catch (Exception ex) {
                 Bukkit.getServer().getConsoleSender().sendMessage(
-                        pl.getUtils().getPrefix() + "§cBroken sound in BeastWithdraw redeem section!");
+                        pl.getUtils().getPrefix() + "\u00A7cBroken sound in BeastWithdraw redeem section!");
             }
         }
 
         pl.getWithdrawLogger().logRedeem(assetHandler, p, singleAmount, stackSize, totalAmount, totalTax, finalAmount, assetHandler.getBalanceAsDouble(p));
+    }
+
+    private void handleMcMMOSkillRedeem(CustomRedeemEvent e, BeastMcMMORedeemHandler assetHandler) {
+        Player player = e.getPlayer();
+        ItemStack item = e.getItem();
+        String skillName = assetHandler.getSkillName(item);
+        if (skillName == null) {
+            return;
+        }
+
+        if (!assetHandler.hasRedeemPermission(player)) {
+            pl.getUtils().noPermission(player);
+            return;
+        }
+
+        int stackSize = 1;
+        boolean fullStack = false;
+        if (item.getAmount() > 1 && player.isSneaking() && assetHandler.hasStackedRedeemPermission(player)) {
+            stackSize = item.getAmount();
+            fullStack = true;
+        }
+
+        double singleAmount = e.getAmount();
+        double singleTax = Math.ceil(assetHandler.calculateTax(singleAmount, item));
+        double singleAfterTax = singleAmount - singleTax;
+        double totalAmount = singleAmount * stackSize;
+        double totalTax = singleTax * stackSize;
+        double finalAmount = totalAmount - totalTax;
+        if (finalAmount <= 0D) {
+            sendSkillRedeemMessage(player, assetHandler, "TransactionFailed",
+                    "%prefix% &cThis skill note has no redeemable value.", skillName, singleAmount, stackSize,
+                    totalAmount, totalTax, finalAmount);
+            return;
+        }
+
+        if (!assetHandler.depositSkillAmount(player, skillName, (long) Math.floor(finalAmount))) {
+            sendSkillRedeemMessage(player, assetHandler, "TransactionFailed",
+                    "%prefix% &cThe mcMMO skill note could not be redeemed right now.", skillName, singleAmount,
+                    stackSize, totalAmount, totalTax, finalAmount);
+            return;
+        }
+
+        String key = totalTax == 0D ? "Redeem" : "RedeemAndTax";
+        String fallback = totalTax == 0D
+                ? "%prefix% &eRedeemed &b%stack%&7%type% skill note(s)&8: &a%amount% &e(&7Total: &a%stacked-amount%&e) &8| &7Skill Balance: &b%balance%"
+                : "%prefix% &eRedeemed &b%stack%&7%type% skill note(s)&8: &a%amount% &e(&7Total: &a%stacked-amount%&e) &cTax: &f-%tax% &e(&7Total: &c-%stacked-tax%&e) &8| &7Skill Balance: &b%balance%";
+        sendSkillRedeemMessage(player, assetHandler, key, fallback, skillName, singleAfterTax, stackSize,
+                totalAmount, totalTax, finalAmount);
+
+        removeRedeemedItem(e, player, item, fullStack);
+        player.updateInventory();
+
+        playRedeemSound(assetHandler, player, singleAmount, item);
+        pl.getWithdrawLogger().logRedeem(assetHandler, player, singleAmount, stackSize, totalAmount, totalTax,
+                finalAmount, assetHandler.getSkillBalance(player, skillName));
+    }
+
+    private void sendSkillRedeemMessage(Player player, BeastMcMMORedeemHandler assetHandler, String key, String fallback,
+                                        String skillName, double amount, int stackSize, double totalAmount,
+                                        double totalTax, double finalAmount) {
+        String message = assetHandler.getSkillMessage(key, fallback);
+        message = message.replace("%amount%", assetHandler.formatWithPreSuffix(amount));
+        message = message.replace("%tax%", assetHandler.formatWithPreSuffix(totalTax / Math.max(1, stackSize)));
+        message = message.replace("%balance%", assetHandler.formatWithPreSuffix(assetHandler.getSkillBalance(player, skillName)));
+        message = Utils.formatStackSize(message, stackSize);
+        message = message.replace("%stacked-amount%", assetHandler.formatWithPreSuffix(finalAmount));
+        message = message.replace("%stacked-tax%", assetHandler.formatWithPreSuffix(totalTax));
+        message = message.replace("%total%", assetHandler.formatWithPreSuffix(totalAmount));
+        message = assetHandler.applySkillPlaceholders(message, skillName, player);
+        pl.getUtils().sendMessage(player, message);
+    }
+
+    private void removeRedeemedItem(CustomRedeemEvent e, Player player, ItemStack item, boolean fullStack) {
+        if (fullStack) {
+            if (e.isOffHand()) {
+                player.getInventory().setItemInOffHand(null);
+            } else {
+                player.getInventory().removeItem(item);
+            }
+            return;
+        }
+
+        if (item.getAmount() > 1) {
+            item.setAmount(item.getAmount() - 1);
+        } else if (e.isOffHand()) {
+            player.getInventory().setItemInOffHand(null);
+        } else {
+            player.getInventory().removeItem(item);
+        }
+    }
+
+    private boolean canAcceptMcMMORedeemCredits(Player player, BeastMcMMORedeemHandler assetHandler, double finalAmount) {
+        long required = (long) Math.ceil(finalAmount);
+        long capacity = assetHandler.getRedeemableCapacity(player);
+        if (capacity >= required) {
+            return true;
+        }
+
+        String message = assetHandler.getMessageSection().getString("CapacityFull");
+        if (message == null || message.trim().isEmpty()) {
+            message = "%prefix% &cYour credit balance cannot accept %amount% right now. &7Available space: &b%capacity%&7.";
+        }
+        message = message.replace("%amount%", assetHandler.formatWithPreSuffix(required));
+        message = message.replace("%capacity%", assetHandler.formatWithPreSuffix(capacity));
+        message = message.replace("%balance%", assetHandler.formatWithPreSuffix(assetHandler.getBalanceAsDouble(player)));
+        message = assetHandler.applyPlaceholders(message, player);
+        pl.getUtils().sendMessage(player, message);
+        return false;
     }
 
     private void handleCashRedeem(CustomRedeemEvent e, CashNoteHandler assetHandler) {
@@ -191,14 +318,14 @@ public class RedeemListener implements Listener {
         ItemStack item = e.getItem();
         int stackSize = 1;
 
-        if (!player.hasPermission("BeastWithdraw." + assetHandler.getID() + ".Redeem")) {
+        if (!assetHandler.hasRedeemPermission(player)) {
             pl.getUtils().noPermission(player);
             return;
         }
 
         boolean fullStack = false;
         if (item.getAmount() > 1 && player.isSneaking()
-                && player.hasPermission("BeastWithdraw." + assetHandler.getID() + ".Redeem.Stacked")) {
+                && assetHandler.hasStackedRedeemPermission(player)) {
             stackSize = item.getAmount();
             fullStack = true;
         }
@@ -232,6 +359,7 @@ public class RedeemListener implements Listener {
         message = Utils.formatStackSize(message, stackSize);
         message = message.replace("%stacked-amount%", assetHandler.formatWithPreSuffix(finalAmount.doubleValue()));
         message = message.replace("%stacked-tax%", assetHandler.formatWithPreSuffix(totalTax.doubleValue()));
+        message = assetHandler.applyPlaceholders(message, player);
         pl.getUtils().sendMessage(player, message);
 
         if (fullStack) {
@@ -252,7 +380,8 @@ public class RedeemListener implements Listener {
 
         player.updateInventory();
 
-        if (assetHandler.getConfig().getBoolean("Settings.Sounds.Redeem.Enabled")) {
+        playRedeemSound(assetHandler, player, singleAmount.doubleValue(), item);
+        if (false && assetHandler.getConfig().getBoolean("Settings.Sounds.Redeem.Enabled")) {
             String soundName = assetHandler.getConfig().getString("Settings.Sounds.Redeem.Sound");
             float volume = assetHandler.getConfig().getDouble("Settings.Sounds.Redeem.Volume", 1.0).floatValue();
             float pitch = assetHandler.getConfig().getDouble("Settings.Sounds.Redeem.Pitch", 1.0).floatValue();
@@ -262,7 +391,7 @@ public class RedeemListener implements Listener {
                 player.playSound(player.getLocation(), sound, volume, pitch);
             } catch (Exception ex) {
                 Bukkit.getServer().getConsoleSender().sendMessage(
-                        pl.getUtils().getPrefix() + "Â§cBroken sound in BeastWithdraw redeem section!");
+                        pl.getUtils().getPrefix() + "\u00A7cBroken sound in BeastWithdraw redeem section!");
             }
         }
 
@@ -276,6 +405,20 @@ public class RedeemListener implements Listener {
                 finalAmount.doubleValue(),
                 transaction.getBalanceAfter().doubleValue()
         );
+    }
+
+    private void playRedeemSound(AssetHandler assetHandler, Player player, double amount, ItemStack item) {
+        String amountOverrideId = assetHandler.getAmountOverrideId(item);
+        NoteItemSettings.SoundSettings soundSettings = assetHandler.getSoundSettings("Redeem", amount, amountOverrideId);
+        if (soundSettings == null || !soundSettings.isEnabled()) return;
+
+        try {
+            Sound sound = Sound.valueOf(soundSettings.getSound().toUpperCase());
+            player.playSound(player.getLocation(), sound, soundSettings.getVolume(), soundSettings.getPitch());
+        } catch (Exception ex) {
+            Bukkit.getServer().getConsoleSender().sendMessage(
+                    pl.getUtils().getPrefix() + "\u00A7cBroken sound in BeastWithdraw redeem section!");
+        }
     }
 
 

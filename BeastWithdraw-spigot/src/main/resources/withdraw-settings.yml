@@ -1,0 +1,491 @@
+##==============================================================##
+## BeastWithdraw withdraw GUI settings
+##==============================================================##
+## This file controls the shared /withdrawmenu type selector and the
+## amount editor used when players create notes.
+##
+## Per-type files can override these values under:
+## Withdraws/<type-folder>/Withdraw.yml -> WithdrawGUI.GUI
+##
+## Slot numbers are 1-based. Slot 1 is the top-left inventory slot.
+## AmountItem is only a preview slot; the preview item look is pulled from
+## the selected type's Withdraw.yml note settings.
+Enabled: true
+##Registers the main withdraw GUI command: /withdrawmenu
+##Hardcoded permission: BeastWithdraw.WithdrawGui.Use
+Command:
+  Name: "withdrawmenu"
+  Aliases:
+    - "withdrawgui"
+    - "notewithdraw"
+    - "withdrawnotes"
+AcceptedTypes:
+  ##ALL shows every loaded withdraw type in the menu.
+  ##SPECIFIC shows only the types listed below.
+  Mode: ALL
+  ##Use withdraw type ids such as CashNote, XpBottle, PlayerPointsNote, heartwithdraw, McMMORedeemCredits, or BeastTokens currency ids such as tokens/gems.
+  Types:
+    # - CashNote
+    # - XpBottle
+RequiredItem:
+  ##Optional global item cost for creating notes.
+  ##Leave disabled if notes should be created directly from balance.
+  ##Global default for regular withdraw commands and withdraw GUI input slots.
+  ##Per-type files can override this under Settings.RequiredItem.
+  Enabled: false
+  ##When true, the item is consumed and converted into the created note.
+  Consume: true
+  ##Required item amount.
+  Amount: 1
+  ##true = Amount is required for each created note in the stack.
+  ##false = Amount is required once per command/gui click.
+  AmountPerNote: true
+  Match:
+    Material: PAPER
+    ##Data is only relevant on legacy versions below 1.13.
+    # Data: 0
+    ##If DisplayName is set, it is matched exactly after color formatting.
+    DisplayName: ""
+    RequireDisplayName: false
+    ##If Lore is set, it is matched exactly after color formatting.
+    Lore: []
+    RequireLore: false
+    ##CustomModelData is only checked when RequireCustomModelData is true.
+    CustomModelData: 0
+    RequireCustomModelData: false
+Sounds:
+  ##Set Enabled false to disable all withdraw GUI sounds in this file.
+  ##Master switch for withdraw GUI click/open sounds.
+  Enabled: true
+  ##Played when a clickable withdraw GUI control is accepted.
+  ##Modern names such as UI_BUTTON_CLICK are supported; old server aliases are resolved automatically where possible.
+  Click: UI_BUTTON_CLICK
+  ##Played whenever the main menu, mcMMO skill selector, or amount menu opens.
+  ##Leave empty ("") to disable only the open sound.
+  MenuOpen: ENTITY_VILLAGER_TRADE
+  Volume: 1
+  Pitch: 1
+Animations:
+  Open:
+    ##Animates withdraw GUI items when a withdraw menu opens.
+    ##By default the whole configured top GUI is covered by the black placeholder and then revealed.
+    Enabled: false
+    ##Supported types:
+    ##SLIDE_LEFT_TO_RIGHT, SLIDE_RIGHT_TO_LEFT, SNAKE, DIAGONAL_WAVE,
+    ##CENTER_OUT, SPIRAL, RANDOM_POP, RAIN.
+    Type: CENTER_OUT
+    ##Choose which BeastWithdraw GUI opens should play the animation.
+    ##MainMenu: the first withdraw type selector opened by /withdrawmenu.
+    ##McMMORedeemSkillMenu: the mcMMO credits/skill selector.
+    ##AmountMenu: the menu where players add/remove amount, stack, max, reset, and confirm.
+    Triggers:
+      MainMenu: true
+      McMMORedeemSkillMenu: true
+      AmountMenu: true
+    ##Delay before the first animated item appears.
+    StartDelayTicks: 1
+    ##Ticks between animation steps. 1 is smooth; higher values are slower.
+    TickDelay: 1
+    ##Number of slots revealed per step. Increase this for large menus.
+    ItemsPerTick: 3
+    ##Extra pause between inventory rows for slide and snake animations.
+    RowPauseTicks: 1
+    ##true = every configured top-GUI slot is first covered by PlaceholderItem, then revealed in animation order.
+    ##false = filler/background appears immediately and only real menu controls animate.
+    AnimateEmptySlots: true
+    ##true = visible animated items cannot be clicked until the whole opening animation finishes.
+    LockClicksUntilFinished: true
+    ##Shown in animated slots before the real item appears.
+    ##This is what gives CENTER_OUT the same staged reveal style as BeastMcMMORedeem.
+    PlaceholderItem:
+      Enabled: true
+      Material: BLACK_STAINED_GLASS_PANE
+      DisplayName: " "
+      DisplayLore: []
+      Flags: [HIDE_ATTRIBUTES, HIDE_POTION_EFFECTS]
+    Sounds:
+      Enabled: true
+      ##Played when the animation starts. Empty by default because Sounds.MenuOpen already plays.
+      Start: ""
+      ##Played as items appear. Empty value disables this sound only.
+      Item: UI_BUTTON_CLICK
+      ##Played when a new row starts. Empty by default because item sound is usually enough.
+      Row: ""
+      ##Played when the animation completes. Empty value disables this sound only.
+      Finish: ENTITY_PLAYER_LEVELUP
+      StartVolume: 0.5
+      StartPitch: 1.0
+      ItemVolume: 0.35
+      ItemPitch: 1.2
+      ##Raises the item sound pitch slightly as the menu builds.
+      ##Set to 0 if you want every item sound to use exactly ItemPitch.
+      ItemPitchStep: 0.03
+      ItemPitchMax: 2.0
+      RowVolume: 0.4
+      RowPitch: 1.35
+      FinishVolume: 0.45
+      FinishPitch: 1.6
+      ##Play the item sound every N revealed items.
+      ItemEvery: 2
+Menu:
+  ##Main type selector opened by /withdrawmenu.
+  Size: 54
+  Title: "<gradient:#ffd86b:#71e7ff>Withdraw Notes</gradient>"
+  ##When true, loaded withdraw type buttons are grouped into centered rows.
+  ##TypeSlots is used as fallback when this is false or when more types are loaded than the centered layout supports.
+  CenterTypeRows: true
+  ##Slots are 1-based, matching the BeastTokens shop layout style.
+  TypeSlots:
+    - 12
+    - 14
+    - 16
+    - 21
+    - 23
+    - 25
+    - 30
+    - 32
+    - 34
+  McMMORedeemSkillMenu:
+    ##When BeastMcMMORedeem skill notes are enabled, clicking the BeastMcMMORedeem withdraw type opens this selector first.
+    ##Players can still choose the credit-balance option, or select a concrete mcMMO skill to withdraw.
+    Enabled: true
+    Size: 54
+    Title: "<gradient:#54f2d2:#83ffa6>mcMMO Redeem Withdraw</gradient>"
+    ##Default order mirrors BeastMcMMORedeem's redeem menu.
+    SkillOrder:
+      - Acrobatics
+      - Alchemy
+      - Archery
+      - Axes
+      - Crossbows
+      - Excavation
+      - Fishing
+      - Herbalism
+      - Maces
+      - Mining
+      - Repair
+      - Swords
+      - Taming
+      - Tridents
+      - Unarmed
+      - Woodcutting
+    SkillSlots:
+      - 11
+      - 12
+      - 13
+      - 14
+      - 15
+      - 16
+      - 17
+      - 20
+      - 21
+      - 22
+      - 23
+      - 24
+      - 25
+      - 26
+      - 30
+      - 34
+    SkillIcons:
+      Acrobatics: LEATHER_BOOTS
+      Alchemy: POTION
+      Archery: BOW
+      Axes: DIAMOND_AXE
+      Crossbows: CROSSBOW
+      Excavation: DIAMOND_SHOVEL
+      Fishing: FISHING_ROD
+      Herbalism: FARMLAND
+      Maces: IRON_AXE
+      Mining: DIAMOND_PICKAXE
+      Repair: ANVIL
+      Swords: DIAMOND_SWORD
+      Taming: BONE
+      Tridents: TRIDENT
+      Unarmed: STICK
+      Woodcutting: OAK_WOOD
+    Items:
+      GuideButton:
+        Enabled: true
+        Slot: 5
+        Material: BOOK
+        DisplayName: "&a&lWithdraw Guide"
+        DisplayLore:
+          - "&7Select a skill to withdraw"
+          - "&7stored mcMMO progress into notes."
+          - ""
+          - "&bNormal credits:&f %credit_balance%"
+          - "&7Skill notes use the skill's"
+          - "&7own stored progress balance."
+      CreditButton:
+        Enabled: true
+        Slot: 48
+        Material: NETHER_STAR
+        DisplayName: "&a&lWithdraw mcMMO Credits"
+        DisplayLore:
+          - "&7Credit balance: &f%credit_balance%"
+          - "&7Command: &f/%withdraw_command%"
+          - ""
+          - "&eClick to withdraw normal credits."
+        Glow: true
+      SkillButton:
+        Enabled: true
+        ##Leave Material unset to use Menu.McMMORedeemSkillMenu.SkillIcons per skill.
+        DisplayName: "&b&l%skill%"
+        DisplayLore:
+          - "&7Stored skill progress: &f%skill_balance%"
+          - "&7Page: &f%page%&7/&f%max_page%"
+          - ""
+          - "&eClick to withdraw this skill."
+        Glow: false
+      PreviousPageButton:
+        Enabled: true
+        Slot: 46
+        Material: ARROW
+        DisplayName: "&e&lPrevious Page"
+        DisplayLore:
+          - "&7Page: &f%page%&7/&f%max_page%"
+      NextPageButton:
+        Enabled: true
+        Slot: 54
+        Material: ARROW
+        DisplayName: "&e&lNext Page"
+        DisplayLore:
+          - "&7Page: &f%page%&7/&f%max_page%"
+      BackButton:
+        Enabled: true
+        Slot: 50
+        Material: EMERALD
+        DisplayName: "&e&lBack"
+        DisplayLore:
+          - "&7Return to withdraw type menu."
+      CloseButton:
+        Enabled: true
+        Slot: 52
+        Material: PAPER
+        DisplayName: "&c&lClose"
+        DisplayLore:
+          - "&7Close this menu."
+    EmptySlot:
+      Enabled: true
+      Items:
+        Primary:
+          Material: CYAN_STAINED_GLASS_PANE
+          Slots: [1,2,3,4,6,7,8,9,10,18,19,27,28,36,37,45,46,47,49,51,53,54]
+          DisplayName: " "
+          DisplayLore: []
+          Flags: [HIDE_ATTRIBUTES, HIDE_POTION_EFFECTS]
+        Secondary:
+          Material: GRAY_STAINED_GLASS_PANE
+          Slots: [29,31,32,33,35,38,39,40,41,42,43,44]
+          DisplayName: " "
+          DisplayLore: []
+          Flags: [HIDE_ATTRIBUTES, HIDE_POTION_EFFECTS]
+        Accent:
+          Material: LIME_STAINED_GLASS_PANE
+          Slots: [5,48,50,52]
+          DisplayName: " "
+          DisplayLore: []
+          Flags: [HIDE_ATTRIBUTES, HIDE_POTION_EFFECTS]
+  Items:
+    TypeButton:
+      ##Material defaults to the withdraw note material when this is not set.
+      DisplayName: "&e&l%type%"
+      DisplayLore:
+        - "&7Balance: &f%balance%"
+        - "&7Command: &f/%withdraw_command%"
+        - ""
+        - "&eClick to open withdraw options."
+      Glow: true
+    CloseButton:
+      Enabled: true
+      Slot: 50
+      Material: BARRIER
+      DisplayName: "&c&lClose"
+      DisplayLore:
+        - "&7Close this menu."
+  EmptySlot:
+    Enabled: true
+    Pattern:
+      # Supported: ALL, BORDER, TOP, BOTTOM, TOP_BOTTOM, LEFT, RIGHT,
+      # SIDES, RECTANGLE, CHECKERBOARD.
+      # Type buttons and action buttons override fillers.
+      Type: ALL
+    Items:
+      Dummy_1:
+        Material: ORANGE_STAINED_GLASS_PANE
+        DisplayName: "&7&l[&4&lB&b&lW&7&l]"
+        DisplayLore:
+          - "&e====="
+        Glow: true
+      Dummy_2:
+        Material: LIGHT_BLUE_STAINED_GLASS_PANE
+        DisplayName: "&7&l[&4&lB&b&lW&7&l]"
+        DisplayLore:
+          - "&e====="
+        Glow: true
+GUI:
+  ##Amount editor shown after a player selects a withdraw type.
+  ##This is where players add/remove value, change stack size, use max, and confirm.
+  Size: 54
+  Title: "<gradient:#ffd86b:#71e7ff>Withdraw %type%</gradient>"
+  ##Only used when RequiredItem is enabled globally or for this withdraw type.
+  ##Players place the configured paper/bottle/base item in these slots.
+  RequiredItemSlots:
+    - 29
+    - 30
+    - 31
+  CloseAfterWithdraw: false
+  AmountEditor:
+    ##Editable transaction layout with add/remove, max, reset, stack, and confirm controls.
+    StartingAmount: "1"
+    StartingStack: 1
+    AdjustmentValues:
+      - 1
+      - 10
+      - 100
+      - 1000
+    StackAdjustmentValues:
+      - 1
+      - 8
+      - 16
+  Items:
+    InfoItem:
+      Enabled: true
+      Slot: 5
+      Material: BOOK
+      DisplayName: "&b&lWithdraw Details"
+      DisplayLore:
+        - "&7Balance: &f%balance%"
+        - "&7Selected: &f%selected_stack%x %selected_amount%"
+        - "&7Total withdraw: &f%selected_total%"
+        - "&7Redeem tax: &f%tax%"
+        - "&7Withdraw fee: &f%fee%"
+        - "&7After withdraw: &f%remaining_balance%"
+        - ""
+        - "&8Tax is stored on the note and"
+        - "&8applied when the note is redeemed."
+      Glow: false
+    AmountItem:
+      ##Preview item shown in the amount editor.
+      ##The item material, CustomModelData, name, lore, glow, flags, and amount overrides are pulled from
+      ##Withdraws/<Currency>/Withdraw.yml -> Settings and Settings.AmountOverrides for the selected note.
+      Enabled: true
+      Slot: 14
+    AddAmountButton:
+      Enabled: true
+      Slots:
+        - 19
+        - 20
+        - 21
+        - 22
+      Material: LIGHT_BLUE_TERRACOTTA
+      DisplayName: "&b&l+%amount%"
+      DisplayLore:
+        - "&7Add &f%amount% &7to the note value."
+        - "&7Selected: &f%selected_amount%"
+      Glow: false
+    RemoveAmountButton:
+      Enabled: true
+      Slots:
+        - 24
+        - 25
+        - 26
+        - 27
+      Material: RED_TERRACOTTA
+      DisplayName: "&c&l-%amount%"
+      DisplayLore:
+        - "&7Remove &f%amount% &7from the note value."
+        - "&7Selected: &f%selected_amount%"
+      Glow: false
+    ResetButton:
+      Enabled: true
+      Slot: 23
+      Material: HOPPER
+      DisplayName: "&e&lReset Amount"
+      DisplayLore:
+        - "&7Set the selected amount to zero."
+    MaxButton:
+      Enabled: true
+      Slot: 32
+      Material: NETHER_STAR
+      DisplayName: "&b&lUse Maximum"
+      DisplayLore:
+        - "&7Set the note value to &f%max_amount%&7."
+        - "&7This accounts for balance, stack, and fee."
+      Glow: true
+    RemoveStackButton:
+      Enabled: true
+      Slots:
+        - 42
+        - 43
+        - 44
+      Material: ORANGE_TERRACOTTA
+      DisplayName: "&6&l-%stack_change%x Stack"
+      DisplayLore:
+        - "&7Create fewer notes."
+        - "&7Current stack: &f%selected_stack%"
+    StackItem:
+      Enabled: true
+      Slot: 41
+      Material: CHEST
+      DisplayName: "&e&lStack: %selected_stack%x"
+      DisplayLore:
+        - "&7Each note value: &f%selected_amount%"
+        - "&7Total value: &f%selected_total%"
+        - "&7Required item: &f%required_amount%x %required_item%"
+    AddStackButton:
+      Enabled: true
+      Slots:
+        - 38
+        - 39
+        - 40
+      Material: LIME_TERRACOTTA
+      DisplayName: "&a&l+%stack_change%x Stack"
+      DisplayLore:
+        - "&7Create more notes."
+        - "&7Current stack: &f%selected_stack%"
+    ConfirmButton:
+      Enabled: true
+      Slot: 50
+      Material: LIME_CONCRETE
+      DisplayName: "&a&lConfirm Withdraw"
+      DisplayLore:
+        - "&7Withdraw: &f%selected_stack%x %selected_amount%"
+        - "&7Total value: &f%selected_total%"
+        - "&7Fee: &f%fee%"
+        - "&7After withdraw: &f%remaining_balance%"
+        - ""
+        - "&eClick to create the notes."
+      Glow: true
+    BackButton:
+      Enabled: true
+      Slot: 49
+      Material: ARROW
+      DisplayName: "&e&lBack"
+      DisplayLore:
+        - "&7Return to withdraw type menu."
+    CloseButton:
+      Enabled: true
+      Slot: 51
+      Material: BARRIER
+      DisplayName: "&c&lClose"
+      DisplayLore:
+        - "&7Return input items and close."
+  EmptySlot:
+    Enabled: true
+    Pattern:
+      Type: ALL
+    Items:
+      Dummy_1:
+        Material: ORANGE_STAINED_GLASS_PANE
+        DisplayName: "&7&l[&4&lB&b&lW&7&l]"
+        DisplayLore:
+          - "&e====="
+        Glow: true
+      Dummy_2:
+        Material: LIGHT_BLUE_STAINED_GLASS_PANE
+        DisplayName: "&7&l[&4&lB&b&lW&7&l]"
+        DisplayLore:
+          - "&e====="
+        Glow: true
+ConfigVersion: 2.1

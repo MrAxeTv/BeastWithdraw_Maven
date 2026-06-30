@@ -1,0 +1,168 @@
+##==============================================================##
+## BeastWithdraw depositor GUI settings
+##==============================================================##
+## This file controls the shared /depositnotes GUI where players place
+## existing BeastWithdraw notes and deposit them back into their balance.
+##
+## Per-type files can override these values in:
+## Withdraws/<type-folder>/Depositor.yml
+##
+## Slot numbers are 1-based. Slot 1 is the top-left inventory slot.
+Enabled: true
+##Registers the main depositor command: /depositnotes
+##Hardcoded permission: BeastWithdraw.Depositor.Use
+Command:
+  Name: "depositnotes"
+  Aliases:
+    - "depositor"
+    - "depositnote"
+    - "deposite"
+AcceptedTypes:
+  ##ALL accepts every loaded BeastWithdraw note type.
+  ##SPECIFIC accepts only the types listed below.
+  Mode: ALL
+  ##Use withdraw type ids such as CashNote, XpBottle, PlayerPointsNote, heartwithdraw, McMMORedeemCredits, or BeastTokens currency ids such as tokens/gems.
+  Types:
+    # - CashNote
+    # - XpBottle
+Sounds:
+  ##Set Enabled false to disable all depositor GUI sounds in this file.
+  ##Master switch for depositor GUI click/open sounds.
+  Enabled: true
+  ##Played whenever a clickable depositor GUI control is accepted.
+  ##Modern names such as UI_BUTTON_CLICK are supported; old server aliases are resolved automatically where possible.
+  Click: UI_BUTTON_CLICK
+  ##Played whenever the depositor GUI opens.
+  ##Leave empty ("") to disable only the open sound.
+  MenuOpen: ENTITY_VILLAGER_TRADE
+  Volume: 1
+  Pitch: 1
+Animations:
+  Open:
+    ##Animates depositor GUI items when a depositor menu opens.
+    ##By default the whole top GUI is covered by the black placeholder and then revealed.
+    Enabled: false
+    ##Supported types:
+    ##SLIDE_LEFT_TO_RIGHT, SLIDE_RIGHT_TO_LEFT, SNAKE, DIAGONAL_WAVE,
+    ##CENTER_OUT, SPIRAL, RANDOM_POP, RAIN.
+    Type: CENTER_OUT
+    ##Delay before the first animated item appears.
+    StartDelayTicks: 1
+    ##Ticks between animation steps. 1 is smooth; higher values are slower.
+    TickDelay: 1
+    ##Number of slots revealed per step. Increase this for large menus.
+    ItemsPerTick: 3
+    ##Extra pause between inventory rows for slide and snake animations.
+    RowPauseTicks: 1
+    ##true = every top-GUI slot is first covered by PlaceholderItem, then revealed in animation order.
+    ##false = filler/background appears immediately and only real menu controls animate.
+    AnimateEmptySlots: true
+    ##true = visible animated items cannot be clicked until the whole opening animation finishes.
+    LockClicksUntilFinished: true
+    ##Shown in animated slots before the real item appears.
+    PlaceholderItem:
+      Enabled: true
+      Material: BLACK_STAINED_GLASS_PANE
+      DisplayName: " "
+      DisplayLore: []
+      Flags: [HIDE_ATTRIBUTES, HIDE_POTION_EFFECTS]
+    Sounds:
+      Enabled: true
+      ##Played when the animation starts. Empty by default because Sounds.MenuOpen already plays.
+      Start: ""
+      ##Played as items appear. Empty value disables this sound only.
+      Item: UI_BUTTON_CLICK
+      ##Played when a new row starts. Empty by default because item sound is usually enough.
+      Row: ""
+      ##Played when the animation completes. Empty value disables this sound only.
+      Finish: ENTITY_PLAYER_LEVELUP
+      StartVolume: 0.5
+      StartPitch: 1.0
+      ItemVolume: 0.35
+      ItemPitch: 1.2
+      ##Raises the item sound pitch slightly as the menu builds.
+      ##Set to 0 if you want every item sound to use exactly ItemPitch.
+      ItemPitchStep: 0.03
+      ItemPitchMax: 2.0
+      RowVolume: 0.4
+      RowPitch: 1.35
+      FinishVolume: 0.45
+      FinishPitch: 1.6
+      ##Play the item sound every N revealed items.
+      ItemEvery: 2
+GUI:
+  ##Main depositor layout.
+  ##Players can place accepted notes only in DepositSlots.
+  Size: 54
+  Title: "<gradient:#6dff8a:#ffd76a>Note Depositor</gradient>"
+  ##Slots are 1-based, matching the shop layout style used by BeastTokens.
+  DepositSlots:
+    - 11
+    - 12
+    - 13
+    - 14
+    - 15
+    - 16
+    - 17
+    - 20
+    - 21
+    - 22
+    - 23
+    - 24
+    - 25
+    - 26
+    - 29
+    - 30
+    - 31
+    - 32
+    - 33
+    - 34
+    - 35
+  ##Close the GUI after at least one note was deposited.
+  CloseAfterDeposit: true
+  Items:
+    DepositButton:
+      Enabled: true
+      Slot: 5
+      Material: EMERALD
+      DisplayName: "&a&lDeposit Notes"
+      DisplayLore:
+        - "&7Place notes in the open slots."
+        - "&eClick to deposit all valid notes."
+      Glow: true
+    CloseButton:
+      Enabled: true
+      Slot: 50
+      Material: BARRIER
+      DisplayName: "&c&lBack"
+      DisplayLore:
+        - "&7Return all notes and close."
+      Glow: false
+  EmptySlot:
+    Enabled: true
+    Pattern:
+      # Supported: ALL, BORDER, TOP, BOTTOM, TOP_BOTTOM, LEFT, RIGHT,
+      # SIDES, RECTANGLE, CHECKERBOARD.
+      # Deposit slots and action buttons override fillers.
+      Type: ALL
+      # RECTANGLE only:
+      # From:
+      #   Row: 2
+      #   Column: 2
+      # To:
+      #   Row: 3
+      #   Column: 8
+    Items:
+      Dummy_1:
+        Material: BLUE_STAINED_GLASS_PANE
+        DisplayName: "&7&l[&4&lB&b&lW&7&l]"
+        DisplayLore:
+          - "&e====="
+        Glow: true
+      Dummy_2:
+        Material: GRAY_STAINED_GLASS_PANE
+        DisplayName: "&7&l[&4&lB&b&lW&7&l]"
+        DisplayLore:
+          - "&e====="
+        Glow: true
+ConfigVersion: 1.4

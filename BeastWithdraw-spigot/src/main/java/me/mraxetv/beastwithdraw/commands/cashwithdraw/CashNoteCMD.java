@@ -2,6 +2,7 @@ package me.mraxetv.beastwithdraw.commands.cashwithdraw;
 
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
 import me.mraxetv.beastwithdraw.commands.WithdrawCMD;
+import me.mraxetv.beastwithdraw.managers.WithdrawItemRequirement;
 import me.mraxetv.beastwithdraw.managers.assets.CashNoteHandler;
 import me.mraxetv.beastwithdraw.utils.MessagesLang;
 import me.mraxetv.beastwithdraw.utils.Utils;
@@ -51,23 +52,38 @@ public class CashNoteCMD extends WithdrawCMD {
             return;
         }
 
+        withdraw(player, args[0], stackSize, null);
+    }
+
+    @Override
+    public boolean withdraw(Player player, String amountInput, int stackSize, WithdrawItemRequirement.ItemSource itemSource) {
+        if (!player.hasPermission(getPermission())) {
+            plugin.getUtils().noPermission(player);
+            return false;
+        }
+        stackSize = normalizeStackSize(player, stackSize);
+
         BigDecimal balance = assetHandler.getBalanceDecimal(player);
         BigDecimal feeAmount = getFeeAmount(player, stackSize);
-        BigDecimal takenAmount = parseCashWithdrawAmount(player, args[0], balance, feeAmount, stackSize);
+        BigDecimal takenAmount = parseCashWithdrawAmount(player, amountInput, balance, feeAmount, stackSize);
         if (takenAmount == null) {
-            return;
+            return false;
         }
 
-        if (!validateInventorySpace(player)) return;
-        if (!validateCashWithdrawLimits(player, takenAmount)) return;
+        if (!validateInventorySpace(player)) return false;
+        if (!validateCashWithdrawLimits(player, takenAmount)) return false;
 
         BigDecimal totalNoteAmount = takenAmount.multiply(BigDecimal.valueOf(stackSize));
-        if (!validateBalanceAfterFee(player, balance, totalNoteAmount, feeAmount)) return;
+        if (!validateBalanceAfterFee(player, balance, totalNoteAmount, feeAmount)) return false;
+
+        WithdrawItemRequirement.ConsumeResult requiredItem = consumeRequiredItem(player, stackSize, itemSource);
+        if (!requiredItem.isSuccess()) return false;
 
         CashNoteHandler.CashTransactionResult transaction = assetHandler.withdrawForNote(player, totalNoteAmount, feeAmount);
         if (!transaction.isSuccess()) {
+            requiredItem.rollback(player);
             sendTransactionFailed(player);
-            return;
+            return false;
         }
 
         if (feeAmount.compareTo(BigDecimal.ZERO) > 0) {
@@ -92,7 +108,8 @@ public class CashNoteCMD extends WithdrawCMD {
         }
 
         plugin.getWithdrawLogger().logWithdraw(assetHandler, player, takenAmount.doubleValue(), stackSize, totalNoteAmount.doubleValue(), transaction.getBalanceAfter().doubleValue());
-        playWithdrawSound(player);
+        playWithdrawSound(player, takenAmount.doubleValue());
+        return true;
     }
 
     private BigDecimal parseCashWithdrawAmount(Player player, String arg, BigDecimal balance, BigDecimal feeAmount, int stackSize) {

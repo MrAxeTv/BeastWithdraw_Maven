@@ -1,13 +1,25 @@
+##==============================================================##
+## BeastWithdraw language file
+##==============================================================##
+## Edit chat messages here.
+## %prefix% is replaced by Prefix.
+## Amount placeholders are formatted by each withdraw type's
+## Settings.Messages.CurrencySymbol and Settings.Messages.Format.
+## Keep ConfigVersion unchanged unless a plugin update changes it.
 Prefix: "&6[&4&lBeast&b&lWithdraw&6]&r&e"
 Help:
   Header: "&7&l&mâŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯&r&7&l[ &4Beast&bWithdraw &eHelp &7&l]&mâŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯"
   Footer: "&7&l&mâŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯"
 Withdraws:
+  ##General command, admin, safety, and required-item messages.
   Admin:
-    GiveUsage: "%prefix% Usage: /beastwithdraw give <player> <id> <amount> <note-amount> <signer> -s"
-    GiveAllUsage: "%prefix% &cUse /BeastWithdraw giveAll <id> <amount> <note-amount> <signer> -s"
+    GiveUsage: "%prefix% Usage: /beastwithdraw give <player> <id> <amount> [stack] [tax] [signer] [-override <id>] [-s]"
+    GiveAllUsage: "%prefix% &cUse /BeastWithdraw giveAll <id> <amount> [stack] [tax] [signer] [-override <id>] [-s]"
+    SkillGiveUsage: "%prefix% Usage: /beastwithdraw give <player> mcmmoredeemskillcredits <skill> <amount> [stack] [tax] [signer] [-override <id>] [-s]"
+    SkillGiveAllUsage: "%prefix% &cUse /BeastWithdraw giveAll mcmmoredeemskillcredits <skill> <amount> [stack] [tax] [signer] [-override <id>] [-s]"
     Given: "%prefix% &b%player% has received &2%stack%%amount%."
     GivenToAll: "%prefix% &bAll players have received an &2%stack%%amount%."
+    UnknownAmountOverride: "%prefix% &cUnknown amount override &b%override% &cfor &b%type%&c."
   FullInventory: "%prefix% &cError: Your Inventory is full!"
   CantFind: "%prefix% &cCan't find %player%!"
   NoPermission: "%prefix% &4You don't have permission to do that."
@@ -16,6 +28,34 @@ Withdraws:
   CancelCrafting: "%prefix% &4Withdraw items can't be used in crafting recipe!"
   CancelVillagerTrade: "%prefix% &4Withdraw items can't be used for trading with villagers!"
   CancelGrindStone: "%prefix% &4Withdraw items can't be used in Grind Stone!"
+  RequiredItem:
+    Missing: "%prefix% &cYou need &e%amount%x %item% &cto withdraw this note."
+WithdrawGui:
+  ##Messages used by /withdrawmenu and per-type withdraw GUI commands.
+  OnlyPlayers: "%prefix% &cConsole can't open the withdraw GUI."
+  Disabled: "%prefix% &cThe withdraw GUI is disabled."
+  MenuOpened: "%prefix% &eSelect which note type you want to withdraw."
+  McMMOSkillMenuOpened: "%prefix% &eChoose mcMMO credits or a skill to withdraw."
+  Opened: "%prefix% &eChoose an amount to withdraw."
+  AmountRequired: "%prefix% &cSelect an amount greater than 0."
+  InvalidRequiredItem: "%prefix% &cOnly the configured required item can be placed in this GUI."
+  RequiredItemSlotsFull: "%prefix% &cThe required item slots are full."
+Depositor:
+  ##Messages used by /depositnotes and per-type depositor GUI commands.
+  OnlyPlayers: "%prefix% &cConsole can't open the depositor GUI."
+  Disabled: "%prefix% &cThe depositor GUI is disabled."
+  Opened: "%prefix% &ePlace notes in the depositor and click deposit."
+  InvalidItem: "%prefix% &cOnly BeastWithdraw notes can be placed in this GUI."
+  UnsupportedItem: "%prefix% &cThis depositor does not accept that note type."
+  Full: "%prefix% &cThe depositor GUI is full."
+  NoNotes: "%prefix% &cNo valid notes were deposited."
+  Deposited: "%prefix% &eDeposited &b%notes%x &7%type%&8: &a+%amount% &8| &7Balance: &b%balance%"
+  DepositedAndTax: "%prefix% &eDeposited &b%notes%x &7%type%&8: &a+%amount% &cTax: &f-%tax% &8| &7Balance: &b%balance%"
+  SkippedInvalid: "%prefix% &cSkipped %items% invalid item(s)."
+  SkippedUnsupported: "%prefix% &cSkipped %items% note(s) because this depositor does not accept that type."
+  SkippedNoPermission: "%prefix% &cSkipped %items% note(s) because you lack redeem permission."
+  SkippedFailed: "%prefix% &cSkipped %items% note(s) because the transaction failed."
+  SkippedCapacity: "%prefix% &cSkipped %items% note(s) because your balance is already full."
 PlaceHolder:
   StackSize: "%amount%x "
-ConfigVersion: 3.2
+ConfigVersion: 3.4

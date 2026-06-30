@@ -44,17 +44,7 @@ public class XpBottleCMD extends WithdrawCMD {
         int stackSize = parseStackSize(player, args);
         if (stackSize == -1) return;
 
-        double balance = assetHandler.getBalance(player);
-        double takenAmount = parseWithdrawAmount(player, args[0], balance);
-        if (takenAmount == -1) return;
-        if (!validateInventorySpace(player)) return;
-        if (!validateWithdrawLimits(player, takenAmount)) return;
-        if (!validateBigAmount(player, takenAmount, stackSize)) return;
-        if (!validateBalance(player, balance, takenAmount, stackSize)) return;
-
-        if (!chargeFee(player, stackSize)) return;
-
-        performWithdraw(player, takenAmount, stackSize);
+        withdraw(player, args[0], stackSize, null);
     }
 
     protected void performWithdraw(Player p, double takenAmount, int stackSize) {
@@ -78,7 +68,7 @@ public class XpBottleCMD extends WithdrawCMD {
 
         pl.getWithdrawLogger().logWithdraw(assetHandler, p, takenAmount, stackSize, takenAmount * stackSize, assetHandler.getBalance(p));
 
-        playWithdrawSound(p);
+        playWithdrawSound(p, takenAmount);
     }
 
 

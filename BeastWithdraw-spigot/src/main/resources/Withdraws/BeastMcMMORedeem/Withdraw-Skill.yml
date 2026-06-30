@@ -1,0 +1,155 @@
+##==============================================================##
+## BeastMcMMORedeem skill note withdraw type
+##==============================================================##
+## Requires BeastMcMMORedeem with skill-note exchange enabled.
+## Command: /mcmmocreditwithdraw <skill> <amount|all> [stack]
+##
+## This file controls notes bound to one exact mcMMO skill.
+## Normal credit balance notes still use Withdraw.yml.
+##
+## Quick edits:
+## - Settings.Enabled controls whether skill-note withdraws exist at all.
+## - %type% and %skill% resolve to the stored mcMMO skill on skill notes.
+## - Skill values are integer-only, so Settings.DisableDecimals should stay true.
+## - Settings.SkillNBTKey stores the skill name separately from the amount NBT key.
+Settings:
+  ## Enables withdrawing existing mcMMO skill progress into notes.
+  ## Disabling this does not disable /mcmmocreditwithdraw <amount|all> [stack].
+  ## When false, skill withdraw command input, the withdraw GUI skill selector, and admin skill-note give/giveAll are disabled.
+  Enabled: true
+  Item: "BOOK"
+  Data: 0
+  Glow:
+    Enabled: true
+    Color: "AQUA"
+  CustomModelData: 0
+  Name: "<gradient:#8ef6ff:#83ffa6>mcMMO Skill Note</gradient> <gray>(Right-Click)</gray>"
+  Lore:
+    - "<dark_gray>[</dark_gray><gradient:#8ef6ff:#83ffa6>Skill</gradient><dark_gray>]</dark_gray> <white>%type%</white>"
+    - "<dark_gray>[</dark_gray><gradient:#8ef6ff:#83ffa6>Stored Value</gradient><dark_gray>]</dark_gray> <white>%amount%</white>"
+    - "%tax%"
+    - "<gray>Right-click to restore this value to %type%.</gray>"
+  Player:
+    Name: "<gradient:#8ef6ff:#83ffa6>%type% Skill Note</gradient> <gray>(Right-Click)</gray>"
+    Lore:
+      - "<dark_gray>[</dark_gray><gradient:#8ef6ff:#83ffa6>Skill</gradient><dark_gray>]</dark_gray> <white>%type%</white>"
+      - "<dark_gray>[</dark_gray><gradient:#8ef6ff:#83ffa6>Stored Value</gradient><dark_gray>]</dark_gray> <white>%amount%</white>"
+      - "<dark_gray>[</dark_gray><gradient:#8ef6ff:#83ffa6>Signed By</gradient><dark_gray>]</dark_gray> <#8ef6ff>%player%</#8ef6ff>"
+      - "%tax%"
+      - "<gray>Right-click to restore this value to %type%.</gray>"
+  Server:
+    Name: "<gradient:#8ef6ff:#83ffa6>%type% Skill Note</gradient> <gray>(Right-Click)</gray>"
+    Lore:
+      - "<dark_gray>[</dark_gray><gradient:#8ef6ff:#83ffa6>Skill</gradient><dark_gray>]</dark_gray> <white>%type%</white>"
+      - "<dark_gray>[</dark_gray><gradient:#8ef6ff:#83ffa6>Stored Value</gradient><dark_gray>]</dark_gray> <white>%amount%</white>"
+      - "<dark_gray>[</dark_gray><gradient:#8ef6ff:#83ffa6>Issued By</gradient><dark_gray>]</dark_gray> <#83ffa6>Server</#83ffa6>"
+      - "%tax%"
+      - "<gray>Right-click to restore this value to %type%.</gray>"
+  CustomName: "<gradient:#8ef6ff:#83ffa6>%type% Skill Note</gradient> <gray>x%amount%</gray>"
+  Flags:
+    - "HIDE_ENCHANTS"
+  AmountOverrides:
+    Enabled: false
+    Ranges:
+      - Id: large
+        min: 1000.0
+        max: 9999.0
+        CustomModelData: 30
+        Name: "<gradient:#8ef6ff:#83ffa6>Large %type% Skill Note</gradient> <gray>(Right-Click)</gray>"
+      - Id: premium
+        min: 10000.0
+        CustomModelData: 40
+        CustomName: "<gradient:#8ef6ff:#83ffa6>Premium %type% Skill Note</gradient> <gray>x%amount%</gray>"
+  Min: 1
+  Max: 100000
+  MaxStackSize: 64
+  AmountFormat: "###,##0"
+  Locale: "en_US"
+  DisableDecimals: true
+  Tax:
+    Lore:
+      - ""
+      - "&dTax: &c%tax%"
+      - ""
+    Percentage: 0
+  PermissionNotes:
+    Enabled: false
+    Small:
+      Min: 1
+      Max: 5000
+      Tax:
+        Percentage: 0
+      MaxStackSize: 64
+    Medium:
+      Min: 1
+      Max: 25000
+      Tax:
+        Percentage: 0
+      MaxStackSize: 64
+    High:
+      Min: 1
+      Max: 100000
+      Tax:
+        Percentage: 0
+      MaxStackSize: 64
+  Charges:
+    Fee:
+      Enabled: false
+      Cost: 0
+  Sounds:
+    Withdraw:
+      Enabled: true
+      Sound: "ENTITY_EXPERIENCE_ORB_PICKUP"
+      Volume: 1.0
+      Pitch: 1.25
+    Redeem:
+      Enabled: true
+      Sound: "ENTITY_PLAYER_LEVELUP"
+      Volume: 1.0
+      Pitch: 1.15
+  Logs:
+    ##Per-type transaction logging override.
+    ##Global config.yml -> Settings.Logs.Enabled must also be true.
+    Enabled: true
+    SeparateFile:
+      Enabled: false
+  ## Amount NBT key.
+  NBTKey: "BeastMcMMORedeemSkillCredits"
+  ## Skill-name NBT key.
+  SkillNBTKey: "BeastMcMMORedeemSkill"
+  RequiredItem:
+    ##Set OverrideGlobal true to make this section override withdraw-settings.yml -> RequiredItem.
+    OverrideGlobal: false
+    Enabled: false
+    Consume: true
+    Amount: 1
+    AmountPerNote: true
+    Match:
+      Material: PAPER
+      DisplayName: ""
+      RequireDisplayName: false
+      Lore: []
+      RequireLore: false
+      CustomModelData: 0
+      RequireCustomModelData: false
+  Messages:
+    CurrencySymbol: ""
+    Format: "%amount%"
+    Disabled: "%prefix% &cWithdrawing mcMMO skill progress into notes is disabled."
+    InvalidSkill: "%prefix% &cThat mcMMO skill is not available for skill notes."
+    InvalidAmount: "%prefix% &cEnter a positive whole number for this skill note."
+    NotEnough: "%prefix% &cYou do not have %amount% stored in %type%. &7Available: &b%balance%&7."
+    TransactionFailed: "%prefix% &cThe mcMMO skill note transaction could not be completed right now."
+    Withdraw: "%prefix% &eCreated &b%stack%&7%type% skill note(s)&8: &a%amount% &e(&7Total: &a%stacked-amount%&e) &8| &7Skill Balance: &b%balance%"
+    Redeem: "%prefix% &eRedeemed &b%stack%&7%type% skill note(s)&8: &a%amount% &e(&7Total: &a%stacked-amount%&e) &8| &7Skill Balance: &b%balance%"
+    RedeemAndTax: "%prefix% &eRedeemed &b%stack%&7%type% skill note(s)&8: &a%amount% &e(&7Total: &a%stacked-amount%&e) &cTax: &f-%tax% &e(&7Total: &c-%stacked-tax%&e) &8| &7Skill Balance: &b%balance%"
+    Min: "%prefix% &cThe minimum skill note value is %min-amount%."
+    Max: "%prefix% &cThe maximum skill note value is %max-amount%."
+    RewardReceived: "%prefix% &bYou received &f%stack%%amount% &b%type% skill note(s)."
+    GiveAll: "%prefix% &bAll online players received mcMMO skill notes."
+    ToBigNumber: "%prefix% &c%amount% is too large for this skill note."
+    MaxStackSize: "%prefix% &cYou cannot create more than %stack% skill notes in one transaction."
+    Fee:
+      NotEnough: "%prefix% &cYou need %fee% to pay the skill-note withdrawal fee."
+      TakenFee: "%prefix% &eSkill-note withdrawal fee paid: &f%fee%&e."
+ConfigVersion: 1.1

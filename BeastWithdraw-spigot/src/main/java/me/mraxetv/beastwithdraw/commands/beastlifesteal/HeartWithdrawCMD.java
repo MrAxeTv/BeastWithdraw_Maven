@@ -135,8 +135,7 @@ public class HeartWithdrawCMD extends WithdrawCMD {
     }
 
     private boolean hasWithdrawPermission(Player player) {
-        String permission = assetHandler.getConfig().getString("Settings.Permission", "beastlifesteal.withdraw");
-        return permission == null || permission.isEmpty() || player.hasPermission(permission);
+        return assetHandler.hasWithdrawPermission(player);
     }
 
     private String[] preprocessArgs(Player player, String[] args) {

@@ -1,7 +1,17 @@
-##Configuration for BeastWithdraw by MrAxeTv
-##Plugin use intended for MC 1.7 - 1.19+
-##Notic all values of withdraw amount are stored as NBT data on items so make sure other plugins for storing items have support for storing NBT data.
+##==============================================================##
+## BeastWithdraw main configuration
+##==============================================================##
+## Start here when enabling or disabling whole withdraw systems.
+## Item looks, command names, min/max amounts, tax, fees, and per-type
+## messages are configured in Withdraws/<Type>/Withdraw.yml.
+##
+## Notes store their value in NBT. If another plugin stores, edits, stacks,
+## or transports items, make sure it keeps custom NBT data intact.
+##
+## Most permissions are hardcoded and listed in plugin.yml and in the comments
+## inside each related config section.
 Settings:
+  ## -------------------- Language --------------------
   ##Language selection for files stored in plugins/BeastWithdraw/Lang/.
   Language:
     Settings:
@@ -9,21 +19,52 @@ Settings:
       File: "en-US.yml"
       ##Reserved for future per-player language support.
       ForceLanguage: false
+  UpdateNotifications:
+    AdminJoin:
+      ##Show update notifications to admins when they join.
+      Enabled: true
+  ## -------------------- Withdraw Types --------------------
+  ## Enable only the systems you use. Dependencies must be installed and enabled.
   Withdraws:
+    ##No external dependency. Stores player experience in throwable XP bottles.
     XpBottle:
       Enabled: true
-    ##Dependency: Economy plugin like(Essentials) and Vault!
+    ##Requires Vault plus an economy plugin such as EssentialsX.
     CashNote:
       Enabled: true
-    ##Dependency:  BeastTokens!
-    BeastTokensNote:
+    ##Dependency: BeastTokens!
+    ##When enabled, BeastWithdraw registers one note system for each enabled BeastTokens currency.
+    ##Examples: Tokens -> /tokenswithdraw, Gems -> /gemswithdraw.
+    ##Admin note type ids use currency ids without the command suffix: tokens, gems, shards.
+    ##Each currency gets its own generated config folder in plugins/BeastWithdraw/Withdraws/<CurrencyId>/, for example Tokens/Withdraw.yml and Gems/Withdraw.yml.
+    ##New generated currency files copy BeastTokens Settings.CurrencySymbol and Settings.Format into Settings.Messages.CurrencySymbol and Settings.Messages.Format.
+    ##BeastTokens /<currency> withdraw is also delegated to the matching BeastWithdraw command while this hook is enabled for that currency.
+    ##Native BeastTokens notes from drops/rewards and /BeastTokensAdmin givenote still redeem in BeastTokens.
+    BeastTokens:
       Enabled: false
-    ##Dependency:  PlayerPoints!
+      Currencies:
+        ##DefaultEnabled applies to every BeastTokens currency that is not listed under Overrides.
+        ##true = create BeastWithdraw note commands for every writable BeastTokens currency by default.
+        ##false = only currencies set to true under Overrides are hooked into BeastWithdraw.
+        DefaultEnabled: true
+        ##Use currency ids from plugins/BeastTokens/Currencies/<CurrencyId>.
+        ##Set a currency to false to skip its /<currency>withdraw command.
+        ##BeastTokens no longer has a native player withdraw fallback, so /<currency> withdraw will show an unavailable message for skipped currencies.
+        ##Set DefaultEnabled to false and list only the currencies you want if you prefer an allow-list.
+        Overrides:
+          # Tokens: true
+          # Gems: false
+    ##Requires PlayerPoints.
     PlayerPointsNote:
       Enabled: false
-    ##Dependency: BeastLifeSteal
+    ##Requires BeastLifeSteal.
     BeastLifeSteal:
       Enabled: false
+    ##Requires BeastMcMMORedeem.
+    ##Allows players to withdraw and redeem BeastMcMMORedeem credits as BeastWithdraw notes.
+    BeastMcMMORedeem:
+      Enabled: false
+  ## -------------------- Logging --------------------
   Logs:
     ##Main switch for withdraw and redeem transaction logging.
     ##When disabled, no transaction logs are written anywhere.
@@ -37,23 +78,24 @@ Settings:
       ##File path: plugins/BeastWithdraw/Logs/Combined/latest.log
       ##This only writes entries for types that still have Settings.Logs.Enabled: true in their own withdraw file.
       Enabled: true
-    ##Per-type separate files are controlled inside each Withdraws/<type>.yml file.
+    ##Per-type separate files are controlled inside each Withdraws/<type-folder>/<type>.yml file.
     ##Logging order is:
     ##1) Settings.Logs.Enabled in this file must be true.
     ##2) Settings.Logs.Enabled in the specific withdraw type file must be true.
     ##3) Console / CombinedFile / per-type SeparateFile then decide where that type is written.
-  ##Cancle villager treading with withdraw items.
+  ## -------------------- Safety Rules --------------------
+  ##Cancel villager trading with withdraw items.
   VillagerTrade:
     Allow: false
-    ##Suport for ShopKeeper plugin allow trading withdraw items keep in mined you will need to remove Signer Lore(&dEnchanter:&r %player%)... from configuration for this to work.
+    ##Shopkeepers support. If enabled, remove signer-only lore from notes if you want identical notes to stack/trade cleanly.
     AllowShopKeeperPlugin: true
   ##Disable using withdraw items in crafting.
   CancelCrafting: true
   ##Drop withdraw item on floor if there is no space in player inventory
   WithdrawDropFloor: true
-  ##Main command alias
+  ##Main /beastwithdraw command aliases.
   Aliases:
     - "bw"
     - "bwa"
 ##Config version (PLEASE DO NOT EDIT & DON'T COPY PAST OLD CONFIG OVER)
-ConfigVersion: 3.3
+ConfigVersion: 3.9

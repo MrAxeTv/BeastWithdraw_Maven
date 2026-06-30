@@ -1,0 +1,169 @@
+##==============================================================##
+## BeastMcMMORedeem credit note withdraw type
+##==============================================================##
+## Requires BeastMcMMORedeem.
+## Normal credit command: /mcmmocreditwithdraw <amount|all> [stack]
+## Skill-note command: /mcmmocreditwithdraw <skill> <amount|all> [stack]
+##
+## This file controls normal BeastMcMMORedeem credit notes.
+## Skill-specific notes use Withdraw-Skill.yml.
+##
+## Quick edits:
+## - Credits are integer-only, so Settings.DisableDecimals should stay true.
+## - Change the note look under Settings.Item, Name, Lore, Player, and Server.
+## - Change command name under Settings.CommandName.
+## - Change chat messages under Settings.Messages.
+##
+## Notes store values in NBT. Do not use item-management plugins that strip NBT.
+Settings:
+  Item: "EMERALD"
+  Data: 0
+  Glow:
+    Enabled: true
+    Color: "AQUA"
+  # Custom model data is supported on 1.14+ versions.
+  CustomModelData: 0
+  Name: "<gradient:#54f2d2:#9fb7ff>mcMMO Credit Note</gradient> <gray>(Right-Click)</gray>"
+  Lore:
+    - "<dark_gray>[</dark_gray><gradient:#54f2d2:#9fb7ff>Credits</gradient><dark_gray>]</dark_gray> <white>%amount%</white>"
+    - "%tax%"
+    - "<gray>Right-click to redeem these credits back to your balance.</gray>"
+  Player:
+    Name: "<gradient:#54f2d2:#9fb7ff>mcMMO Credit Note</gradient> <gray>(Right-Click)</gray>"
+    Lore:
+      - "<dark_gray>[</dark_gray><gradient:#54f2d2:#9fb7ff>Credits</gradient><dark_gray>]</dark_gray> <white>%amount%</white>"
+      - "<dark_gray>[</dark_gray><gradient:#54f2d2:#9fb7ff>Signed By</gradient><dark_gray>]</dark_gray> <#54f2d2>%player%</#54f2d2>"
+      - "%tax%"
+      - "<gray>Right-click to redeem these credits back to your balance.</gray>"
+  Server:
+    Name: "<gradient:#54f2d2:#9fb7ff>mcMMO Credit Note</gradient> <gray>(Right-Click)</gray>"
+    Lore:
+      - "<dark_gray>[</dark_gray><gradient:#54f2d2:#9fb7ff>Credits</gradient><dark_gray>]</dark_gray> <white>%amount%</white>"
+      - "<dark_gray>[</dark_gray><gradient:#54f2d2:#9fb7ff>Issued By</gradient><dark_gray>]</dark_gray> <#9fb7ff>Server</#9fb7ff>"
+      - "%tax%"
+      - "<gray>Right-click to redeem these credits back to your balance.</gray>"
+  CustomName: "<gradient:#54f2d2:#9fb7ff>mcMMO Credit Note</gradient> <gray>x%amount%</gray>"
+  Flags:
+    - "HIDE_ENCHANTS"
+  AmountOverrides:
+    Enabled: false
+    Ranges:
+      - Id: large
+        min: 1000.0
+        max: 9999.0
+        CustomModelData: 10
+        Name: "<gradient:#54f2d2:#9fb7ff>Large mcMMO Credit Note</gradient> <gray>(Right-Click)</gray>"
+      - Id: premium
+        min: 10000.0
+        CustomModelData: 20
+        CustomName: "<gradient:#54f2d2:#9fb7ff>Premium mcMMO Credit Note</gradient> <gray>x%amount%</gray>"
+  Min: 1
+  Max: 100000
+  MaxStackSize: 64
+  AmountFormat: "###,##0"
+  Locale: "en_US"
+  DisableDecimals: true
+  Tax:
+    Lore:
+      - ""
+      - "&dTax: &c%tax%"
+      - ""
+    Percentage: 0
+  PermissionNotes:
+    Enabled: false
+    Small:
+      Min: 1
+      Max: 5000
+      Tax:
+        Percentage: 0
+      MaxStackSize: 64
+    Medium:
+      Min: 1
+      Max: 25000
+      Tax:
+        Percentage: 0
+      MaxStackSize: 64
+    High:
+      Min: 1
+      Max: 100000
+      Tax:
+        Percentage: 0
+      MaxStackSize: 64
+  Charges:
+    Fee:
+      Enabled: false
+      Cost: 0
+  Sounds:
+    Withdraw:
+      Enabled: true
+      Sound: "ENTITY_EXPERIENCE_ORB_PICKUP"
+      Volume: 1.0
+      Pitch: 1.15
+    Redeem:
+      Enabled: true
+      Sound: "ENTITY_PLAYER_LEVELUP"
+      Volume: 1.0
+      Pitch: 1.0
+  Logs:
+    ##Per-type transaction logging override.
+    ##Global config.yml -> Settings.Logs.Enabled must also be true.
+    Enabled: true
+    SeparateFile:
+      Enabled: false
+  NBTKey: "BeastMcMMORedeemCredits"
+  ##Regular withdraw command for normal credits: /mcmmocreditwithdraw <amount|all> [stack]
+  ##Skill withdraw uses the same command as: /mcmmocreditwithdraw <skill> <amount|all> [stack]
+  ##Hardcoded permissions: BeastWithdraw.McMMORedeemCredits.Withdraw, BeastWithdraw.McMMORedeemCredits.Withdraw.All, BeastWithdraw.McMMORedeemCredits.Withdraw.Skill
+  CommandName: "mcmmocreditwithdraw"
+  Aliases:
+    - "mcmmoctwithdraw"
+    - "mcmmocreditswithdraw"
+    - "mcmmocreditsnote"
+  RequiredItem:
+    ##Set OverrideGlobal true to make this section override withdraw-settings.yml -> RequiredItem.
+    OverrideGlobal: false
+    Enabled: false
+    Consume: true
+    Amount: 1
+    AmountPerNote: true
+    Match:
+      Material: PAPER
+      DisplayName: ""
+      RequireDisplayName: false
+      Lore: []
+      RequireLore: false
+      CustomModelData: 0
+      RequireCustomModelData: false
+  Messages:
+    CurrencySymbol: ""
+    Format: "%amount% credits"
+    Help: "%prefix% &eBalance: &b%balance%&7. Use &f/%credits_withdraw_command% <amount|all> [stack]&7."
+    NotEnough: "%prefix% &cYou need %amount% to create that note. &7Current balance: &b%balance%&7."
+    Withdraw: "%prefix% &eCreated &b%stack%&7mcMMO credit note(s)&8: &a%amount% &e(&7Total: &a%stacked-amount%&e) &8| &7Balance: &b%balance%"
+    Redeem: "%prefix% &eRedeemed &b%stack%&7mcMMO credit note(s)&8: &a%amount% &e(&7Total: &a%stacked-amount%&e) &8| &7Balance: &b%balance%"
+    RedeemAndTax: "%prefix% &eRedeemed &b%stack%&7mcMMO credit note(s)&8: &a%amount% &e(&7Total: &a%stacked-amount%&e) &cTax: &f-%tax% &e(&7Total: &c-%stacked-tax%&e) &8| &7Balance: &b%balance%"
+    Min: "%prefix% &cThe minimum note value is %min-amount%."
+    Max: "%prefix% &cThe maximum note value is %max-amount%."
+    RewardReceived: "%prefix% &bYou received &f%stack%%amount% &bmcMMO credit note(s)."
+    GiveAll: "%prefix% &bAll online players received mcMMO credit notes."
+    ToBigNumber: "%prefix% &c%amount% is too large for this credit note."
+    MaxStackSize: "%prefix% &cYou cannot create more than %stack% notes in one transaction."
+    CapacityFull: "%prefix% &cYour credit balance cannot accept %amount% right now. &7Available space: &b%capacity%&7."
+    Fee:
+      NotEnough: "%prefix% &cYou need %fee% to pay the withdrawal fee."
+      TakenFee: "%prefix% &eWithdrawal fee paid: &f%fee%&e."
+WithdrawGUI:
+  ##Optional per-type direct GUI command.
+  ##The main /withdrawmenu can still show this type even when this section is disabled.
+  Enabled: false
+  ##Direct GUI command: /mcmmocreditwithdrawgui
+  ##Hardcoded permission: BeastWithdraw.McMMORedeemCredits.WithdrawGui.Use
+  Command:
+    Enabled: false
+    Name: "mcmmocreditwithdrawgui"
+    Aliases:
+      - "mcmmocreditsgui"
+      - "mcmmocreditnotegui"
+  GUI:
+    Title: "<gradient:#54f2d2:#9fb7ff>mcMMO Credit Withdraw</gradient>"
+ConfigVersion: 1.1

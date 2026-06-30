@@ -17,9 +17,20 @@ public class XpBottleHandler extends AssetHandler<Integer> {
 
     public XpBottleHandler(BeastWithdrawPlugin pl, String id) {
         super(pl, id);
+        enforceIntegerAmounts();
         new XpBottleRedeemListener(pl,this);
         xpBottleCMD = new XpBottleCMD(pl, this);
         RedeemRegistry.register(id, BottleRedeemEvent::new);
+    }
+
+    private void enforceIntegerAmounts() {
+        if (getConfig().contains("Settings.DisableDecimals")
+                && getConfig().getBoolean("Settings.DisableDecimals", true)) {
+            return;
+        }
+
+        getConfig().set("Settings.DisableDecimals", true);
+        saveConfig();
     }
 
     @Override

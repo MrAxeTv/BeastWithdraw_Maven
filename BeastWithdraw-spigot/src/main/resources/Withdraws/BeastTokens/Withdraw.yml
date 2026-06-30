@@ -1,0 +1,264 @@
+##==============================================================##
+## BeastTokens withdraw type template
+##==============================================================##
+## Requires BeastTokens.
+## This file is a template. When BeastTokens hook is enabled, BeastWithdraw
+## creates one generated folder per BeastTokens currency:
+## plugins/BeastWithdraw/Withdraws/<CurrencyId>/Withdraw.yml
+##
+## Commands are generated per currency:
+## - Tokens -> /tokenswithdraw
+## - Gems -> /gemswithdraw
+## - Shards -> /shardswithdraw
+##
+## Hardcoded permissions:
+## - BeastWithdraw.<currency_id>.Withdraw
+## - BeastWithdraw.<currency_id>.Withdraw.All
+## - BeastWithdraw.<currency_id>.Redeem
+##
+## Admin give/giveAll type ids use only the currency id: tokens, gems, shards.
+## Notes store values in NBT. Do not use item-management plugins that strip NBT.
+Settings:
+  ##Set which item you want to use for currency notes.
+  ##Even if u changed to new item the old withdrawn items by player will be usable because of NBT  data storing.
+  Item: "PLAYER_HEAD"
+  # Used for version under 1.13!
+  Data: 0
+  ##Add enchant glow to item.
+  Glow:
+    Enabled: true
+    Color: "DARK_PURPLE"
+  #Change Item to PLAYER_HEAD  uncomment SkullTexture and item will be replaced with specific textured head
+  #https://minecraft-heads.com/custom-heads/head/120999-void-monster copy  "Value" section for skin of head and paste it in SkullTexture
+  #You can use %player% or just type  name of player you want
+  SkullTexture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmVhNTdlOWVkOWFmODZlZjc4NWVmZDUwZmY2ODQyMmNlYWZlOTlkZDIwM2Y1MTFjMGIxNTliNjE3ZTkyMTAxOSJ9fX0="
+  # Custom model data is supported on 1.14+ versions.
+  CustomModelData: 0
+  ##Default item display used when Player or Server does not override it.
+  Name: "<gradient:#62f5ff:#ff66d9>%currency_name% Note</gradient> <gray>(Right-Click)</gray>"
+  Lore:
+    - "<dark_gray>[</dark_gray><gradient:#62f5ff:#ff66d9>Value</gradient><dark_gray>]</dark_gray> <white>%amount%</white>"
+    - "%tax%"
+    - "<gray>Right-click to redeem this premium %currency_name% note.</gray>"
+  ##Set up your item display name & lores how do you like.
+  ##Currency placeholders work here, so the same file can render Tokens, Gems, Shards, or any other BeastTokens currency.
+  ##If Player.Name or Player.Lore is missing it inherits Settings.Name or Settings.Lore.
+  ##This is part of configuration for item which player will get when they withdraw /<currency>withdraw <amount>.
+  Player:
+    Name: "<gradient:#62f5ff:#ff66d9>%currency_name% Note</gradient> <gray>(Right-Click)</gray>"
+    Lore:
+      - "<dark_gray>[</dark_gray><gradient:#62f5ff:#ff66d9>Value</gradient><dark_gray>]</dark_gray> <white>%amount%</white>"
+      - "<dark_gray>[</dark_gray><gradient:#62f5ff:#ff66d9>Signed By</gradient><dark_gray>]</dark_gray> <#62f5ff>%player%</#62f5ff>"
+      - "%tax%"
+      - "<gray>Right-click to redeem this premium %currency_name% note.</gray>"
+  ##This is part of configuration for item withdrawn by staff or console.
+  ##If Server.Name or Server.Lore is missing it inherits Settings.Name or Settings.Lore.
+  Server:
+    Name: "<gradient:#62f5ff:#ff66d9>%currency_name% Note</gradient> <gray>(Right-Click)</gray>"
+    Lore:
+      - "<dark_gray>[</dark_gray><gradient:#62f5ff:#ff66d9>Value</gradient><dark_gray>]</dark_gray> <white>%amount%</white>"
+      - "<dark_gray>[</dark_gray><gradient:#62f5ff:#ff66d9>Issued By</gradient><dark_gray>]</dark_gray> <#ff66d9>Beast Tokenizer</#ff66d9>"
+      - "%tax%"
+      - "<gray>Right-click to redeem this premium %currency_name% note.</gray>"
+  ##CustomName is the name shown above the dropped item. Set "" to disable it.
+  CustomName: "<gradient:#62f5ff:#ff66d9>%currency_name% Note</gradient> <gray>x%amount%</gray>"
+  #Item Flags section you can find full list here https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/inventory/ItemFlag.html
+  Flags:
+    - "HIDE_ENCHANTS"
+  ##Full note item overrides by amount.
+  ##Missing values inherit from the main Settings section above.
+  ##You can override Item, Data, CustomModelData, Glow, SkullTexture, CustomName, Flags, Enchants, Name, Lore, Player, Server, and Sounds.
+  ##If a range sets Name or Lore, that value is used for both player-created and server/admin-created notes
+  ##unless that same range also sets Player.Name, Server.Name, Player.Lore, or Server.Lore.
+  ##To intentionally remove inherited values use explicit clear values:
+  ##  CustomModelData: CLEAR
+  ##  Data: CLEAR
+  ##  SkullTexture: ""
+  ##  CustomName: ""
+  ##  Name: ""
+  ##  Lore: []
+  ##  Flags: []
+  ##  Enchants: {}
+  ##  Glow: false
+  ##  Sounds:
+  ##    Redeem:
+  ##      Enabled: false
+  AmountOverrides:
+    Enabled: false
+    ##Id is optional, but recommended for every range.
+    ##Admins can force a named override regardless of amount with:
+    ##/BeastWithdraw give <player> <id> <amount> [stack] [tax] [signer] -override <Id>
+    ##/BeastWithdraw giveAll <id> <amount> [stack] [tax] [signer] -override <Id>
+    ##Example: forcing Id: large applies this visual even to a 10.0 or 300.0 note.
+    Ranges:
+      - Id: large
+        min: 1000.0
+        max: 4999.99
+        CustomModelData: 10
+        Name: "<gradient:#62f5ff:#ff66d9>Large %currency_name% Note</gradient> <gray>(Right-Click)</gray>"
+        Lore:
+          - "<dark_gray>[</dark_gray><gradient:#62f5ff:#ff66d9>Value</gradient><dark_gray>]</dark_gray> <white>%amount%</white>"
+          - "<gray>Large tier %currency_name% note.</gray>"
+        Player:
+          Lore:
+            - "<dark_gray>[</dark_gray><gradient:#62f5ff:#ff66d9>Value</gradient><dark_gray>]</dark_gray> <white>%amount%</white>"
+            - "<dark_gray>[</dark_gray><gradient:#62f5ff:#ff66d9>Signed By</gradient><dark_gray>]</dark_gray> <#62f5ff>%player%</#62f5ff>"
+            - "<gray>Large tier player %currency_name% note.</gray>"
+        Server:
+          Lore:
+            - "<dark_gray>[</dark_gray><gradient:#62f5ff:#ff66d9>Value</gradient><dark_gray>]</dark_gray> <white>%amount%</white>"
+            - "<dark_gray>[</dark_gray><gradient:#62f5ff:#ff66d9>Issued By</gradient><dark_gray>]</dark_gray> <#ff66d9>Beast Tokenizer</#ff66d9>"
+            - "<gray>Large tier server %currency_name% note.</gray>"
+      - Id: premium
+        min: 5000.0
+        CustomModelData: 20
+        CustomName: "<gradient:#62f5ff:#ff66d9>Premium %currency_name% Note</gradient> <gray>x%amount%</gray>"
+  ##Minimum amount which can be withdrawn to one note.
+  Min: 25
+  ##Maximum amount which can be withdrawn to one note.
+  Max: 10000
+  ##Maximum number of notes that can be created by one command or GUI confirm.
+  MaxStackSize: 64
+  ##Set amount format
+  AmountFormat: "###,##0.00"
+  ##Locale Region
+  Locale: "en_US"
+  DisableDecimals: false
+  ##Tax will take specified percentage amount when player redeems this note (0.01% to 100% Possible values).
+  ##Bypass Tax permission: "BeastWithdraw.<currency_id>.ByPass.Tax"
+  Tax:
+    Lore:
+      - ""
+      - "&dTax: &c%tax%"
+      - ""
+    Percentage: 5
+
+  ##Min and Max amount per permissions.
+  ##Permission should be BeastWithdraw.<currency_id>.PermissionNotes.<name_of_perm>
+  ##Here is one example: if player has "BeastWithdraw.tokens.PermissionNotes.Small" permission they will be able to withdraw minimum 20 and maximum 50000
+  ##You can rename this permissions settings and add new ones how you like.
+  ##If PermissionNotes are enabled they will override default min and max setting if player has any of permissions for this groups.
+  PermissionNotes:
+    Enabled: false
+    Small:
+      Min: 20
+      Max: 50000
+      Tax:
+        Percentage: 10
+      MaxStackSize: 64
+    Medium:
+      Min: 10
+      Max: 100000
+      Tax:
+        Percentage: 15
+      MaxStackSize: 64
+    High:
+      Min: 10
+      Max: 100000
+      Tax:
+        Percentage: 25
+      MaxStackSize: 64
+
+  Charges:
+    ##Fee will take amount when player withdraws this note.
+    ##Bypass Fee permission: "BeastWithdraw.<currency_id>.ByPass.Fee".
+    Fee:
+      Enabled: false
+      Cost: 100
+
+  ##Play sounds when player withdraws or redeems a note.
+  ##Sounds  for 1.9 and above: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Sound.html
+  ##Sounds for 1.7 and 1.8: https://www.spigotmc.org/wiki/cc-sounds-list/
+  Sounds:
+    Withdraw:
+      Enabled: true
+      Sound: "ENTITY_GENERIC_EXPLODE"
+      Volume: 1.0
+      Pitch: 1.0
+    Redeem:
+      Enabled: true
+      Sound: "ENTITY_EXPERIENCE_ORB_PICKUP"
+      Volume: 1.0
+      Pitch: 1.0
+  Logs:
+    ##Per-type transaction logging override.
+    ##Default true means BeastTokens currency notes can be logged, but config.yml -> Settings.Logs.Enabled must also be true.
+    ##Set this to false to stop this currency note type from being written anywhere, including console, Combined, and its separate file.
+    Enabled: true
+    SeparateFile:
+      ##Also write this currency note type into its own file: plugins/BeastWithdraw/Logs/<CurrencyId>/latest.log.
+      ##This works together with the main config and does not replace the optional Combined log file.
+      Enabled: false
+
+  ##BeastTokens currency notes do not define NBTKey here.
+  ##The amount key is read from BeastTokens/Currencies/<CurrencyId>/setting.yml -> NoteItem.NBTKey.
+  ##This keeps BeastTokens drops, /BeastTokensAdmin givenote, and BeastWithdraw notes on the same per-currency note identity.
+  ##Extra aliases created for every BeastTokens currency instance.
+  ##Root commands are automatic: /%currency_id_lower%withdraw.
+  ##Admin give/giveall type ids use only the currency id, for example: /beastwithdraw give MrAxeTv gems 100.
+  ##Available placeholders: %currency_id%, %currency_id_lower%, %currency_name%, %currency_withdraw_command%, %withdraw_command%.
+  ##Example for Gems: /gemsnote and /gemsnotes.
+  CurrencyAliases:
+    - "%currency_id_lower%note"
+    - "%currency_id_lower%notes"
+  ##Optional item required before a player can create withdraw notes.
+  ##This applies to the regular withdraw command and to the withdraw GUI input slots.
+  RequiredItem:
+    ##Set OverrideGlobal true to make this section override withdraw-settings.yml -> RequiredItem.
+    OverrideGlobal: false
+    Enabled: false
+    Consume: true
+    Amount: 1
+    AmountPerNote: true
+    Match:
+      Material: PAPER
+      # Data: 0
+      DisplayName: ""
+      RequireDisplayName: false
+      Lore: []
+      RequireLore: false
+      CustomModelData: 0
+      RequireCustomModelData: false
+  Messages:
+    ##Currency symbol used in formatted amount placeholders such as %amount%, %balance%, %fee%, and %stacked-amount%.
+    ##Per-currency BeastTokens generated files automatically copy BeastTokens Settings.CurrencySymbol here on first creation.
+    ##Format controls how the final amount is displayed.
+    ##Available placeholders: %symbol%, %amount%, and %amount_raw%.
+    ##Legacy aliases %currency% and %currency_raw% are accepted as %amount% and %amount_raw% only in this format value.
+    ##Per-currency BeastTokens generated files also copy BeastTokens Settings.Format here on first creation.
+    CurrencySymbol: "\uD83D\uDC8E"
+    Format: "%symbol%%amount%"
+    Help: "%prefix% &2You have %balance% %currency_name% &e(Use /%currency_withdraw_command% <amount>/<all> <note-amount>)"
+    NotEnough: "%prefix% &cYou don't have %amount% %currency_name%! &e(Current: %balance%)"
+    Withdraw: "%prefix% &eWithdrawn &b%stack%&7%currency_name% Note&8: &a+%amount% &e(&7Total: &a%stacked-amount%&e) &8| &7Balance: &b%balance%"
+    Redeem: "%prefix% &eRedeemed &b%stack%&7%currency_name% Note&8: &a+%amount% &e(&7Total: &a%stacked-amount%&e) &8| &7Balance: &b%balance%"
+    RedeemAndTax: "%prefix% &eRedeemed &b%stack%&7%currency_name% Note&8: &a+%amount% &e(&7Total: &a%stacked-amount%&e) &cTax: &f-%tax% &e(&7Total: &c-%stacked-tax%&e) &8| &7Balance: &b%balance%"
+    Min: "%prefix% &cYou must withdraw at least %min-amount% %currency_name%!."
+    Max: "%prefix% &cYou can withdraw a maximum of %max-amount% %currency_name%!"
+    RewardReceived: "%prefix% &bYou have received a %currency_name% note worth &2%stack%%amount%&b!"
+    GiveAll: "%prefix% &bAll players have received a %currency_name% note!"
+    ToBigNumber: "%prefix% &4%amount% is too large!"
+    MaxStackSize: "%prefix% &cYou can't make stack bigger than %stack% items!"
+    Fee:
+      NotEnough: "%prefix% &cYou need %fee% %currency_name% to pay fee for this transaction!"
+      TakenFee: "%prefix% &eYou paid %fee% %currency_name% fee for this transaction!"
+##--------------------------------------------------------------------------------------------------------##
+WithdrawGUI:
+  ##Optional per-currency direct GUI command and per-currency GUI overrides.
+  ##The main /withdrawmenu can still show this currency even when this section is disabled.
+  Enabled: false
+  ##Direct GUI command: /%currency_id_lower%withdrawgui
+  ##Hardcoded permission: BeastWithdraw.<currency_id>.WithdrawGui.Use
+  Command:
+    Enabled: false
+    Name: "%currency_id_lower%withdrawgui"
+    Aliases:
+      - "%currency_id_lower%gui"
+      - "%currency_id_lower%notegui"
+  GUI:
+    Title: "<gradient:#ffd86b:#71e7ff>%currency_name% Withdraw</gradient>"
+    ##Uncomment any GUI section here to override withdraw-settings.yml only for this type.
+    # Size: 54
+    # RequiredItemSlots: [29, 30, 31]
+    # CloseAfterWithdraw: false
+ConfigVersion: 2.3

@@ -103,7 +103,8 @@ public class XpBottleRedeemListener implements Listener {
         }
 
         // Play redeem sound
-        if (assetHandler.getConfig().getBoolean("Settings.Sounds.Redeem.Enabled")) {
+        assetHandler.playConfiguredSound(p, "Redeem", singleAmount, "XpBottle Redeem", assetHandler.getAmountOverrideId(item));
+        if (false && assetHandler.getConfig().getBoolean("Settings.Sounds.Redeem.Enabled")) {
             String soundName = assetHandler.getConfig().getString("Settings.Sounds.Redeem.Sound");
             float volume = assetHandler.getConfig().getDouble("Settings.Sounds.Redeem.Volume", 1.0).floatValue();
             float pitch = assetHandler.getConfig().getDouble("Settings.Sounds.Redeem.Pitch", 1.0).floatValue();
@@ -113,7 +114,7 @@ public class XpBottleRedeemListener implements Listener {
                 p.playSound(p.getLocation(), sound, volume, pitch);
             } catch (Exception e1) {
                 Bukkit.getServer().getConsoleSender().sendMessage(
-                        pl.getUtils().getPrefix() + "§cBroken sound in XpBottle Redeem section!");
+                        pl.getUtils().getPrefix() + "\u00A7cBroken sound in XpBottle Redeem section!");
             }
         }
 

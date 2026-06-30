@@ -4,6 +4,7 @@ import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
 import me.mraxetv.beastwithdraw.commands.admin.subcmd.BWGiveAllCMD;
 import me.mraxetv.beastwithdraw.commands.admin.subcmd.BWGiveCMD;
 import me.mraxetv.beastwithdraw.commands.admin.subcmd.BWDebugCMD;
+import me.mraxetv.beastwithdraw.commands.admin.subcmd.BWDoctorCMD;
 import me.mraxetv.beastwithdraw.commands.admin.subcmd.BWReloadCMD;
 import me.mraxetv.beastwithdraw.commands.admin.subcmd.BWVersionCMD;
 import me.mraxetv.beastwithdraw.utils.Utils;
@@ -24,6 +25,7 @@ public class BeastWithdrawCMD extends CommandBuilder {
         addSubCommand( new BWGiveCMD(this, "give"));
         addSubCommand( new BWGiveAllCMD(this, "giveall"));
         addSubCommand(new BWDebugCMD(this, "debug"));
+        addSubCommand(new BWDoctorCMD(this, "doctor"));
         addSubCommand( new BWReloadCMD(this, "reload"));
         addSubCommand(new BWVersionCMD(this, "version"));
         setHelpSuggestions(getSubCommands().size()); 

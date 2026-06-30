@@ -1,4 +1,16 @@
-##Configuration for BeastWithdraw BeastLifeSteal heart withdraw.
+##==============================================================##
+## BeastLifeSteal heart withdraw type
+##==============================================================##
+## Requires BeastLifeSteal.
+## Main command: /heartwithdraw [amount] [stack] [confirm]
+##
+## Quick edits:
+## - Heart values are integer-only, so Settings.DisableDecimals should stay true.
+## - Change the item look under Settings.Item, Name, Lore, Player, and Server.
+## - Use AllowLethalWithdraw and RequireConfirmOnLethal to control risky withdraws.
+## - Change chat messages under Settings.Messages.
+##
+## Notes store values in NBT. Do not use item-management plugins that strip NBT.
 Settings:
   ##Item material used for the withdrawn heart item.
   Item: "PAPER"
@@ -6,16 +18,15 @@ Settings:
   Data: 0
   ##Simple glow toggle used by BeastWithdraw item builder.
   Glow: false
-  ##Custom model data options for resource pack support.
-  CustomModel:
-    ##Fallback model data when no amount range matches.
-    DefaultModelData: 0
-    AmountModelData:
-      ##Enable amount-based custom model data switching.
-      Enabled: false
-      ##Range list is optional. Leave empty to always use DefaultModelData.
-      Ranges: []
+  ##Custom model data for resource pack support. Works on 1.14+.
+  CustomModelData: 0
+  ##Default item display used when Player or Server does not override it.
+  Name: "<gradient:#ff5a5f:#ff9a44>Heart Satchel</gradient> <gray>(Right-Click)</gray>"
+  Lore:
+    - "<dark_gray>[</dark_gray><gradient:#ff5a5f:#ff9a44>Value</gradient><dark_gray>]</dark_gray> <white>%amount%</white>"
+    - "<gray>Right-click to reclaim your hearts.</gray>"
   ##Display used for player-created heart withdraw items.
+  ##If Player.Name or Player.Lore is missing it inherits Settings.Name or Settings.Lore.
   Player:
     Name: "<gradient:#ff5a5f:#ff9a44>Heart Satchel</gradient> <gray>(Right-Click)</gray>"
     Lore:
@@ -23,6 +34,7 @@ Settings:
       - "<dark_gray>[</dark_gray><gradient:#ff5a5f:#ff9a44>Created By</gradient><dark_gray>]</dark_gray> <#ff9a44>%player%</#ff9a44>"
       - "<gray>Right-click to reclaim your hearts.</gray>"
   ##Display used for admin/server-generated heart items.
+  ##If Server.Name or Server.Lore is missing it inherits Settings.Name or Settings.Lore.
   Server:
     Name: "<gradient:#ff5a5f:#ff9a44>Heart Satchel</gradient> <gray>(Right-Click)</gray>"
     Lore:
@@ -33,6 +45,41 @@ Settings:
   CustomName: "<gradient:#ff5a5f:#ff9a44>Heart Satchel</gradient> <gray>x%amount%</gray>"
   ##Optional Bukkit item flags.
   Flags: []
+  ##Full note item overrides by amount.
+  ##Missing values inherit from the main Settings section above.
+  ##You can override Item, Data, CustomModelData, Glow, SkullTexture, CustomName, Flags, Enchants, Name, Lore, Player, Server, and Sounds.
+  ##If a range sets Name or Lore, that value is used for both player-created and server/admin-created notes
+  ##unless that same range also sets Player.Name, Server.Name, Player.Lore, or Server.Lore.
+  ##To intentionally remove inherited values use explicit clear values:
+  ##  CustomModelData: CLEAR
+  ##  Data: CLEAR
+  ##  SkullTexture: ""
+  ##  CustomName: ""
+  ##  Name: ""
+  ##  Lore: []
+  ##  Flags: []
+  ##  Enchants: {}
+  ##  Glow: false
+  ##  Sounds:
+  ##    Redeem:
+  ##      Enabled: false
+  AmountOverrides:
+    Enabled: false
+    ##Id is optional, but recommended for every range.
+    ##Admins can force a named override regardless of amount with:
+    ##/BeastWithdraw give <player> <id> <amount> [stack] [tax] [signer] -override <Id>
+    ##/BeastWithdraw giveAll <id> <amount> [stack] [tax] [signer] -override <Id>
+    ##Example: forcing Id: large applies this visual even to a 1.0 or 100.0 heart note.
+    Ranges:
+      - Id: large
+        min: 10.0
+        max: 49.0
+        CustomModelData: 10
+        Name: "<gradient:#ff5a5f:#ff9a44>Large Heart Satchel</gradient> <gray>(Right-Click)</gray>"
+      - Id: premium
+        min: 50.0
+        CustomModelData: 20
+        CustomName: "<gradient:#ff5a5f:#ff9a44>Premium Heart Satchel</gradient> <gray>x%amount%</gray>"
   ##Base minimum withdraw amount allowed by the generic BeastWithdraw validator.
   Min: 1
   ##Base maximum withdraw amount allowed by the generic BeastWithdraw validator.
@@ -78,8 +125,7 @@ Settings:
       ##Also write BeastLifeSteal into its own file: plugins/BeastWithdraw/Logs/BeastLifeSteal/latest.log.
       ##This works together with the main config and does not replace the optional Combined log file.
       Enabled: false
-  ##Main permission checked by /heartwithdraw, /withdrawheart and /blswithdraw.
-  Permission: "beastlifesteal.withdraw"
+  ##If the command is run without amount, this value is used.
   ##Amount used when the player runs the command with no number.
   DefaultAmount: 1
   ##If false, any withdraw that would eliminate the player is blocked.
@@ -92,13 +138,33 @@ Settings:
   CheckInventorySpace: true
   ##NBT key holding the per-item redeem value for BeastWithdraw's redeem listener.
   NBTKey: "bLifeStealHeart"
-  ##Aliases for the main command label /heartwithdraw.
+  ##Regular withdraw command: /heartwithdraw [amount] [stack] [confirm]
+  ##Hardcoded permission: BeastWithdraw.heartwithdraw.Withdraw
+  ##Aliases for /heartwithdraw.
   Aliases: [ withdrawheart, blswithdraw ]
-  ##All feature-specific messages for heart withdraw.
+  ##Optional item required before a player can create withdraw notes.
+  ##This applies to the regular withdraw command and to the withdraw GUI input slots.
+  RequiredItem:
+    ##Set OverrideGlobal true to make this section override withdraw-settings.yml -> RequiredItem.
+    OverrideGlobal: false
+    Enabled: false
+    Consume: true
+    Amount: 1
+    AmountPerNote: true
+    Match:
+      Material: PAPER
+      # Data: 0
+      DisplayName: ""
+      RequireDisplayName: false
+      Lore: []
+      RequireLore: false
+      CustomModelData: 0
+      RequireCustomModelData: false
   Messages:
-    ##Value prefix/suffix formatting used by BeastWithdraw placeholders.
-    Prefix: ""
-    Suffix: " &4❤"
+    ##Symbol and format used by formatted amount placeholders such as %amount%, %balance%, %fee%, and %stacked-amount%.
+    ##Format placeholders: %symbol%, %amount%, and %amount_raw%.
+    CurrencySymbol: ""
+    Format: "%symbol%%amount% &4❤"
     ##Shown if the player runs the command without arguments.
     Help: "%prefix% &2You have %balance% &e(Use /heartwithdraw <hearts> <notes> confirm)"
     PlayerOnly: "%prefix% &cOnly players can use this command."
@@ -122,4 +188,22 @@ Settings:
       NotEnough: "%prefix% &cYou need %fee% to pay the fee for this transaction!"
       TakenFee: "%prefix% &eYou paid %fee% fee for this transaction!"
 ##Internal config version for auto-update checks.
-ConfigVersion: 1.1
+WithdrawGUI:
+  ##Optional per-type direct GUI command and per-type GUI overrides.
+  ##The main /withdrawmenu can still show this type even when this section is disabled.
+  Enabled: false
+  ##Direct GUI command: /heartwithdrawgui
+  ##Hardcoded permission: BeastWithdraw.heartwithdraw.WithdrawGui.Use
+  Command:
+    Enabled: false
+    Name: "heartwithdrawgui"
+    Aliases:
+      - "heartgui"
+      - "beastlifestealgui"
+  GUI:
+    Title: "<gradient:#ffd86b:#71e7ff>Heart Withdraw</gradient>"
+    ##Uncomment any GUI section here to override withdraw-settings.yml only for this type.
+    # Size: 54
+    # RequiredItemSlots: [29, 30, 31]
+    # CloseAfterWithdraw: false
+ConfigVersion: 2.3

@@ -11,3 +11,8 @@
   - logging or storage paths
 - Prefer short YAML entries with exact command names, permission nodes, and config paths.
 - Treat `FEATURE_TRACKER.yml` as the source file for later wiki preparation.
+
+## Verification
+
+- After changing code, run `mvn package` from the repository root/main pom before finishing the task.
+- Report the build result in the final response.

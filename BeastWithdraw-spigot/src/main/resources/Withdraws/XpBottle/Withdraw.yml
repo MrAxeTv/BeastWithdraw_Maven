@@ -1,8 +1,18 @@
-##Configuration for BeastWithdraw by MrAxeTv
-##Notic all values of withdraw amount are stored as NBT data on items so make sure other plugins for storing items have support for storing NBT data.
-##This file controls the XP bottle asset used by /xpbottle and its aliases.
-##--------------------------------------------------------------------------------------------------------##
-##Expiriance bottle xp storing.
+##==============================================================##
+## XpBottle withdraw type
+##==============================================================##
+## No external dependency. Stores a player's raw experience points in notes.
+## Main command: /xpbottle <amount|all|levelsL> [stack]
+## Example: /xpbottle 500 3 creates 3 bottles worth 500 XP each.
+## Example: /xpbottle 10L converts 10 levels into XP value.
+##
+## Quick edits:
+## - XP is integer-only, so Settings.DisableDecimals should stay true.
+## - Change the note item look under Settings.Item, Name, Lore, Player, and Server.
+## - Change min/max/stack limits under Settings.Min, Max, and MaxStackSize.
+## - Change redeem tax under Settings.Tax.Percentage.
+##
+## Notes store values in NBT. Do not use item-management plugins that strip NBT.
 Settings:
   ##Set which item you want to use for Xp Withdraw.
   ##Even if u changed to new item the old withdrawn items by player will be usable because of NBT  data storing.
@@ -19,27 +29,16 @@ Settings:
   #https://minecraft-heads.com/custom-heads/head/120999-void-monster copy  "Value" section for skin of head and paste it in SkullTexture
   #You can use %player% or just type  name of player you want
   #SkullTexture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZmVhNTdlOWVkOWFmODZlZjc4NWVmZDUwZmY2ODQyMmNlYWZlOTlkZDIwM2Y1MTFjMGIxNTliNjE3ZTkyMTAxOSJ9fX0="
-  CustomModel:
-    # Default model for note items that don't match any range (e.g. < 100.0)
-    DefaultModelData: 0
-    # Custom model data for different ranges
-    #Enable this to have different model data on notes based on amount
-    AmountModelData:
-      Enabled: false
-      # Ranges are float/double-based
-      # First example all notes between 100.0 and 999.99 will have model data 1
-      # Second example all notes between 1000.0 and 5000.0 will have model data 2
-      # Third example all notes above 5000.00 will have model data 3
-      Ranges:
-        - min: 100.0
-          max: 999.99
-          model: 1
-        - min: 1000.0
-          max: 5000.0
-          model: 2
-        - min: 5000.00
-          model: 3
+  # Custom model data is supported on 1.14+ versions.
+  CustomModelData: 0
+  ##Default item display used when Player or Server does not override it.
+  Name: "<gradient:#ff4d4d:#5dfdff>Experience Bottle</gradient> <gray>(Throw)</gray>"
+  Lore:
+    - "<dark_gray>[</dark_gray><gradient:#ff4d4d:#5dfdff>Stored XP</gradient><dark_gray>]</dark_gray> <white>%amount%</white>"
+    - "%tax%"
+    - "<gray>Throw or redeem to reclaim the experience.</gray>"
   ##Set up your item display name & lores how do you like.
+  ##If Player.Name or Player.Lore is missing it inherits Settings.Name or Settings.Lore.
   ##This is part of configuration for item which player will get when they withdraw there xp /Xpbottle <xp>.
   Player:
     Name: "<gradient:#ff4d4d:#5dfdff>Experience Bottle</gradient> <gray>(Throw)</gray>"
@@ -50,6 +49,7 @@ Settings:
       - "<gray>Throw or redeem to reclaim the experience.</gray>"
 
   ##This is part of configuration for item withdraw by staff or console /BW give <player> <type> <bottle-amount> <tax> <signer> <-silent>.
+  ##If Server.Name or Server.Lore is missing it inherits Settings.Name or Settings.Lore.
   Server:
     Name: "<gradient:#ff4d4d:#5dfdff>Experience Bottle</gradient> <gray>(Throw)</gray>"
     Lore:
@@ -57,21 +57,68 @@ Settings:
       - "<dark_gray>[</dark_gray><gradient:#ff4d4d:#5dfdff>Prepared By</gradient><dark_gray>]</dark_gray> <#ff8b8b>Thinkerer</#ff8b8b>"
       - "%tax%"
       - "<gray>Throw or redeem to reclaim the experience.</gray>"
-  ##Custo Name is hologram you see when item is dropped on floor, disable by setting empty line ""
+  ##CustomName is the name shown above the dropped item. Set "" to disable it.
   CustomName: "<gradient:#ff4d4d:#5dfdff>XP Bottle</gradient> <gray>x%amount%</gray>"
 
   #Item Flags section you can find full list here https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/inventory/ItemFlag.html
   Flags:
     - "HIDE_ENCHANTS"
+  ##Full note item overrides by amount.
+  ##Missing values inherit from the main Settings section above.
+  ##You can override Item, Data, CustomModelData, Glow, SkullTexture, CustomName, Flags, Enchants, Name, Lore, Player, Server, and Sounds.
+  ##If a range sets Name or Lore, that value is used for both player-created and server/admin-created notes
+  ##unless that same range also sets Player.Name, Server.Name, Player.Lore, or Server.Lore.
+  ##To intentionally remove inherited values use explicit clear values:
+  ##  CustomModelData: CLEAR
+  ##  Data: CLEAR
+  ##  SkullTexture: ""
+  ##  CustomName: ""
+  ##  Name: ""
+  ##  Lore: []
+  ##  Flags: []
+  ##  Enchants: {}
+  ##  Glow: false
+  ##  Sounds:
+  ##    Redeem:
+  ##      Enabled: false
+  AmountOverrides:
+    Enabled: false
+    ##Id is optional, but recommended for every range.
+    ##Admins can force a named override regardless of amount with:
+    ##/BeastWithdraw give <player> <id> <amount> [stack] [tax] [signer] -override <Id>
+    ##/BeastWithdraw giveAll <id> <amount> [stack] [tax] [signer] -override <Id>
+    ##Example: forcing Id: large applies this visual even to a 10.0 or 300.0 note.
+    Ranges:
+      - Id: large
+        min: 1000.0
+        max: 4999.99
+        CustomModelData: 10
+        Name: "<gradient:#ff4d4d:#5dfdff>Large Experience Bottle</gradient> <gray>(Throw)</gray>"
+        Player:
+          Lore:
+            - "<dark_gray>[</dark_gray><gradient:#ff4d4d:#5dfdff>Stored XP</gradient><dark_gray>]</dark_gray> <white>%amount%</white>"
+            - "<dark_gray>[</dark_gray><gradient:#ff4d4d:#5dfdff>Enchanter</gradient><dark_gray>]</dark_gray> <#5dfdff>%player%</#5dfdff>"
+            - "<gray>Large tier player XP bottle.</gray>"
+        Server:
+          Lore:
+            - "<dark_gray>[</dark_gray><gradient:#ff4d4d:#5dfdff>Stored XP</gradient><dark_gray>]</dark_gray> <white>%amount%</white>"
+            - "<dark_gray>[</dark_gray><gradient:#ff4d4d:#5dfdff>Prepared By</gradient><dark_gray>]</dark_gray> <#ff8b8b>Thinkerer</#ff8b8b>"
+            - "<gray>Large tier server XP bottle.</gray>"
+      - Id: premium
+        min: 5000.0
+        CustomModelData: 20
+        CustomName: "<gradient:#ff4d4d:#5dfdff>Premium XP Bottle</gradient> <gray>x%amount%</gray>"
 
   ##Minimum amount which can be withdrawn to bottle.
   Min: 25
   ##Maximum amount which can be withdrawn to bottle.
   Max: 10000
-  ## Max amount of bottle which can be created per execution of command
+  ##Maximum number of bottles that can be created by one command or GUI confirm.
   MaxStackSize: 64
   ##Set amount format
   AmountFormat: "###,##0"
+  ##Experience is stored as whole XP points, so XP bottle withdraws cannot use decimal amounts.
+  DisableDecimals: true
 
   ##Tax will take specified percentage amount when player redeems XpBottle (0.01% to 100% Possible values).
   ##Bypass Tax permission "BeastWithdraw.XpBottle.ByPass.Tax"
@@ -110,7 +157,7 @@ Settings:
 
   ##Charge "Tax" or "Fee" to players when they withdraw XpBottle.
   Charges:
-    ##Fee will charge money when player withdraw's XpBottle.
+    ##Fee charged when a player creates XP bottles.
     ##Bypass Fee permission "BeastWithdraw.XpBottle.ByPass.Fee"
     Fee:
       Enabled: false
@@ -146,16 +193,39 @@ Settings:
   ##Set up procenttage of droped xp in bottle. Min Chance 1 / Max Chance 100 going over it or under it will break plugin!
   DropPercentage: 100
 
-  ##Set up aliases for /Xpbottle command
+  ##Regular withdraw command: /xpbottle <amount|all> [stack]
+  ##Hardcoded permission: BeastWithdraw.XpBottle.Withdraw
+  ##Hardcoded all permission: BeastWithdraw.XpBottle.Withdraw.All
+  ##Aliases for /xpbottle.
   Aliases: [ xpb, beastxpb, bottle ]
 
   ##This is invisible lore name in which is stored amount of xp change the name if you want disable old bottles.
   NBTKey: "bWithdrawXp"
   ##By setting this option to true xp from bottle will be automatically given to player it won't be dropped on floor.
   AutoCollect: true
+  ##Optional item required before a player can create withdraw notes.
+  ##This applies to the regular withdraw command and to the withdraw GUI input slots.
+  RequiredItem:
+    ##Set OverrideGlobal true to make this section override withdraw-settings.yml -> RequiredItem.
+    OverrideGlobal: false
+    Enabled: false
+    Consume: true
+    Amount: 1
+    AmountPerNote: true
+    Match:
+      Material: PAPER
+      # Data: 0
+      DisplayName: ""
+      RequireDisplayName: false
+      Lore: []
+      RequireLore: false
+      CustomModelData: 0
+      RequireCustomModelData: false
   Messages:
-    Prefix: ""
-    Suffix: "&eXP"
+    ##Symbol and format used by formatted amount placeholders such as %amount%, %balance%, %fee%, and %stacked-amount%.
+    ##Format placeholders: %symbol%, %amount%, and %amount_raw%.
+    CurrencySymbol: "&eXP"
+    Format: "%amount%%symbol%"
     NotEnough: "%prefix% &cYou don't have %amount%!&e(XpBalance: %balance%)"
     Help: "%prefix% &2You have %balance% &e(Use /xpBottle <xp>/<all>/<xp>L <note-amount>)"
     Withdraw: "%prefix% &eWithdrawn &b%stack%&7bottles&8: &a+%amount% &e(&7Total: &a%stacked-amount%&e) &8| &7Balance: &b%balance%"
@@ -165,10 +235,28 @@ Settings:
     Max: "%prefix% &cYou can only withdraw a maximum of %max-amount%!"
     NotEnoughLevels: "%prefix% &cYou don't have %amount% levels!"
     RewardReceived: "%prefix% &eYou have received an XP-Bottle with &2%stack%%amount%!"
-    ToBigNumber: "%prefix% &4%amount% is to big number!"
+    ToBigNumber: "%prefix% &4%amount% is too large!"
     MaxStackSize: "%prefix% &cYou can't make stack bigger than %stack% items!"
     Fee:
       NotEnough: "%prefix% &cYou need %fee% points to pay fee for this transaction!"
-      TakenFee: "%prefix% &eYou payed %fee% points fee for this transaction!"
+      TakenFee: "%prefix% &eYou paid %fee% points fee for this transaction!"
 ##--------------------------------------------------------------------------------------------------------##
-ConfigVersion: 1.8
+WithdrawGUI:
+  ##Optional per-type direct GUI command and per-type GUI overrides.
+  ##The main /withdrawmenu can still show this type even when this section is disabled.
+  Enabled: false
+  ##Direct GUI command: /xpbottlewithdrawgui
+  ##Hardcoded permission: BeastWithdraw.XpBottle.WithdrawGui.Use
+  Command:
+    Enabled: false
+    Name: "xpbottlewithdrawgui"
+    Aliases:
+      - "xpgui"
+      - "xpwithdrawgui"
+  GUI:
+    Title: "<gradient:#ffd86b:#71e7ff>XP Bottle Withdraw</gradient>"
+    ##Uncomment any GUI section here to override withdraw-settings.yml only for this type.
+    # Size: 54
+    # RequiredItemSlots: [29, 30, 31]
+    # CloseAfterWithdraw: false
+ConfigVersion: 2.3

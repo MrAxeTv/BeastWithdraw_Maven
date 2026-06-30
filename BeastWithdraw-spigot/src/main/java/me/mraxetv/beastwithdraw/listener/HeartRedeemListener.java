@@ -94,7 +94,8 @@ public class HeartRedeemListener implements Listener {
                 assetHandler.getBalance(player)
         );
 
-        if (assetHandler.getConfig().getBoolean("Settings.Sounds.Redeem.Enabled")) {
+        assetHandler.playConfiguredSound(player, "Redeem", singleAmount, "Heart Withdraw redeem", assetHandler.getAmountOverrideId(item));
+        if (false && assetHandler.getConfig().getBoolean("Settings.Sounds.Redeem.Enabled")) {
             String soundName = assetHandler.getConfig().getString("Settings.Sounds.Redeem.Sound");
             float volume = assetHandler.getConfig().getDouble("Settings.Sounds.Redeem.Volume", 1.0).floatValue();
             float pitch = assetHandler.getConfig().getDouble("Settings.Sounds.Redeem.Pitch", 1.0).floatValue();
@@ -104,7 +105,7 @@ public class HeartRedeemListener implements Listener {
                 player.playSound(player.getLocation(), sound, volume, pitch);
             } catch (Exception ex) {
                 Bukkit.getServer().getConsoleSender().sendMessage(
-                        plugin.getUtils().getPrefix() + "§cBroken sound in Heart Withdraw redeem section!");
+                        plugin.getUtils().getPrefix() + "\u00A7cBroken sound in Heart Withdraw redeem section!");
             }
         }
     }
@@ -183,7 +184,7 @@ public class HeartRedeemListener implements Listener {
         String signer = nbtItem.getString("Signer");
         boolean signed = nbtItem.getBoolean("Signed");
         double tax = nbtItem.getDouble("Tax");
-        return assetHandler.getItem(signer == null ? "" : signer, amount, 1, signed, tax);
+        return assetHandler.getItem(signer == null ? "" : signer, amount, 1, signed, tax, assetHandler.getAmountOverrideId(original));
     }
 
     private void setHeldItem(Player player, boolean offHand, ItemStack replacement) {

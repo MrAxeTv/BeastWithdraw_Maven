@@ -19,6 +19,7 @@ public class BeastLifeStealHandler extends AssetHandler<Integer> {
 
     public BeastLifeStealHandler(BeastWithdrawPlugin pl, String id) {
         super(pl, id, "BeastLifeSteal.yml");
+        removeLegacyWithdrawPermissionConfig();
         this.hook = new BeastLifeStealHook();
         new HeartRedeemListener(pl, this);
         this.heartWithdrawCMD = new HeartWithdrawCMD(pl, this);
@@ -69,5 +70,13 @@ public class BeastLifeStealHandler extends AssetHandler<Integer> {
     @Override
     public WithdrawCMD getWithdrawCMD() {
         return heartWithdrawCMD;
+    }
+
+    private void removeLegacyWithdrawPermissionConfig() {
+        if (!getConfig().contains("Settings.Permission")) {
+            return;
+        }
+        getConfig().remove("Settings.Permission");
+        saveConfig();
     }
 }

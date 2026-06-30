@@ -1,0 +1,372 @@
+[CENTER][ATTACH=full]947073[/ATTACH]
+[SIZE=6][B]BeastWithdraw Plus[/B][/SIZE]
+[SIZE=4][B]Advanced XP, Money, Token, Points, Hearts & mcMMO Withdrawal Plugin[/B][/SIZE][/CENTER]
+
+⭐ [B]BeastWithdraw Plus[/B] is a powerful and highly configurable withdrawal system that lets players convert server balances into physical note items.
+
+Players can withdraw [B]XP, money, BeastTokens currencies, PlayerPoints, BeastLifeSteal hearts, BeastMcMMORedeem credits, and mcMMO skill progress[/B] into redeemable notes or bottles.
+
+All note values are stored safely using [B]NBT data[/B], with full support for custom item names, lore, glow, skull textures, custom model data, taxes, fees, permissions, GUI menus, animations, required items, deposit menus, and transaction logging.
+
+By purchasing [B]BeastWithdraw Plus[/B], you receive the same core experience as the free version, plus the newest premium features, faster updates, priority support, and direct help from the developer.
+
+Your support helps keep BeastWithdraw actively maintained and improved.
+
+Perfect for [B]Survival[/B], [B]Prison[/B], [B]RPG[/B], [B]Lifesteal[/B], [B]mcMMO[/B], and [B]Economy[/B] servers.
+
+[SIZE=5][B]⚠️ Required Dependency[/B][/SIZE]
+❗ BeastWithdraw Plus [B]requires BeastLib[/B] to run.
+
+[B]Download BeastLib:[/B]
+[URL='https://www.spigotmc.org/resources/beastlib.108586/']BeastLib Dependency[/URL]
+
+[SIZE=5][B]✨ Main Features[/B][/SIZE]
+✅ Withdraw [B]XP into XP Bottles[/B]
+✅ Withdraw [B]money into Cash Notes[/B]
+✅ Withdraw [B]BeastTokens currencies[/B] into notes
+✅ Withdraw [B]PlayerPoints[/B] into notes
+✅ Withdraw [B]BeastLifeSteal hearts[/B] into redeemable heart notes
+✅ Withdraw [B]BeastMcMMORedeem credits[/B] into notes
+✅ Withdraw [B]specific mcMMO skill progress[/B] into skill-bound notes
+✅ Redeem [B]single notes[/B] or [B]entire stacks by sneaking[/B]
+✅ Fully configurable [B]withdraw GUI[/B] with amount editor, stack editor, max button, preview item, and confirm button
+✅ Fully configurable [B]deposit GUI[/B] where players place notes and redeem them back into balances
+✅ Optional [B]per-type GUI commands[/B]
+✅ Optional [B]required base item[/B] before players can create notes
+✅ Configurable [B]min/max withdraw limits[/B]
+✅ Permission-based [B]withdraw limits, tax overrides, and note groups[/B]
+✅ Optional [B]redeem tax[/B]
+✅ Optional [B]withdraw fee[/B]
+✅ [B]Formatted values[/B] on item names, lore, GUI buttons, and messages
+✅ Custom note [B]material, name, lore, glow, flags, skull texture, enchants, and custom model data[/B]
+✅ Amount-based [B]item overrides[/B] for resource packs
+✅ Admin-created notes with optional [B]signer, stack size, tax, and forced visual override[/B]
+✅ Safe [B]NBT storage[/B] for note values, note type, amount overrides, and mcMMO skill data
+✅ Blocks [B]crafting, grindstone use, villager trading, and unsafe note usage[/B]
+✅ Configurable [B]withdraw/redeem sounds[/B]
+✅ Configurable [B]GUI click/open sounds[/B]
+✅ GUI open animations: [B]CENTER_OUT, SPIRAL, SNAKE, RANDOM_POP, RAIN[/B], and more
+✅ Drop XP bottles on [B]player death[/B]
+✅ Transaction logging to [B]console, combined files, and per-type log files[/B]
+✅ Config doctor command to help find [B]bad GUI slots, invalid materials, invalid limits, and common config issues[/B]
+✅ Update notifications for free and premium builds
+✅ Readable, documented YAML configs
+✅ Built for serious servers that need [B]flexible, polished, and safe[/B] withdrawal systems
+
+More features are actively being added.
+Suggestions are always welcome!
+
+[SIZE=5][B]📦 Installation[/B][/SIZE]
+1️⃣ Download [B]BeastWithdrawPlus.jar[/B]
+2️⃣ Place it into your [B]/plugins[/B] folder
+3️⃣ Install [B]BeastLib[/B]
+4️⃣ Install any optional supported plugins you want to use
+5️⃣ Restart your server
+
+The plugin will generate its config files automatically.
+
+[SIZE=5][B]🔌 Supported Plugins[/B][/SIZE]
+[B]Required[/B]
+
+[LIST]
+[*][URL='https://www.spigotmc.org/resources/beastlib.108586/']BeastLib[/URL]
+[/LIST]
+
+[B]Optional Integrations[/B]
+
+[LIST]
+[*]Vault
+[*]EssentialsX or any Vault-compatible economy
+[*][URL='https://www.spigotmc.org/resources/beasttokens-custom-currency.20806/']BeastTokens[/URL]
+[*]PlayerPoints
+[*]BeastLifeSteal
+[*]BeastMcMMORedeem
+[/LIST]
+
+[SIZE=5][B]🖥️ GUI System[/B][/SIZE]
+[SIZE=4][B]Withdraw Menu[/B][/SIZE]
+[php]
+/withdrawmenu
+/withdrawgui
+/notewithdraw
+/withdrawnotes
+[/php]
+
+Opens the main withdraw GUI. Players select a note type, adjust the amount, adjust stack size, preview the real note item, and confirm.
+
+[B]The withdraw GUI has two main screens:[/B]
+✅ [B]Withdraw Type Selector[/B] - players choose what they want to withdraw, such as XP, money, BeastTokens, PlayerPoints, hearts, mcMMO credits, or mcMMO skill notes.
+✅ [B]Withdraw Amount Editor[/B] - players choose the currency amount, stack size, max amount, preview the real note item, and confirm the withdraw.
+
+[CENTER][SIZE=4][B]📸 Withdraw Type Selector GUI[/B][/SIZE]
+[COLOR=#ff9900][B]ADD IMAGE HERE:[/B] Upload your withdraw type selector screenshot, then replace this line with the generated Spigot attachment code.[/COLOR]
+[I]Show the first withdraw menu where players pick which note type they want to create.[/I][/CENTER]
+
+[CENTER][SIZE=4][B]📸 Withdraw Amount Editor GUI[/B][/SIZE]
+[COLOR=#ff9900][B]ADD IMAGE HERE:[/B] Upload your withdraw amount editor screenshot, then replace this line with the generated Spigot attachment code.[/COLOR]
+[I]Show the second withdraw menu with amount controls, stack controls, note preview, max button, and confirm button.[/I][/CENTER]
+
+[SIZE=4][B]Deposit Menu[/B][/SIZE]
+[php]
+/depositnotes
+/depositor
+/depositnote
+/deposite
+[/php]
+
+Opens the depositor GUI. Players place BeastWithdraw notes into the GUI and redeem accepted notes back into their balances.
+
+[CENTER][SIZE=4][B]📸 Deposit GUI[/B][/SIZE]
+[COLOR=#ff9900][B]ADD IMAGE HERE:[/B] Upload your deposit GUI screenshot, then replace this line with the generated Spigot attachment code.[/COLOR]
+[I]Show the depositor menu where players place notes into the deposit slots and click the deposit button.[/I][/CENTER]
+
+[B]Both GUIs support:[/B]
+✅ Configurable title, size, buttons, lore, filler items, and slots
+✅ Accepted type filters
+✅ Click sounds
+✅ Open animations
+✅ Empty-slot filler patterns
+✅ Per-type command overrides
+✅ Safe item return when the GUI closes
+
+[SIZE=5][B]🎮 Player Commands[/B][/SIZE]
+[SIZE=4][B]🧪 XP Bottles[/B][/SIZE]
+[php]
+/xpbottle <xp> [stack]
+/xpbottle all [stack]
+/xpbottle <levels>L [stack]
+[/php]
+
+[B]Examples:[/B]
+[php]
+/xpbottle 500 3
+/xpbottle all
+/xpbottle 10L
+[/php]
+
+[SIZE=4][B]💰 Cash Notes[/B][/SIZE]
+[php]
+/cashnote <amount> [stack]
+/cashnote all [stack]
+/withdraw <amount> [stack]
+/withdraw all [stack]
+[/php]
+
+[SIZE=4][B]🪙 BeastTokens Currency Notes[/B][/SIZE]
+BeastWithdraw creates one withdraw command per BeastTokens currency.
+
+[B]Examples:[/B]
+[php]
+/tokenswithdraw <amount> [stack]
+/tokenswithdraw all [stack]
+
+/gemswithdraw <amount> [stack]
+/gemswithdraw all [stack]
+[/php]
+
+[SIZE=4][B]⭐ PlayerPoints Notes[/B][/SIZE]
+[php]
+/playerpointsnote <amount> [stack]
+/playerpointsnote all [stack]
+/playerpointswithdraw <amount> [stack]
+/pointswithdraw <amount> [stack]
+[/php]
+
+[SIZE=4][B]❤️ BeastLifeSteal Heart Notes[/B][/SIZE]
+[php]
+/heartwithdraw [amount] [stack] [confirm]
+/withdrawheart [amount] [stack] [confirm]
+/blswithdraw [amount] [stack] [confirm]
+[/php]
+
+[SIZE=4][B]📘 BeastMcMMORedeem Credit Notes[/B][/SIZE]
+[php]
+/mcmmocreditwithdraw <amount> [stack]
+/mcmmocreditwithdraw all [stack]
+[/php]
+
+[SIZE=4][B]⚔️ mcMMO Skill Notes[/B][/SIZE]
+[php]
+/mcmmocreditwithdraw <skill> <amount> [stack]
+/mcmmocreditwithdraw <skill> all [stack]
+[/php]
+
+Creates a note bound to the exact selected mcMMO skill.
+
+[SIZE=5][B]🛠️ Admin Commands[/B][/SIZE]
+[php]
+/beastwithdraw give <player> <type> <amount> [stack] [tax] [signer] [-override <id>] [-s]
+/beastwithdraw giveAll <type> <amount> [stack] [tax] [signer] [-override <id>] [-s]
+/beastwithdraw reload
+/beastwithdraw version
+/beastwithdraw help
+/beastwithdraw doctor
+/beastwithdraw debug
+[/php]
+
+[B]mcMMO skill-note admin syntax:[/B]
+[php]
+/beastwithdraw give <player> mcmmoredeemskillcredits <skill> <amount> [stack] [tax] [signer] [-override <id>] [-s]
+/beastwithdraw giveAll mcmmoredeemskillcredits <skill> <amount> [stack] [tax] [signer] [-override <id>] [-s]
+[/php]
+
+[B]Common note type ids:[/B]
+[php]
+XpBottle
+CashNote
+PlayerPointsNote
+heartwithdraw
+mcmmoredeemcredits
+mcmmoredeemskillcredits
+<beasttokens_currency_id>
+[/php]
+
+[B]BeastTokens examples:[/B]
+[php]
+/beastwithdraw give MrAxeTv tokens 100
+/beastwithdraw give MrAxeTv gems 500
+[/php]
+
+[SIZE=5][B]🔐 Permissions[/B][/SIZE]
+[SIZE=4][B]Withdraw[/B][/SIZE]
+[php]
+BeastWithdraw.XpBottle.Withdraw
+BeastWithdraw.CashNote.Withdraw
+BeastWithdraw.PlayerPointsNote.Withdraw
+BeastWithdraw.heartwithdraw.Withdraw
+BeastWithdraw.McMMORedeemCredits.Withdraw
+BeastWithdraw.<currency_id>.Withdraw
+[/php]
+
+[SIZE=4][B]Withdraw All[/B][/SIZE]
+[php]
+BeastWithdraw.XpBottle.Withdraw.All
+BeastWithdraw.CashNote.Withdraw.All
+BeastWithdraw.PlayerPointsNote.Withdraw.All
+BeastWithdraw.McMMORedeemCredits.Withdraw.All
+BeastWithdraw.<currency_id>.Withdraw.All
+[/php]
+
+[SIZE=4][B]mcMMO Skill Withdraw[/B][/SIZE]
+[php]
+BeastWithdraw.McMMORedeemCredits.Withdraw.Skill
+[/php]
+
+[SIZE=4][B]Redeem[/B][/SIZE]
+[php]
+BeastWithdraw.XpBottle.Redeem
+BeastWithdraw.CashNote.Redeem
+BeastWithdraw.PlayerPointsNote.Redeem
+BeastWithdraw.heartwithdraw.Redeem
+BeastWithdraw.McMMORedeemCredits.Redeem
+BeastWithdraw.<currency_id>.Redeem
+[/php]
+
+[SIZE=4][B]Stacked Redeem[/B][/SIZE]
+[php]
+BeastWithdraw.<type>.Redeem.Stacked
+[/php]
+
+[SIZE=4][B]Bypass Fee / Tax[/B][/SIZE]
+[php]
+BeastWithdraw.<type>.ByPass.Fee
+BeastWithdraw.<type>.ByPass.Tax
+[/php]
+
+[SIZE=4][B]Permission Note Groups[/B][/SIZE]
+[php]
+BeastWithdraw.<type>.PermissionNotes.<group>
+[/php]
+
+Used for permission-based min/max/tax settings.
+
+[SIZE=4][B]GUI Permissions[/B][/SIZE]
+[php]
+BeastWithdraw.WithdrawGui.Use
+BeastWithdraw.Depositor.Use
+
+BeastWithdraw.<type>.WithdrawGui.Use
+BeastWithdraw.<type>.Depositor.Use
+BeastWithdraw.McMMORedeemCredits.Depositor.Skill.Use
+[/php]
+
+[SIZE=4][B]Admin / Utility[/B][/SIZE]
+[php]
+BeastWithdraw.Admin
+BeastWithdraw.admin.debug
+BeastWithdraw.admin.doctor
+[/php]
+
+[SIZE=4][B]XP Death Drops[/B][/SIZE]
+[php]
+BeastWithdraw.XpBottle.Drop
+[/php]
+
+[SIZE=5][B]⚙️ Customization[/B][/SIZE]
+Every note type has its own config folder:
+
+[php]
+plugins/BeastWithdraw/Withdraws/<Type>/Withdraw.yml
+plugins/BeastWithdraw/Withdraws/<Type>/Depositor.yml
+[/php]
+
+[B]You can customize:[/B]
+✅ Item material
+✅ Display name
+✅ Lore
+✅ Glow
+✅ Custom model data
+✅ Skull textures
+✅ Dropped item name
+✅ NBT keys
+✅ Min/max amounts
+✅ Stack limits
+✅ Tax
+✅ Fees
+✅ Sounds
+✅ Messages
+✅ Required item settings
+✅ GUI buttons and slots
+✅ Empty-slot filler patterns
+✅ Open animations
+
+[B]Amount override example use cases:[/B]
+✅ Different model for small, medium, and large notes
+✅ Premium-looking notes above a configured amount
+✅ Custom admin reward notes using [B]-override <id>[/B]
+✅ Resource-pack note tiers without needing separate commands
+
+[SIZE=5][B]🧾 Logging & Safety[/B][/SIZE]
+BeastWithdraw Plus includes transaction logging and safety protections:
+
+✅ Console transaction logs
+✅ Combined log file
+✅ Separate per-type log files
+✅ Log rotation
+✅ Crafting protection
+✅ Villager trade protection
+✅ Grindstone protection
+✅ Safe item return from GUIs
+✅ NBT-based note validation
+✅ Vault transaction verification for cash notes
+✅ BigDecimal-safe cash note storage
+✅ Capacity checks for BeastLifeSteal and BeastMcMMORedeem redemptions
+
+[SIZE=5][B]💎 Why Upgrade To BeastWithdraw Plus?[/B][/SIZE]
+✅ More supported balance types
+✅ Advanced withdraw and deposit GUIs
+✅ Premium integrations like BeastLifeSteal and BeastMcMMORedeem
+✅ mcMMO skill-bound note support
+✅ Amount-based note visuals
+✅ Better configuration tools
+✅ Priority support
+✅ Faster updates
+✅ Direct help from the developer
+
+BeastWithdraw Plus is made for server owners who want a polished, flexible, and future-ready withdrawal system.
+
+[SIZE=5][B]❤️ Support & Community[/B][/SIZE]
+Need help, found a bug, or have a suggestion?
+
+[B]Join our Discord:[/B]
+[URL='https://discord.gg/a2pdAsPS7G']Click here to join Discord[/URL]

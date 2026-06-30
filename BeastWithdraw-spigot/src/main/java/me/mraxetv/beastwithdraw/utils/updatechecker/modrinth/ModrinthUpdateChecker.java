@@ -24,41 +24,42 @@ public class ModrinthUpdateChecker {
     }
 
     public void checkOnceAsync() {
-        Bukkit.getScheduler().runTaskAsynchronously(pl, () -> {
-            try {
-                String url = "https://api.modrinth.com/v2/project/" + projectSlugOrId + "/version";
-                String responseBody = UpdateHttpClient.get(url, pl.getName() + "/" + pl.getDescription().getVersion());
-                if (responseBody == null || responseBody.trim().isEmpty()) return;
+        Bukkit.getScheduler().runTaskAsynchronously(pl, this::checkOnce);
+    }
 
-                JsonArray versions = new JsonParser().parse(responseBody).getAsJsonArray();
-                if (versions.size() == 0) return;
+    public void checkOnce() {
+        try {
+            String url = "https://api.modrinth.com/v2/project/" + projectSlugOrId + "/version";
+            String responseBody = UpdateHttpClient.get(url, pl.getName() + "/" + pl.getDescription().getVersion());
+            if (responseBody == null || responseBody.trim().isEmpty()) return;
 
-                JsonObject latest = null;
-                for (JsonElement element : versions) {
-                    JsonObject candidate = element.getAsJsonObject();
-                    if (latest == null) {
-                        latest = candidate;
-                        continue;
-                    }
+            JsonArray versions = new JsonParser().parse(responseBody).getAsJsonArray();
+            if (versions.size() == 0) return;
 
-                    Instant latestInstant = Instant.parse(latest.get("date_published").getAsString());
-                    Instant candidateInstant = Instant.parse(candidate.get("date_published").getAsString());
-                    if (candidateInstant.isAfter(latestInstant)) {
-                        latest = candidate;
-                    }
+            JsonObject latest = null;
+            for (JsonElement element : versions) {
+                JsonObject candidate = element.getAsJsonObject();
+                if (latest == null) {
+                    latest = candidate;
+                    continue;
                 }
 
-                if (latest == null) return;
-
-                String newest = latest.get("version_number").getAsString();
-                String current = pl.getDescription().getVersion();
-
-                this.latestVersion = newest;
-                this.updateAvailable = isNewer(newest, current);
-
-            } catch (Exception ignored) {
+                Instant latestInstant = Instant.parse(latest.get("date_published").getAsString());
+                Instant candidateInstant = Instant.parse(candidate.get("date_published").getAsString());
+                if (candidateInstant.isAfter(latestInstant)) {
+                    latest = candidate;
+                }
             }
-        });
+
+            if (latest == null) return;
+
+            String newest = latest.get("version_number").getAsString();
+            String current = pl.getDescription().getVersion();
+
+            this.latestVersion = newest;
+            this.updateAvailable = isNewer(newest, current);
+        } catch (Exception ignored) {
+        }
     }
 
     // Returns true if "a" is strictly newer than "b" (e.g. 2.5.8 > 2.5.6)

@@ -18,24 +18,25 @@ public class SpigotPlusUpdateChecker {
     }
 
     public void checkOnceAsync() {
-        Bukkit.getScheduler().runTaskAsynchronously(pl, () -> {
-            try {
-                String url = "https://api.spigotmc.org/legacy/update.php?resource=" + resourceId;
-                String responseBody = UpdateHttpClient.get(url, pl.getName() + "/" + pl.getDescription().getVersion());
-                if (responseBody == null) return;
+        Bukkit.getScheduler().runTaskAsynchronously(pl, this::checkOnce);
+    }
 
-                String newest = responseBody.trim();
-                if (newest.isEmpty()) return;
+    public void checkOnce() {
+        try {
+            String url = "https://api.spigotmc.org/legacy/update.php?resource=" + resourceId;
+            String responseBody = UpdateHttpClient.get(url, pl.getName() + "/" + pl.getDescription().getVersion());
+            if (responseBody == null) return;
 
-                String current = pl.getDescription().getVersion();
+            String newest = responseBody.trim();
+            if (newest.isEmpty()) return;
 
-                this.latestVersion = newest;
-                this.updateAvailable = me.mraxetv.beastwithdraw.utils.updatechecker.modrinth.ModrinthUpdateChecker
-                        .isNewer(newest, current);
+            String current = pl.getDescription().getVersion();
 
-            } catch (Exception ignored) {
-            }
-        });
+            this.latestVersion = newest;
+            this.updateAvailable = me.mraxetv.beastwithdraw.utils.updatechecker.modrinth.ModrinthUpdateChecker
+                    .isNewer(newest, current);
+        } catch (Exception ignored) {
+        }
     }
 
     public boolean isUpdateAvailable() {

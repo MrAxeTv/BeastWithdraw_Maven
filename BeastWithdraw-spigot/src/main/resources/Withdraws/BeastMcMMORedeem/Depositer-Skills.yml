@@ -1,0 +1,73 @@
+##==============================================================##
+## BeastMcMMORedeem skill-note per-type depositor
+##==============================================================##
+## Set Enabled true to register the direct /mcmmoskilldeposit command.
+## This GUI accepts only BeastMcMMORedeem notes bound to a specific mcMMO skill.
+## Normal credit notes use Depositor.yml.
+## The shared /depositnotes GUI is configured in deposit-settings.yml.
+## Slot numbers are 1-based.
+Enabled: false
+##Direct depositor command: /mcmmoskilldeposit
+##Hardcoded permission: BeastWithdraw.McMMORedeemCredits.Depositor.Skill.Use
+Command:
+  Name: "mcmmoskilldeposit"
+  Aliases:
+    - "mcmmoskilldepositor"
+    - "mcmmoskilldepositnotes"
+GUI:
+  Size: 54
+  Title: "<gradient:#8ef6ff:#83ffa6>mcMMO Skill Note Depositor</gradient>"
+  DepositSlots:
+    - 11
+    - 12
+    - 13
+    - 14
+    - 15
+    - 16
+    - 20
+    - 21
+    - 22
+    - 23
+    - 24
+    - 25
+    - 29
+    - 30
+    - 31
+    - 32
+    - 33
+    - 34
+  CloseAfterDeposit: true
+  Items:
+    DepositButton:
+      Enabled: true
+      Slot: 5
+      Material: EXPERIENCE_BOTTLE
+      DisplayName: "&a&lDeposit Skill Notes"
+      DisplayLore:
+        - "&7Place mcMMO skill notes in the open slots."
+        - "&eClick to restore all accepted notes."
+      Glow: true
+    CloseButton:
+      Enabled: true
+      Slot: 50
+      Material: BARRIER
+      DisplayName: "&c&lBack"
+      DisplayLore:
+        - "&7Return all notes and close."
+      Glow: false
+  EmptySlot:
+    Enabled: true
+    Pattern:
+      Type: ALL
+    Items:
+      Dummy_1:
+        Material: LIME_STAINED_GLASS_PANE
+        DisplayName: "&7"
+        DisplayLore: []
+        Glow: false
+      Dummy_2:
+        Material: CYAN_STAINED_GLASS_PANE
+        DisplayName: "&7"
+        DisplayLore: []
+        Glow: false
+ConfigVersion: 1.1

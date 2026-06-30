@@ -124,7 +124,12 @@ public class CashNoteHandler extends AssetHandler<BigDecimal> {
 
     @Override
     public ItemStack getItem(String owner, double value, int amount, boolean signed, double tax) {
-        ItemStack itemStack = super.getItem(owner, value, amount, signed, tax);
+        return getItem(owner, value, amount, signed, tax, null);
+    }
+
+    @Override
+    public ItemStack getItem(String owner, double value, int amount, boolean signed, double tax, String amountOverrideId) {
+        ItemStack itemStack = super.getItem(owner, value, amount, signed, tax, amountOverrideId);
         NBTItem nbtItem = new NBTItem(itemStack);
         nbtItem.setString(getExactAmountKey(), normalize(BigDecimal.valueOf(value), RoundingMode.DOWN).toPlainString());
         return nbtItem.getItem();

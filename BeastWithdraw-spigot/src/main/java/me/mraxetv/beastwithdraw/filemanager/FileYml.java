@@ -12,6 +12,7 @@ public class FileYml {
     private final JavaPlugin pl;
     private final String name;
     private final boolean autoUpdate;
+    private final boolean newFile;
     private YamlDocument config;
 
     public FileYml(JavaPlugin plugin, String n) {
@@ -22,6 +23,7 @@ public class FileYml {
         this.pl = plugin;
         this.name = n;
         this.autoUpdate = autoUpdate;
+        this.newFile = !new File(plugin.getDataFolder(), n).exists();
         loadConfig();
     }
 
@@ -39,6 +41,10 @@ public class FileYml {
 
     public File getFile() {
         return config.getFile();
+    }
+
+    public boolean isNewFile() {
+        return newFile;
     }
 
     public void saveConfig() {

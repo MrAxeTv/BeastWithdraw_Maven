@@ -28,6 +28,9 @@ implements Listener {
 
 
 	public String getPrefix() {
+		if (BeastWithdrawPlugin.getInstance() == null || BeastWithdrawPlugin.getInstance().getMessages() == null) {
+			return "&7[&4Beast&bWithdraw&7] ";
+		}
 		return BeastWithdrawPlugin.getInstance().getMessages().getString("Prefix");
 
 	}
@@ -90,4 +93,3 @@ implements Listener {
     }
 
 }
-

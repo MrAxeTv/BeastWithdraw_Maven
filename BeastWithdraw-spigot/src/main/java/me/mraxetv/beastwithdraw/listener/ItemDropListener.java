@@ -3,6 +3,7 @@ package me.mraxetv.beastwithdraw.listener;
 import me.mraxetv.beastlib.lib.nbtapi.NBTItem;
 import me.mraxetv.beastwithdraw.BeastWithdrawPlugin;
 import me.mraxetv.beastwithdraw.managers.AssetHandler;
+import me.mraxetv.beastwithdraw.managers.assets.BeastMcMMORedeemHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Item;
@@ -31,11 +32,30 @@ public class ItemDropListener implements Listener {
         if (!nbtItem.hasTag("RedeemType")) return;
 
         String type = nbtItem.getString("RedeemType").toLowerCase();
-        AssetHandler assetHandler = pl.getWithdrawManager().getAssetHandler(type);
 
-        if(assetHandler.getConfig().contains("Settings.CustomName")){
-            String hologram = assetHandler.getConfig().getString("Settings.CustomName");
-            hologram = hologram.replace("%amount%",assetHandler.formatWithPreSuffix(nbtItem.getDouble(assetHandler.getNbtTag())));
+        AssetHandler assetHandler = pl.getWithdrawManager().getAssetHandler(type);
+        if (assetHandler == null) return;
+        if (!nbtItem.hasKey(assetHandler.getNbtTag())) return;
+
+        double amount = nbtItem.getDouble(assetHandler.getNbtTag());
+        String amountOverrideId = assetHandler.getAmountOverrideId(e.getItemDrop().getItemStack());
+        String customName = assetHandler.getCustomNameFor(amount, amountOverrideId);
+        if(customName != null && !customName.trim().isEmpty()){
+            String hologram;
+            if (assetHandler instanceof BeastMcMMORedeemHandler) {
+                BeastMcMMORedeemHandler mcMMOHandler = (BeastMcMMORedeemHandler) assetHandler;
+                String skillName = mcMMOHandler.getSkillName(e.getItemDrop().getItemStack());
+                if (skillName != null) {
+                    hologram = assetHandler.applyRawNotePlaceholders(customName, e.getPlayer().getName(), amount, 0);
+                    hologram = mcMMOHandler.applySkillPlaceholders(hologram, skillName, e.getPlayer());
+                } else {
+                    hologram = assetHandler.applyNotePlaceholders(customName, e.getPlayer().getName(), amount, 0);
+                    hologram = assetHandler.applyPlaceholders(hologram, e.getPlayer());
+                }
+            } else {
+                hologram = assetHandler.applyNotePlaceholders(customName, e.getPlayer().getName(), amount, 0);
+                hologram = assetHandler.applyPlaceholders(hologram, e.getPlayer());
+            }
 
             hologram = pl.getUtils().setPlaceholders(e.getPlayer(), hologram);
 
@@ -45,8 +65,13 @@ public class ItemDropListener implements Listener {
             e.getItemDrop().setCustomNameVisible(true);
 
             //Set glow color
-            if(assetHandler.getConfig().getBoolean("Settings.Glow.Enabled") && assetHandler.getConfig().contains("Settings.Glow.Color"))
-                setGlowColor( e.getItemDrop(),ChatColor.valueOf(assetHandler.getConfig().getString("Settings.Glow.Color")));
+            String glowColor = assetHandler.getGlowColor(amount, amountOverrideId);
+            if(assetHandler.isGlowEnabled(amount, amountOverrideId) && glowColor != null && !glowColor.trim().isEmpty()) {
+                try {
+                    setGlowColor(e.getItemDrop(), ChatColor.valueOf(glowColor.toUpperCase()));
+                } catch (IllegalArgumentException ignored) {
+                }
+            }
 
         }
 
